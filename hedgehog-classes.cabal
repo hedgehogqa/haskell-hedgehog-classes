@@ -1,0 +1,89 @@
+cabal-version:       2.0
+name:                hedgehog-classes
+version:             0.0.0
+synopsis:            Hedgehog will eat your typeclass bugs
+description:         Hedgehog will eat your typeclass bugs
+homepage:            https://github.com/chessai/hedgehog-classes
+bug-reports:         https://github.com/chessai/hedgehog-classes/issues
+license:             BSD3
+license-file:        LICENSE
+author:              chessai
+maintainer:          chessai1996@gmail.com
+copyright:           2019 chessai
+category:            Testing
+build-type:          Simple
+extra-doc-files:     README.md
+                   , CHANGELOG.md
+tested-with:         GHC == 8.2.2, GHC == 8.4.4, GHC == 8.6.3
+
+source-repository head
+  type:                git
+  location:            https://github.com/chessai/hedgehog-classes.git
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     HedgehogClasses
+                       
+
+  build-depends:       base >= 4.10.1.0 && < 4.13
+                     
+
+  ghc-options:         -Wall
+                       -Wall
+                       -Werror
+
+  default-language:    Haskell2010
+
+executable hedgehog-classes
+  hs-source-dirs:      app
+  main-is:             Main.hs
+
+  build-depends:       base >= 4.10.1.0 && < 4.13
+                     , hedgehog-classes
+                     
+
+  ghc-options:         -Wall
+                       -threaded
+                       -rtsopts
+                       -with-rtsopts=-N
+                       -Wall
+                       -Werror
+
+  default-language:    Haskell2010
+
+test-suite hedgehog-classes-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+
+  build-depends:       base >= 4.10.1.0 && < 4.13
+                     , hedgehog-classes
+                     
+
+  ghc-options:         -Wall
+                       -threaded
+                       -rtsopts
+                       -with-rtsopts=-N
+                       -Wall
+                       -Werror
+
+  default-language:    Haskell2010
+
+benchmark hedgehog-classes-benchmark
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      benchmark
+  main-is:             Main.hs
+
+  build-depends:       base >= 4.10.1.0 && < 4.13
+                     , gauge
+                     , hedgehog-classes
+                     
+
+  ghc-options:         -Wall
+                       -threaded
+                       -rtsopts
+                       -with-rtsopts=-N
+                       -Wall
+                       -Werror
+
+  default-language:    Haskell2010
