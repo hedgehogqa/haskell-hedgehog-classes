@@ -19,7 +19,7 @@ showShowsPrecZero gen = property $ do
 
 equivarianceShowsPrec :: forall a. (Show a) => Gen a -> Property
 equivarianceShowsPrec gen = property $ do
-  p <- forAll genShowReadPrecedences
+  p <- forAll genShowReadPrecedence
   a <- forAll gen
   r <- forAll genSmallString
   s <- forAll genSmallString

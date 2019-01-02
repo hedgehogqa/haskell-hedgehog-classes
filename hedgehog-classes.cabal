@@ -60,6 +60,7 @@ library
     Hedgehog.Classes.Ord
     Hedgehog.Classes.Semigroup
     Hedgehog.Classes.Show
+    Hedgehog.Classes.ShowRead
   build-depends:
       base >= 4.10.1.0 && < 4.13
     , hedgehog >= 0.6 && < 0.7

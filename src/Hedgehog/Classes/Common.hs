@@ -3,7 +3,7 @@ module Hedgehog.Classes.Common
   
   , hLessThan, hGreaterThan
 
-  , genSmallList, genShowReadPrecedences, genSmallString
+  , genSmallList, genShowReadPrecedence, genSmallString
   ) where
 
 import Hedgehog
@@ -28,8 +28,8 @@ genSmallString = Gen.string (Range.linear 0 10) Gen.ascii
 -- read instances have to accept this range. According to the Haskell Language
 -- Report, the output of derived show instances in precedence context 11 has to
 -- be an atomic expression.
-genShowReadPrecedences :: Gen Int
-genShowReadPrecedences = Gen.element [0..11]
+genShowReadPrecedence :: Gen Int
+genShowReadPrecedence = Gen.element [0..11]
 
 -- | Fails the test if the right argument is less than or equal to the left.
 -- see https://github.com/hedgehogqa/haskell-hedgehog/pull/196 
