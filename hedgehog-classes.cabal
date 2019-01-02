@@ -1,7 +1,10 @@
-cabal-version:       2.0
-name:                hedgehog-classes
-version:             0.0.0
-synopsis:            Hedgehog will eat your typeclass bugs
+cabal-version: 2.0
+name: 
+  hedgehog-classes
+version:
+  0.0.0
+synopsis:
+  Hedgehog will eat your typeclass bugs
 description:
   This library provides Hedgehog properties to ensure
   that typeclass instances adhere to the set of laws
@@ -10,25 +13,41 @@ description:
   This library differs from other solutions by not introducing any
   new typeclasses that the user needs to learn, and otherwise minimal
   API overhead.
-homepage:            https://github.com/chessai/hedgehog-classes
-bug-reports:         https://github.com/chessai/hedgehog-classes/issues
-license:             BSD3
-license-file:        LICENSE
-author:              chessai
-maintainer:          chessai1996@gmail.com
-copyright:           2019 chessai
-category:            Testing
-build-type:          Simple
-extra-doc-files:     README.md
-                   , CHANGELOG.md
-tested-with:         GHC == 8.2.2, GHC == 8.4.4, GHC == 8.6.3
+  .
+  This library is directly inspired by `quickcheck-classes`.
+homepage:
+  https://github.com/chessai/hedgehog-classes
+bug-reports:
+  https://github.com/chessai/hedgehog-classes/issues
+license:
+  BSD3
+license-file:
+  LICENSE
+author:
+  chessai
+maintainer:
+  chessai1996@gmail.com
+copyright:
+  2019 chessai
+category:
+  Testing
+build-type:
+  Simple
+extra-doc-files:
+    README.md
+  , CHANGELOG.md
+tested-with:
+    GHC == 8.2.2
+  , GHC == 8.4.4
+  , GHC == 8.6.3
 
 source-repository head
   type:                git
   location:            https://github.com/chessai/hedgehog-classes.git
 
 library
-  hs-source-dirs:      src
+  hs-source-dirs:
+    src
   exposed-modules:
     Hedgehog.Classes
   other-modules:
@@ -40,13 +59,15 @@ library
     Hedgehog.Classes.Monoid
     Hedgehog.Classes.Ord
     Hedgehog.Classes.Semigroup
-  
-  build-depends:       base >= 4.10.1.0 && < 4.13, hedgehog >= 0.6 && < 0.7
-
-  ghc-options:         -Wall
-                       -Werror
-
-  default-language:    Haskell2010
+    Hedgehog.Classes.Show
+  build-depends:
+      base >= 4.10.1.0 && < 4.13
+    , hedgehog >= 0.6 && < 0.7
+  ghc-options:
+    -Wall
+    -Werror
+  default-language:
+    Haskell2010
 
 --test-suite hedgehog-classes-test
 --  type:                exitcode-stdio-1.0
