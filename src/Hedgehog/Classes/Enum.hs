@@ -1,39 +1,40 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Hedgehog.Classes.Eq (eqLaws) where
+module Hedgehog.Classes.Enum (enumLaws, boundedEnumLaws) where
 
 import Hedgehog
 import Hedgehog.Classes.Common
 
-eqLaws :: (Eq a, Show a) => Gen a -> Laws
-eqLaws gen = Laws "Eq"
-  [ ("Transitive", eqTransitive gen)
-  , ("Symmetric", eqSymmetric gen)  
-  , ("Reflexive", eqReflexive gen) 
+import qualified Hedgehog.Gen as Gen
+
+enumLaws :: (Enum a, Eq a, Show a) => Gen a -> Laws
+enumLaws gen = Laws "Enum"
+  [ ("Succ Pred Identity", succPredIdentity gen)
+  , ("Pred Succ Identity", predSuccIdentity gen)
   ]
 
-eqTransitive :: forall a. (Eq a, Show a) => Gen a -> Property
-eqTransitive gen = property $ do
-  a <- forAll gen
-  b <- forAll gen
-  c <- forAll gen
-  case a == b of
-    True -> case b == c of
-      True -> a === c
-      False -> a /== c
-    False -> case b == c of
-      True -> a /== c
-      False -> success
+boundedEnumLaws :: (Bounded a, Enum a, Eq a, Show a) => Gen a -> Laws
+boundedEnumLaws gen = Laws "Bounded Enum"
+  [ ("Succ Pred Identity", succPredBoundedIdentity gen)
+  , ("Pred Succ Identity", predSuccBoundedIdentity gen)
+  ]
 
-eqSymmetric :: forall a. (Eq a, Show a) => Gen a -> Property
-eqSymmetric gen = property $ do
-  a <- forAll gen
-  b <- forAll gen
-  case a == b of
-    True -> b === a
-    False -> b /== a
+succPredIdentity :: forall a. (Enum a, Eq a, Show a) => Gen a -> Property
+succPredIdentity gen = property $ do
+  x <- forAll gen
+  succ (pred x) === x
 
-eqReflexive :: forall a. (Eq a, Show a) => Gen a -> Property
-eqReflexive gen = property $ do
-  a <- forAll gen
-  a === a
+predSuccIdentity :: forall a. (Enum a, Eq a, Show a) => Gen a -> Property
+predSuccIdentity gen = property $ do
+  x <- forAll gen
+  pred (succ x) === x
+
+succPredBoundedIdentity :: forall a. (Bounded a, Enum a, Eq a, Show a) => Gen a -> Property
+succPredBoundedIdentity gen = property $ do
+  x <- forAll $ Gen.filter (/= minBound) gen
+  succ (pred x) === x
+
+predSuccBoundedIdentity :: forall a. (Bounded a, Enum a, Eq a, Show a) => Gen a -> Property
+predSuccBoundedIdentity gen = property $ do
+  x <- forAll $ Gen.filter (/= maxBound) gen
+  pred (succ x) === x

@@ -34,6 +34,7 @@ library
   other-modules:
     Hedgehog.Classes.Bits
     Hedgehog.Classes.Common
+    Hedgehog.Classes.Enum
     Hedgehog.Classes.Eq
     Hedgehog.Classes.Integral
     Hedgehog.Classes.Monoid
