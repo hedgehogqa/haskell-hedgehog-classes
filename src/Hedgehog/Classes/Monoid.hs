@@ -4,8 +4,6 @@ module Hedgehog.Classes.Monoid (monoidLaws, commutativeMonoidLaws) where
 
 import Hedgehog
 import Hedgehog.Classes.Common
-import qualified Hedgehog.Gen as Gen
-import qualified Hedgehog.Range as Range
 
 monoidLaws :: (Eq a, Monoid a, Show a) => Gen a -> Laws
 monoidLaws gen = Laws "Monoid"
@@ -22,7 +20,7 @@ commutativeMonoidLaws gen = Laws "Commutative Monoid"
 
 monoidConcatenation :: forall a. (Eq a, Monoid a, Show a) => Gen a -> Property
 monoidConcatenation gen = property $ do
-  as <- forAll $ Gen.list (Range.linear 0 6) gen
+  as <- forAll $ genSmallList gen
   mconcat as === foldr mappend mempty as
 
 monoidAssociative :: forall a. (Eq a, Monoid a, Show a) => Gen a -> Property
