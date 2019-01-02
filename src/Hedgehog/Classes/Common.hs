@@ -3,7 +3,7 @@ module Hedgehog.Classes.Common
   
   , hLessThan, hGreaterThan
 
-  , genSmallList, genShowReadPrecedence, genSmallString
+  , genSmallList, genSmallNonEmptyList, genShowReadPrecedence, genSmallString
   ) where
 
 import Hedgehog
@@ -16,6 +16,9 @@ data Laws = Laws
   { lawsTypeClass :: String
   , lawsProperties :: [(String, Property)]
   }
+
+genSmallNonEmptyList :: Gen a -> Gen [a]
+genSmallNonEmptyList gen = Gen.list (Range.linear 1 7) gen
 
 genSmallList :: Gen a -> Gen [a]
 genSmallList gen = Gen.list (Range.linear 0 6) gen
