@@ -1,0 +1,1 @@
+module Hedgehog.Classes () where
