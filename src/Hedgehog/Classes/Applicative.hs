@@ -75,11 +75,3 @@ applicativeLiftA2_1 gen = property $ do
   let f = fmap runQuadraticEquation f'
   (liftA2 id f x) === (f <*> x)
 
---liftedFunction :: (Functor f, Show (f z), 
---applicativeIdentity :: forall f a. (Applicative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
---applicativeIdentity :: forall f a. (Applicative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
---applicativeIdentity :: forall f a. (Applicative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
---applicativeIdentity :: forall f a. (Applicative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
---applicativeIdentity :: forall f a. (Applicative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
---applicativeIdentity :: forall f a. (Applicative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
-

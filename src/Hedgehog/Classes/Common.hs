@@ -1,11 +1,17 @@
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 module Hedgehog.Classes.Common
   ( Laws(..)
   
   , hLessThan, hGreaterThan
 
-  , genSmallList, genSmallNonEmptyList, genShowReadPrecedence, genSmallString, genQuadraticEquation, genSmallInteger
+  , genSmallList, genSmallNonEmptyList, genShowReadPrecedence, genSmallString, genSmallInteger
 
-  , QuadraticEquation(..), runQuadraticEquation
+  , QuadraticEquation(..), runQuadraticEquation, genQuadraticEquation
+  , LinearEquation(..), runLinearEquation, genLinearEquation
+  , LinearEquationM(..), runLinearEquationM, genLinearEquationM
 
   , hackReplace
 
@@ -18,6 +24,7 @@ import Data.Semigroup
 import Hedgehog.Internal.Property
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
+import qualified Data.List as List
 
 data Laws = Laws
   { lawsTypeClass :: String
@@ -84,6 +91,45 @@ genQuadraticEquation = do
 
 runQuadraticEquation :: QuadraticEquation -> Integer -> Integer
 runQuadraticEquation (QuadraticEquation a b c) x = a * x ^ (2 :: Integer) + b * x + c
+
+data LinearEquation = LinearEquation
+  { _linearEquationLinear :: Integer
+  , _linearEquationConstant :: Integer
+  }
+  deriving (Eq)
+
+instance Show LinearEquation where
+  showsPrec _ (LinearEquation a b) = shows a . showString " * x + " . shows b
+  showList xs = appEndo
+    $ mconcat
+    $  [Endo (showChar '[')]
+    ++ List.intersperse (Endo (showChar ',')) (map (Endo . showsPrec 0) xs)
+    ++ [Endo (showChar ']')]
+
+runLinearEquation :: LinearEquation -> Integer -> Integer
+runLinearEquation (LinearEquation a b) x = a * x + b
+
+genLinearEquation :: Gen LinearEquation
+genLinearEquation = LinearEquation <$> genSmallInteger <*> genSmallInteger
+
+data LinearEquationM m = LinearEquationM (m LinearEquation) (m LinearEquation)
+
+deriving instance (forall x. Eq x => Eq (m x)) => Eq (LinearEquationM m)
+
+instance (forall x. Show x => Show (m x)) => Show (LinearEquationM m) where
+  show (LinearEquationM a b) = (\f -> f "")
+    $ showString "\\x -> if odd x then "
+    . showsPrec 0 a
+    . showString " else "
+    . showsPrec 0 b
+
+runLinearEquationM :: Functor m => LinearEquationM m -> Integer -> m Integer
+runLinearEquationM (LinearEquationM e1 e2) i = if odd i
+  then fmap (flip runLinearEquation i) e1
+  else fmap (flip runLinearEquation i) e2
+
+genLinearEquationM :: Applicative m => Gen (LinearEquationM m)
+genLinearEquationM = LinearEquationM <$> (pure <$> genLinearEquation) <*> (pure <$> genLinearEquation)
 
 hackReplace :: (Functor f) => Gen b -> Gen (f a) -> Gen (f b)
 hackReplace genb genfa = do
