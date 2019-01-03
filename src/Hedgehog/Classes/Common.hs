@@ -3,7 +3,11 @@ module Hedgehog.Classes.Common
   
   , hLessThan, hGreaterThan
 
-  , genSmallList, genSmallNonEmptyList, genShowReadPrecedence, genSmallString
+  , genSmallList, genSmallNonEmptyList, genShowReadPrecedence, genSmallString, genQuadraticEquation, genSmallInteger
+
+  , QuadraticEquation(..), runQuadraticEquation
+
+  , hackReplace
   ) where
 
 import Hedgehog
@@ -16,6 +20,9 @@ data Laws = Laws
   { lawsTypeClass :: String
   , lawsProperties :: [(String, Property)]
   }
+
+genSmallInteger :: Gen Integer
+genSmallInteger = Gen.integral (Range.linear 0 20)
 
 genSmallNonEmptyList :: Gen a -> Gen [a]
 genSmallNonEmptyList gen = Gen.list (Range.linear 1 7) gen
@@ -51,3 +58,34 @@ hGreaterThan x y = do
   if ok
     then success
     else withFrozenCallStack $ failDiff x y
+
+data QuadraticEquation = QuadraticEquation
+  { _quadraticEquationQuadratic :: Integer
+  , _quadraticEquationLinear :: Integer
+  , _quadraticEquationConstant :: Integer
+  }
+  deriving (Eq)
+
+-- This show instance does not actually provide a way
+-- to create an equation. Instead, it makes it look
+-- like a lambda.
+instance Show QuadraticEquation where
+  show (QuadraticEquation a b c) = "\\x -> " ++ show a ++ " * x ^ 2 + " ++ show b ++ " * x + " ++ show c
+
+genQuadraticEquation :: Gen QuadraticEquation
+genQuadraticEquation = do
+  a <- Gen.integral (Range.linear 0 15)
+  b <- Gen.integral (Range.linear 0 15)
+  c <- Gen.integral (Range.linear 0 15)
+  pure (QuadraticEquation a b c)
+
+runQuadraticEquation :: QuadraticEquation -> Integer -> Integer
+runQuadraticEquation (QuadraticEquation a b c) x = a * x ^ (2 :: Integer) + b * x + c
+
+hackReplace :: (Functor f) => Gen b -> Gen (f a) -> Gen (f b)
+hackReplace genb genfa = do
+  b <- genb
+  fmap2 (const b) genfa
+
+fmap2 :: (Functor f, Functor g) => (a -> b) -> f (g a) -> f (g b)
+fmap2 = fmap . fmap

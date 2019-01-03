@@ -52,6 +52,7 @@ library
     Hedgehog.Classes
   other-modules:
     Hedgehog.Classes.Alternative
+    Hedgehog.Classes.Applicative
     Hedgehog.Classes.Bits
     Hedgehog.Classes.Common
     Hedgehog.Classes.Enum
