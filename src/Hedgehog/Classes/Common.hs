@@ -8,10 +8,13 @@ module Hedgehog.Classes.Common
   , QuadraticEquation(..), runQuadraticEquation
 
   , hackReplace
+
+  , func1, func2, func3
   ) where
 
 import Hedgehog
 import GHC.Stack
+import Data.Semigroup
 import Hedgehog.Internal.Property
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
@@ -89,3 +92,12 @@ hackReplace genb genfa = do
 
 fmap2 :: (Functor f, Functor g) => (a -> b) -> f (g a) -> f (g b)
 fmap2 = fmap . fmap
+
+func1 :: Integer -> (Integer, Integer)
+func1 i = (div (i + 5) 3, i * i - 2 * i + 1)
+
+func2 :: (Integer, Integer) -> (Bool, Either Ordering Integer)
+func2 (a,b) = (odd a, if even a then Left (compare a b) else Right (b + 2))
+
+func3 :: Integer -> Sum Integer
+func3 i = Sum (3 * i * i - 7 * i + 4)

@@ -57,6 +57,8 @@ library
     Hedgehog.Classes.Common
     Hedgehog.Classes.Enum
     Hedgehog.Classes.Eq
+    Hedgehog.Classes.Foldable
+    Hedgehog.Classes.Functor
     Hedgehog.Classes.Integral
     Hedgehog.Classes.Monoid
     Hedgehog.Classes.Ord
