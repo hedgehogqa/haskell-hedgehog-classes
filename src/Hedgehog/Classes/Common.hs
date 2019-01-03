@@ -1,17 +1,24 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Hedgehog.Classes.Common
   ( Laws(..)
   
   , hLessThan, hGreaterThan
 
-  , genSmallList, genSmallNonEmptyList, genShowReadPrecedence, genSmallString, genSmallInteger
+  , genSmallList, genSmallNonEmptyList, genShowReadPrecedence, genSmallString, genSmallInteger, genSmallSum
 
   , QuadraticEquation(..), runQuadraticEquation, genQuadraticEquation
   , LinearEquation(..), runLinearEquation, genLinearEquation
   , LinearEquationM(..), runLinearEquationM, genLinearEquationM
+  , LinearEquationTwo(..), runLinearEquationTwo, genLinearEquationTwo
+
+  , ChooseFirst(..), genChooseFirst
+  , ChooseSecond(..), genChooseSecond
+  , LastNothing(..), genLastNothing
+  , Bottom(..), genBottom
 
   , hackReplace
 
@@ -30,6 +37,9 @@ data Laws = Laws
   { lawsTypeClass :: String
   , lawsProperties :: [(String, Property)]
   }
+
+genSmallSum :: Gen (Sum Integer)
+genSmallSum = fmap Sum genSmallInteger
 
 genSmallInteger :: Gen Integer
 genSmallInteger = Gen.integral (Range.linear 0 20)
@@ -131,6 +141,23 @@ runLinearEquationM (LinearEquationM e1 e2) i = if odd i
 genLinearEquationM :: Applicative m => Gen (LinearEquationM m)
 genLinearEquationM = LinearEquationM <$> (pure <$> genLinearEquation) <*> (pure <$> genLinearEquation)
 
+data LinearEquationTwo = LinearEquationTwo
+  { _linearEquationTwoX :: Integer
+  , _linearEquationTwoY :: Integer
+  , _linearEquationTwoConstant :: Integer
+  }
+
+instance Show LinearEquationTwo where
+  show (LinearEquationTwo x y c) = "\\x y -> " ++ show x ++ " * x + " ++ show y ++ " * y + " ++ show c
+
+genLinearEquationTwo :: Gen LinearEquationTwo
+genLinearEquationTwo = LinearEquationTwo <$> absGenInteger <*> absGenInteger <*> absGenInteger
+  where
+    absGenInteger = abs <$> genSmallInteger
+
+runLinearEquationTwo :: LinearEquationTwo -> Integer -> Integer -> Integer
+runLinearEquationTwo (LinearEquationTwo a b c) x y = a * x + b * y + c
+
 hackReplace :: (Functor f) => Gen b -> Gen (f a) -> Gen (f b)
 hackReplace genb genfa = do
   b <- genb
@@ -147,3 +174,44 @@ func2 (a,b) = (odd a, if even a then Left (compare a b) else Right (b + 2))
 
 func3 :: Integer -> Sum Integer
 func3 i = Sum (3 * i * i - 7 * i + 4)
+
+data ChooseFirst = ChooseFirst
+  deriving (Eq)
+
+data ChooseSecond = ChooseSecond
+  deriving (Eq)
+
+data LastNothing = LastNothing
+  deriving (Eq)
+
+data Bottom a = BottomUndefined | BottomValue a
+  deriving (Eq)
+
+instance Show ChooseFirst where
+  show ChooseFirst = "\\a b -> if even a then a else b"
+
+instance Show ChooseSecond where
+  show ChooseSecond = "\\a b -> if even b then a else b"
+
+instance Show LastNothing where
+  show LastNothing = "0"
+
+instance Show a => Show (Bottom a) where
+  show = \case
+    BottomUndefined -> "undefined"
+    BottomValue a   -> show a
+
+genChooseFirst :: Gen ChooseFirst
+genChooseFirst = pure ChooseFirst
+
+genChooseSecond :: Gen ChooseSecond
+genChooseSecond = pure ChooseSecond
+
+genLastNothing :: Gen LastNothing
+genLastNothing = pure LastNothing
+
+genBottom :: Gen a -> Gen (Bottom a)
+genBottom = fmap maybeToBottom . Gen.maybe
+
+maybeToBottom :: Maybe a -> Bottom a
+maybeToBottom = \case { Nothing -> BottomUndefined; Just a -> BottomValue a }
