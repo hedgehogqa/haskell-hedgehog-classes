@@ -61,15 +61,20 @@ library
     Hedgehog.Classes.Functor
     Hedgehog.Classes.Integral
     Hedgehog.Classes.Monad
+    Hedgehog.Classes.MonadPlus
+    Hedgehog.Classes.MonadZip
     Hedgehog.Classes.Monoid
     Hedgehog.Classes.Ord
     Hedgehog.Classes.Semigroup
     Hedgehog.Classes.Show
     Hedgehog.Classes.ShowRead
     Hedgehog.Classes.Storable
+    Hedgehog.Classes.Traversable
   build-depends:
       base >= 4.10.1.0 && < 4.13
     , hedgehog >= 0.6 && < 0.7
+    , containers
+    , transformers
   ghc-options:
     -Wall
     -Werror
