@@ -55,6 +55,7 @@ library
     Hedgehog.Classes.Applicative
     Hedgehog.Classes.Bifunctor
     Hedgehog.Classes.Bits
+    Hedgehog.Classes.Category
     Hedgehog.Classes.Common
     Hedgehog.Classes.Enum
     Hedgehog.Classes.Eq
