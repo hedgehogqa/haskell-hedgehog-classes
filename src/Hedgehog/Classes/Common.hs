@@ -25,7 +25,7 @@ module Hedgehog.Classes.Common
 
   , func1, func2, func3, func4, func5, func6
   
-  , genCompose, genTuple, genSetInteger
+  , genCompose, genTuple, genSetInteger, genIO, showIO
   ) where
 
 import Data.Tuple (swap)
@@ -40,6 +40,7 @@ import Hedgehog.Internal.Property
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import qualified Data.List as List
+import System.IO.Unsafe (unsafePerformIO)
 
 data Laws = Laws
   { lawsTypeClass :: String
@@ -282,3 +283,12 @@ genSetInteger :: Gen (S.Set Integer)
 genSetInteger = do
   xs <- sequence $ fmap (const genSmallInteger) [1..10 :: Integer]
   pure $ foldMap S.singleton xs
+
+genIO :: Gen a -> Gen (IO a)
+genIO gen = fmap pure gen
+
+showIO :: Show a => IO a -> String
+showIO io = unsafePerformIO $ do
+  x <- fmap show io
+  let y = "IO " ++ x
+  pure y
