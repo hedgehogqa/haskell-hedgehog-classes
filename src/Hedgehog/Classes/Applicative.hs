@@ -19,7 +19,7 @@ applicativeLaws gen = Laws "Applicative"
   , ("Homomorphism", applicativeHomomorphism gen)
   , ("Interchange", applicativeInterchange gen)
   , ("LiftA2 Part 1", applicativeLiftA2_1 gen)
-  -- todo: liftA2 part 2, we need an equation of two variables for this
+  , ("LiftA2 Part 2", applicativeLiftA2_2 gen) 
   ]
 
 applicativeIdentity :: forall f.
@@ -73,3 +73,13 @@ applicativeLiftA2_1 fgen = property $ do
   x <- forAll $ fgen genSmallInteger
   let f = fmap runQuadraticEquation f'
   (liftA2 id f x) === (f <*> x)
+
+applicativeLiftA2_2 :: forall f.
+  ( Applicative f
+  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeLiftA2_2 fgen = property $ do
+  x <- forAll $ fgen genSmallInteger
+  y <- forAll $ fgen genSmallInteger
+  let f a b = a * a - b
+  (liftA2 f x y) === (f <$> x <*> y)
