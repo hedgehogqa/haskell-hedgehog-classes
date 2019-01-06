@@ -54,6 +54,7 @@ library
     Hedgehog.Classes.Alternative
     Hedgehog.Classes.Applicative
     Hedgehog.Classes.Arrow
+    Hedgehog.Classes.Bifoldable
     Hedgehog.Classes.Bifunctor
     Hedgehog.Classes.Bits
     Hedgehog.Classes.Category
