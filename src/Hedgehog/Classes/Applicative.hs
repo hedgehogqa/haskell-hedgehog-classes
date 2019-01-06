@@ -1,5 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Hedgehog.Classes.Applicative (applicativeLaws) where
 
@@ -11,8 +12,7 @@ import Hedgehog.Classes.Common
 applicativeLaws ::
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  , Eq a, Show a
-  ) => Gen (f a) -> Laws
+  ) => (forall x. Gen x -> Gen (f x)) -> Laws
 applicativeLaws gen = Laws "Applicative"
   [ ("Identity", applicativeIdentity gen)
   , ("Composition", applicativeComposition gen)
@@ -22,22 +22,21 @@ applicativeLaws gen = Laws "Applicative"
   -- todo: liftA2 part 2, we need an equation of two variables for this
   ]
 
-applicativeIdentity :: forall f a.
+applicativeIdentity :: forall f.
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  , Eq a, Show a
-  ) => Gen (f a) -> Property
-applicativeIdentity gen = property $ do
-  a <- forAll gen
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeIdentity fgen = property $ do
+  a <- forAll $ fgen genSmallInteger
   (pure id <*> a) === a
 
-applicativeComposition :: forall f a.
+applicativeComposition :: forall f.
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => Gen (f a) -> Property
-applicativeComposition gen = property $ do
-  u' <- forAll $ hackReplace genQuadraticEquation gen
-  v' <- forAll $ hackReplace genQuadraticEquation gen
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeComposition fgen = property $ do
+  u' <- forAll $ fgen genQuadraticEquation
+  v' <- forAll $ fgen genQuadraticEquation
   w' <- forAll genSmallInteger
 
   let u = runQuadraticEquation <$> u'
@@ -45,33 +44,32 @@ applicativeComposition gen = property $ do
       w = pure w'
   (pure (.) <*> u <*> v <*> w) === (u <*> (v <*> w))
 
-applicativeHomomorphism :: forall f a.
+applicativeHomomorphism :: forall f.
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => Gen (f a) -> Property
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
 applicativeHomomorphism _ = property $ do
   e <- forAll genQuadraticEquation
   a <- forAll genSmallInteger
   let f = runQuadraticEquation e
   (pure f <*> pure a) === (pure (f a) :: f Integer)
 
-applicativeInterchange :: forall f a.
+applicativeInterchange :: forall f.
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => Gen (f a) -> Property
-applicativeInterchange gen = property $ do
-  u' <- forAll $ hackReplace genQuadraticEquation gen
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeInterchange fgen = property $ do
+  u' <- forAll $ fgen genQuadraticEquation
   y <- forAll genSmallInteger
   let u = fmap runQuadraticEquation u'
   (u <*> pure y) === (pure ($ y) <*> u)
 
-applicativeLiftA2_1 :: forall f a.
+applicativeLiftA2_1 :: forall f.
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => Gen (f a) -> Property
-applicativeLiftA2_1 gen = property $ do
-  f' <- forAll $ hackReplace genQuadraticEquation gen
-  x <- forAll $ hackReplace genSmallInteger gen
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeLiftA2_1 fgen = property $ do
+  f' <- forAll $ fgen genQuadraticEquation
+  x <- forAll $ fgen genSmallInteger
   let f = fmap runQuadraticEquation f'
   (liftA2 id f x) === (f <*> x)
-

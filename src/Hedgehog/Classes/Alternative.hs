@@ -1,4 +1,6 @@
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE RankNTypes            #-}
 
 module Hedgehog.Classes.Alternative (alternativeLaws) where
 
@@ -7,26 +9,38 @@ import Control.Applicative (Alternative(..))
 import Hedgehog
 import Hedgehog.Classes.Common
 
-alternativeLaws :: (Alternative f, Eq (f a), Show (f a)) => Gen (f a) -> Laws
+alternativeLaws ::
+  ( Alternative f
+  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
+  ) => (forall x. Gen x -> Gen (f x)) -> Laws
 alternativeLaws gen = Laws "Alternative"
   [ ("Left Identity", alternativeLeftIdentity gen)
   , ("Right Identity", alternativeRightIdentity gen)
   , ("Associativity", alternativeAssociativity gen)
   ]
-
-alternativeLeftIdentity :: (Alternative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
-alternativeLeftIdentity gen = property $ do
-  a <- forAll gen
+ 
+alternativeLeftIdentity ::
+  ( Alternative f
+  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+alternativeLeftIdentity fgen = property $ do
+  a <- forAll $ fgen genSmallInteger
   (empty <|> a) === a
 
-alternativeRightIdentity :: (Alternative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
-alternativeRightIdentity gen = property $ do
-  a <- forAll gen
+alternativeRightIdentity ::
+  ( Alternative f
+  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+alternativeRightIdentity fgen = property $ do
+  a <- forAll $ fgen genSmallInteger
   a === (empty <|> a)
 
-alternativeAssociativity :: (Alternative f, Eq (f a), Show (f a)) => Gen (f a) -> Property
-alternativeAssociativity gen = property $ do
-  a <- forAll gen
-  b <- forAll gen
-  c <- forAll gen
+alternativeAssociativity ::
+  ( Alternative f
+  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
+  ) => (forall x. Gen x -> Gen (f x)) -> Property
+alternativeAssociativity fgen = property $ do
+  a <- forAll $ fgen genSmallInteger
+  b <- forAll $ fgen genSmallInteger
+  c <- forAll $ fgen genSmallInteger
   (a <|> (b <|> c)) === ((a <|> b) <|> c)
