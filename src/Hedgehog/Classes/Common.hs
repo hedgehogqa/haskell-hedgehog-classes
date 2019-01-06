@@ -25,9 +25,10 @@ module Hedgehog.Classes.Common
 
   , func1, func2, func3, func4, func5, func6
   
-  , genCompose, genTuple, genSetInteger, genIO, showIO
+  , genCompose, genTuple, genTuple3, genSetInteger, genIO, showIO, genInRange, genValidRange
   ) where
 
+import Data.Ix (Ix(..))
 import Data.Tuple (swap)
 import Hedgehog
 import GHC.Stack
@@ -279,6 +280,21 @@ genCompose gen fgen ggen = Compose <$> fgen (ggen gen)
 genTuple :: Gen a -> Gen b -> Gen (a,b)
 genTuple a b = (,) <$> a <*> b
 
+genTuple3 :: Gen a -> Gen b -> Gen c -> Gen (a, b, c)
+genTuple3 gena genb genc = do
+  a <- gena
+  b <- genb
+  c <- genc
+  pure (a, b, c)
+
+genValidRange :: Ix a => Gen a -> Gen (a, a)
+genValidRange gen = do
+  Gen.filter (\(l,u) -> l <= u) (genTuple gen gen)
+
+genInRange :: Ix a => Gen a -> Gen (a, a, a)
+genInRange gen = do
+  Gen.filter (\(l,u,i) -> inRange (l,u) i) (genTuple3 gen gen gen)
+ 
 genSetInteger :: Gen (S.Set Integer)
 genSetInteger = do
   xs <- sequence $ fmap (const genSmallInteger) [1..10 :: Integer]
