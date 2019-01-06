@@ -53,6 +53,7 @@ library
   other-modules:
     Hedgehog.Classes.Alternative
     Hedgehog.Classes.Applicative
+    Hedgehog.Classes.Arrow
     Hedgehog.Classes.Bifunctor
     Hedgehog.Classes.Bits
     Hedgehog.Classes.Category
