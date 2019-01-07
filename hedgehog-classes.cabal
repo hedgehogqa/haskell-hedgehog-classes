@@ -67,6 +67,7 @@ library
     Hedgehog.Classes.Functor
     Hedgehog.Classes.Integral
     Hedgehog.Classes.Ix
+    Hedgehog.Classes.Json
     Hedgehog.Classes.Monad
     Hedgehog.Classes.MonadFix
     Hedgehog.Classes.MonadIO
@@ -82,6 +83,7 @@ library
   build-depends:
       base >= 4.10.1.0 && < 4.13
     , hedgehog >= 0.6 && < 0.7
+    , aeson 
     , containers
     , transformers
   ghc-options:
