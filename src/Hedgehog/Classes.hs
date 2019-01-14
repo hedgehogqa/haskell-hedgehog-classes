@@ -8,10 +8,13 @@
 -}
 module Hedgehog.Classes
   ( -- * Running
-  
+    lawsCheck
+  , lawsCheckOne
+  , lawsCheckMany
+
     -- * Properties
     -- ** Ground types
-    bitsLaws
+  , bitsLaws
   , eqLaws
   , integralLaws
   , monoidLaws
@@ -28,6 +31,8 @@ module Hedgehog.Classes
   , showLaws
   , showReadLaws
   , storableLaws
+  , genericLaws
+  , jsonLaws
 
     -- ** Unary type constructors
   , alternativeLaws
@@ -36,13 +41,13 @@ module Hedgehog.Classes
   , foldableLaws
   , functorLaws
   , monadLaws
-  , monadFixLaws
+--  , monadFixLaws
   , monadIOLaws
   , monadPlusLaws
   , monadZipLaws
   , traversableLaws
 
-   -- ** Binary type constructors
+    -- ** Binary type constructors
   , arrowLaws
   , bifoldableLaws
   , bifoldableFunctorLaws
@@ -50,6 +55,9 @@ module Hedgehog.Classes
   , bitraversableLaws
   , categoryLaws
   , commutativeCategoryLaws
+
+    -- * Types
+  , Laws(..)
   ) where
 
 import Hedgehog.Classes.Alternative (alternativeLaws)
@@ -60,15 +68,17 @@ import Hedgehog.Classes.Bifunctor (bifunctorLaws)
 import Hedgehog.Classes.Bitraversable (bitraversableLaws)
 import Hedgehog.Classes.Bits (bitsLaws)
 import Hedgehog.Classes.Category (categoryLaws, commutativeCategoryLaws)
+import Hedgehog.Classes.Common (lawsCheck, lawsCheckOne, lawsCheckMany, Laws(..))
 import Hedgehog.Classes.Contravariant (contravariantLaws)
 import Hedgehog.Classes.Enum (enumLaws, boundedEnumLaws)
 import Hedgehog.Classes.Eq (eqLaws)
 import Hedgehog.Classes.Foldable (foldableLaws)
 import Hedgehog.Classes.Functor (functorLaws)
+import Hedgehog.Classes.Generic (genericLaws)
 import Hedgehog.Classes.Integral (integralLaws)
 import Hedgehog.Classes.Ix (ixLaws)
+import Hedgehog.Classes.Json (jsonLaws)
 import Hedgehog.Classes.Monad (monadLaws)
-import Hedgehog.Classes.MonadFix (monadFixLaws)
 import Hedgehog.Classes.MonadIO (monadIOLaws)
 import Hedgehog.Classes.MonadPlus (monadPlusLaws)
 import Hedgehog.Classes.MonadZip (monadZipLaws)

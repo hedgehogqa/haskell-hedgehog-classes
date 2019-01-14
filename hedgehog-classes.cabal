@@ -60,6 +60,14 @@ library
     Hedgehog.Classes.Bits
     Hedgehog.Classes.Category
     Hedgehog.Classes.Common
+      Hedgehog.Classes.Common.ApTrans
+      Hedgehog.Classes.Common.Bottom
+      Hedgehog.Classes.Common.Equation
+      Hedgehog.Classes.Common.Func
+      Hedgehog.Classes.Common.Gen
+      Hedgehog.Classes.Common.IO
+      Hedgehog.Classes.Common.Laws
+      Hedgehog.Classes.Common.Property
     Hedgehog.Classes.Contravariant
     Hedgehog.Classes.Enum
     Hedgehog.Classes.Eq
@@ -87,27 +95,54 @@ library
     , hedgehog >= 0.6 && < 0.7
     , aeson 
     , containers
-    , semirings >= 0.3.1.1 
-    , transformers
+    , semirings    ^>= 0.3.1.1 
+    , transformers ^>= 0.5.0.0
   ghc-options:
     -Wall
     -Werror
   default-language:
     Haskell2010
 
---test-suite hedgehog-classes-test
---  type:                exitcode-stdio-1.0
---  hs-source-dirs:      test
---  main-is:             Spec.hs
---
---  build-depends:       base >= 4.10.1.0 && < 4.13
---                     , hedgehog-classes
---
---  ghc-options:         -Wall
---                       -threaded
---                       -rtsopts
---                       -with-rtsopts=-N
---                       -Wall
---                       -Werror
---
--- default-language:    Haskell2010
+test-suite spec
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+
+  other-modules:       Spec.Alternative
+                       Spec.Applicative
+                       Spec.Arrow
+                       Spec.Bifoldable
+                       Spec.Bifunctor
+                       Spec.Bitraversable
+                       Spec.Bits
+                       Spec.Category
+                       Spec.Contravariant
+                       Spec.Enum
+                       Spec.Eq
+                       Spec.Foldable
+                       Spec.Functor
+                       Spec.Generic
+                       Spec.Integral
+                       Spec.Ix
+                       Spec.Json
+                       Spec.Monad
+                       Spec.MonadIO
+                       Spec.MonadPlus
+                       Spec.MonadZip
+                       Spec.Monoid
+                       Spec.Ord
+                       Spec.Semigroup
+                       Spec.Show
+                       Spec.ShowRead
+                       Spec.Storable
+                       Spec.Traversable
+
+  build-depends:       base >= 4.10.1.0 && < 4.13
+                     , aeson 
+                     , containers 
+                     , hedgehog 
+                     , hedgehog-classes
+
+  ghc-options:         -Wall
+ 
+  default-language:    Haskell2010

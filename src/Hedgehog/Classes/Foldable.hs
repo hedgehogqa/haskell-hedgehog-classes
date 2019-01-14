@@ -116,7 +116,7 @@ foldableFoldl' fgen = property $ do
     e <- try (evaluate (Foldable.foldl' f z0 xs))
     case e of
       Left (_ :: ErrorCall) -> pure Nothing
-      Right i -> pure (Just i)
+      Right i -> pure (Just i) 
   r1 === r2
 
 foldableFoldl1 ::
