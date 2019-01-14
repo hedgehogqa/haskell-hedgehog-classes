@@ -65,17 +65,19 @@ library
     Hedgehog.Classes.Eq
     Hedgehog.Classes.Foldable
     Hedgehog.Classes.Functor
+    Hedgehog.Classes.Generic
     Hedgehog.Classes.Integral
     Hedgehog.Classes.Ix
     Hedgehog.Classes.Json
     Hedgehog.Classes.Monad
-    Hedgehog.Classes.MonadFix
+--    Hedgehog.Classes.MonadFix
     Hedgehog.Classes.MonadIO
     Hedgehog.Classes.MonadPlus
     Hedgehog.Classes.MonadZip
     Hedgehog.Classes.Monoid
     Hedgehog.Classes.Ord
     Hedgehog.Classes.Semigroup
+    Hedgehog.Classes.Semiring
     Hedgehog.Classes.Show
     Hedgehog.Classes.ShowRead
     Hedgehog.Classes.Storable
@@ -85,6 +87,7 @@ library
     , hedgehog >= 0.6 && < 0.7
     , aeson 
     , containers
+    , semirings >= 0.3.1.1 
     , transformers
   ghc-options:
     -Wall
