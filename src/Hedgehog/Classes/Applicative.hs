@@ -28,7 +28,7 @@ applicativeIdentity :: forall f.
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 applicativeIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  (pure id <*> a) === a
+  (pure id <*> a) `heq1` a
 
 applicativeComposition :: forall f.
   ( Applicative f
@@ -42,7 +42,7 @@ applicativeComposition fgen = property $ do
   let u = runQuadraticEquation <$> u'
       v = runQuadraticEquation <$> v'
       w = pure w'
-  (pure (.) <*> u <*> v <*> w) === (u <*> (v <*> w))
+  (pure (.) <*> u <*> v <*> w) `heq1` (u <*> (v <*> w))
 
 applicativeHomomorphism :: forall f.
   ( Applicative f
@@ -52,7 +52,7 @@ applicativeHomomorphism _ = property $ do
   e <- forAll genQuadraticEquation
   a <- forAll genSmallInteger
   let f = runQuadraticEquation e
-  (pure f <*> pure a) === (pure (f a) :: f Integer)
+  (pure f <*> pure a) `heq1` (pure (f a) :: f Integer)
 
 applicativeInterchange :: forall f.
   ( Applicative f
@@ -62,7 +62,7 @@ applicativeInterchange fgen = property $ do
   u' <- forAll $ fgen genQuadraticEquation
   y <- forAll genSmallInteger
   let u = fmap runQuadraticEquation u'
-  (u <*> pure y) === (pure ($ y) <*> u)
+  (u <*> pure y) `heq1` (pure ($ y) <*> u)
 
 applicativeLiftA2_1 :: forall f.
   ( Applicative f
@@ -72,7 +72,7 @@ applicativeLiftA2_1 fgen = property $ do
   f' <- forAll $ fgen genQuadraticEquation
   x <- forAll $ fgen genSmallInteger
   let f = fmap runQuadraticEquation f'
-  (liftA2 id f x) === (f <*> x)
+  (liftA2 id f x) `heq1` (f <*> x)
 
 applicativeLiftA2_2 :: forall f.
   ( Applicative f
@@ -82,4 +82,5 @@ applicativeLiftA2_2 fgen = property $ do
   x <- forAll $ fgen genSmallInteger
   y <- forAll $ fgen genSmallInteger
   let f a b = a * a - b
-  (liftA2 f x y) === (f <$> x <*> y)
+  (liftA2 f x y) `heq1` (f <$> x <*> y)
+

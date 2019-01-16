@@ -29,7 +29,7 @@ monadLeftIdentity _ = property $ do
   k' :: LinearEquationM f <- forAll genLinearEquationM
   a <- forAll $ genSmallInteger
   let k = runLinearEquationM k'
-  (pure a >>= k) === (k a)
+  (pure a >>= k) `heq1` (k a)
 
 monadRightIdentity :: forall f.
   ( Monad f
@@ -37,7 +37,7 @@ monadRightIdentity :: forall f.
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 monadRightIdentity fgen = property $ do
   m <- forAll $ fgen genSmallInteger
-  (m >>= pure) === m
+  (m >>= pure) `heq1` m
 
 monadAssociativity :: forall f.
   ( Monad f
@@ -49,7 +49,7 @@ monadAssociativity fgen = property $ do
   h' :: LinearEquationM f <- forAll genLinearEquationM
   let k = runLinearEquationM k'
       h = runLinearEquationM h'
-  (m >>= (\x -> k x >>= h)) === ((m >>= k) >>= h)
+  (m >>= (\x -> k x >>= h)) `heq1` ((m >>= k) >>= h)
 
 monadReturn :: forall f.
   ( Monad f
@@ -57,7 +57,7 @@ monadReturn :: forall f.
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 monadReturn _ = property $ do
   x <- forAll genSmallInteger
-  return x === (pure x :: f Integer)
+  return x `heq1` (pure x :: f Integer)
 
 monadAp :: forall f.
   ( Monad f
@@ -67,4 +67,5 @@ monadAp _ = property $ do
   f' :: f QuadraticEquation <- forAll $ pure <$> genQuadraticEquation
   x :: f Integer <- forAll $ pure <$> genSmallInteger
   let f = fmap runQuadraticEquation f'
-  (ap f x) === (f <*> x)
+  (ap f x) `heq1` (f <*> x)
+

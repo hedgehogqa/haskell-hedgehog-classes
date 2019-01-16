@@ -4,6 +4,7 @@ module Hedgehog.Classes.Common
 
 import Hedgehog.Classes.Common.ApTrans  as Common
 import Hedgehog.Classes.Common.Bottom   as Common
+import Hedgehog.Classes.Common.Compat   as Common
 import Hedgehog.Classes.Common.Equation as Common
 import Hedgehog.Classes.Common.Func     as Common
 import Hedgehog.Classes.Common.Gen      as Common

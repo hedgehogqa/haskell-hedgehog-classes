@@ -45,6 +45,30 @@ source-repository head
   type:                git
   location:            https://github.com/chessai/hedgehog-classes.git
 
+flag aeson
+  description:
+    You can disable the use of the `aeson` package using `-f-aeson`.
+    .
+    This may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
+flag semigroupoids
+  description:
+    You can disable the use of the `semirings` package using `-f-semirings`.
+    .
+    This may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
+flag semirings
+  description:
+    You can disable the use of the `semirings` package using `-f-semirings`.
+    .
+    This may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
 library
   hs-source-dirs:
     src
@@ -62,12 +86,14 @@ library
     Hedgehog.Classes.Common
       Hedgehog.Classes.Common.ApTrans
       Hedgehog.Classes.Common.Bottom
+      Hedgehog.Classes.Common.Compat
       Hedgehog.Classes.Common.Equation
       Hedgehog.Classes.Common.Func
       Hedgehog.Classes.Common.Gen
       Hedgehog.Classes.Common.IO
       Hedgehog.Classes.Common.Laws
       Hedgehog.Classes.Common.Property
+      Hedgehog.Classes.Common.PP
     Hedgehog.Classes.Contravariant
     Hedgehog.Classes.Enum
     Hedgehog.Classes.Eq
@@ -91,18 +117,31 @@ library
     Hedgehog.Classes.Storable
     Hedgehog.Classes.Traversable
   build-depends:
-      base >= 4.10.1.0 && < 4.13
-    , hedgehog >= 0.6 && < 0.7
-    , aeson 
-    , containers
-    , semirings    ^>= 0.3.1.1 
-    , transformers ^>= 0.5.0.0
+      base                >= 4.10.1.0 && < 4.13.0.0
+    , hedgehog            >= 0.5.0.0  && < 0.7.0.0
+    , containers          >= 0.5.9.2  && < 0.7.0.0
+    , pretty-show         >= 1.6.0.0  && < 2.0.0.0
+    , transformers        >= 0.5.0.0  && < 0.6.0.0
+    , wl-pprint-annotated >= 0.0.0.0  && < 0.2.0.0
   ghc-options:
     -Wall
-    -Werror
   default-language:
     Haskell2010
-
+  if impl(ghc >= 8.5)
+    cpp-options: -DHAVE_QUANTIFIED_CONSTRAINTS
+  if flag(aeson)
+    build-depends: aeson >= 0.9.0.0 && < 1.5.0.0
+    cpp-options: -DHAVE_AESON
+--  if flag(semigroupoids)
+--    build-depends: semigroupoids >= 0.5.3.0 && < 0.6.0.0
+--    cpp-options: -DHAVE_SEMIGROUPOIDS
+  if flag(semirings)
+    build-depends: semirings >= 0.3.1.1 && < 0.4.0.0
+    cpp-options: -DHAVE_SEMIRINGS
+--  if flag(vector)
+--    build-depends: vector >= 0.12.0.0 && < 0.13.0.0 
+--    cpp-options: -DHAVE_VECTOR
+ 
 test-suite spec
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test

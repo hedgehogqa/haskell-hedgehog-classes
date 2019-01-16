@@ -79,7 +79,7 @@ allBinaryLaws = testArrow
   ++ testCommutativeCategory
 
 allLaws :: [(String, [Laws])]
-allLaws = allNullaryLaws ++ allUnaryLaws ++ allBinaryLaws
+allLaws = testFoldable --allNullaryLaws ++ allUnaryLaws ++ allBinaryLaws
 
 {-
 tightenTypes :: [(String, [Laws])] -> [(String, [Laws])]

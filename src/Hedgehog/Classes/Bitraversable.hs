@@ -37,16 +37,16 @@ bitraversableNaturality fgen = property $ do
   let t = apTrans
   let f = func4
   let g = func4
-  let x' = bitraverse (t . f) (t . g) x
-  let y' = t (bitraverse f g x)
-  x' === y'
+  let lhs = bitraverse (t . f) (t . g) x
+  let rhs = t (bitraverse f g x)
+  lhs `heq1` rhs
 
 bitraversableIdentity :: forall f. BitraversableProp f
 bitraversableIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  let x' = bitraverse Identity Identity x
-  let y' = Identity x
-  x' === y'
+  let lhs = bitraverse Identity Identity x
+  let rhs = Identity x
+  lhs `heq1` rhs
 
 
 bitraversableComposition :: forall f. BitraversableProp f
@@ -56,9 +56,10 @@ bitraversableComposition fgen = property $ do
   let f2 = func5
   let g1 = func4
   let g2 = func4
-  let x' :: Compose Triple (Compose Triple (WL.Writer (S.Set Integer))) (f Integer Integer)
-      x' = Compose . fmap (bitraverse g1 g2) . bitraverse f1 f2 $ x
+  let lhs :: Compose Triple (Compose Triple (WL.Writer (S.Set Integer))) (f Integer Integer)
+      lhs = Compose . fmap (bitraverse g1 g2) . bitraverse f1 f2 $ x
       
-  let y' :: Compose Triple (Compose Triple (WL.Writer (S.Set Integer))) (f Integer Integer)
-      y' = bitraverse (Compose . fmap g1 . f1) (Compose . fmap g2 . f2) x
-  x' === y' 
+  let rhs :: Compose Triple (Compose Triple (WL.Writer (S.Set Integer))) (f Integer Integer)
+      rhs = bitraverse (Compose . fmap g1 . f1) (Compose . fmap g2 . f2) x
+  lhs `heq1` rhs
+

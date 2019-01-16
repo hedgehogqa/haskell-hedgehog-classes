@@ -8,9 +8,17 @@ module Hedgehog.Classes.Common.Laws
   , lawsCheckMany
   ) where
 
-import Hedgehog
+import Hedgehog (Gen)
 import Data.Monoid (All(..), Ap(..))
 import System.Exit (exitFailure)
+import Control.Monad.IO.Class (MonadIO(liftIO))
+import Hedgehog.Internal.Report (Report, Result(..), Progress(..), renderProgress, reportStatus)
+import Hedgehog.Internal.Region (Region)
+import qualified Hedgehog.Internal.Region as Region
+import Hedgehog.Internal.Runner (checkReport)
+import Hedgehog.Internal.Property (Property(..))
+import qualified Hedgehog.Internal.Seed as Seed
+import qualified Hedgehog.Classes.Common.PP as PP
 
 data Laws = Laws
   { lawsTypeClass :: String
@@ -74,3 +82,29 @@ instance Semigroup Status where
 
 instance Monoid Status where
   mempty = Good
+
+checkRegion :: MonadIO m
+  => Region
+  -> Property
+  -> m (Report Result)
+checkRegion region prop = liftIO $ do
+  seed <- liftIO Seed.random 
+  result <- checkReport (propertyConfig prop) 0 seed (propertyTest prop) $ \progress -> do
+    ppprogress <- renderProgress Nothing Nothing progress
+    case reportStatus progress of
+      Running -> Region.setRegion region ppprogress
+      Shrinking _ -> Region.openRegion region ppprogress
+  ppresult <- PP.renderResult result
+  case reportStatus result of
+    Failed _ -> Region.openRegion region ppresult
+    GaveUp -> Region.openRegion region ppresult
+    OK -> Region.setRegion region ppresult
+
+  pure result 
+
+check :: MonadIO m
+  => Property
+  -> m Bool
+check prop = liftIO . Region.displayRegion $ \region ->
+  (== OK) . reportStatus <$> checkRegion region prop
+

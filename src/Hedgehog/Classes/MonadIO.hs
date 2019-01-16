@@ -26,7 +26,7 @@ type MonadIOProp f =
 monadIOReturn :: forall f. MonadIOProp f
 monadIOReturn _fgen = property $ do
   x <- forAll genSmallInteger
-  liftIO (pure x) === (pure x :: f Integer)
+  liftIO (pure x) `heq1` (pure x :: f Integer)
 
 monadIOLift :: forall f. MonadIOProp f
 monadIOLift _fgen = property $ do
@@ -35,5 +35,5 @@ monadIOLift _fgen = property $ do
   let f = pure . runLinearEquation f'
   let x = liftIO (m >>= f) :: f Integer
   let y = liftIO m >>= (liftIO . f) :: f Integer
-  x === y
+  x `heq1` y
 

@@ -20,7 +20,7 @@ arrowLaws :: forall f.
 arrowLaws gen = Laws "Arrow"
   [ ("Arr Identity", arrowLaw1 gen)
   , ("Arr Composition", arrowLaw2 gen)
-  , ("Arr . First === First . Arr", arrowLaw3 gen)
+  , ("Arr . First == First . Arr", arrowLaw3 gen)
   , ("First Composition", arrowLaw4 gen)
   , ("Arrow Law 5", arrowLaw5 gen)
   , ("Arrow Law 6", arrowLaw6 gen)
@@ -35,7 +35,7 @@ type ArrowProp f =
 
 arrowLaw1 :: forall f. ArrowProp f
 arrowLaw1 _ = property $ do
-  arr Prelude.id === (id :: f Integer Integer)
+  arr Prelude.id `heq2` (id :: f Integer Integer)
 
 arrowLaw2 :: forall f. ArrowProp f
 arrowLaw2 _ = property $ do
@@ -43,7 +43,7 @@ arrowLaw2 _ = property $ do
   g' <- forAll genQuadraticEquation
   let f = runQuadraticEquation f'
       g = runQuadraticEquation g'
-  (arr (f >>> g) :: f Integer Integer) === (arr f >>> arr g) 
+  (arr (f >>> g) :: f Integer Integer) `heq2` (arr f >>> arr g) 
 
 arrowLaw3 :: forall f. ArrowProp f
 arrowLaw3 _ = property $ do
@@ -51,7 +51,7 @@ arrowLaw3 _ = property $ do
   let f = runQuadraticEquation f'
   let x = first (arr f) :: f (Integer, Integer) (Integer, Integer)
   let y = arr (first f) :: f (Integer, Integer) (Integer, Integer) 
-  x === y
+  x `heq2` y
 
 arrowLaw4 :: forall f. ArrowProp f
 arrowLaw4 fgen = property $ do
@@ -59,14 +59,14 @@ arrowLaw4 fgen = property $ do
   g <- forAll $ fgen genSmallInteger genSmallInteger
   let x = first (f >>> g) :: f (Integer, Integer) (Integer, Integer)
   let y = first f >>> first g :: f (Integer, Integer) (Integer, Integer)
-  x === y 
+  x `heq2` y 
 
 arrowLaw5 :: forall f. ArrowProp f
 arrowLaw5 fgen = property $ do
   f <- forAll $ fgen genSmallInteger genSmallInteger
   let x = first f >>> arr fst :: f (Integer, Integer) Integer
   let y = arr fst >>> f :: f (Integer, Integer) Integer
-  x === y 
+  x `heq2` y 
 
 arrowLaw6 :: forall f. ArrowProp f
 arrowLaw6 fgen = property $ do
@@ -75,7 +75,7 @@ arrowLaw6 fgen = property $ do
   let g = runQuadraticEquation g'
   let x = ((first f) >>> (arr (Prelude.id *** g))) :: f (Integer, Integer) (Integer, Integer) 
   let y = arr (id *** g) >>> first f :: f (Integer, Integer) (Integer, Integer) 
-  x === y
+  x `heq2` y
 
 arrowLaw7 :: forall f. ArrowProp f
 arrowLaw7 fgen = property $ do
@@ -83,5 +83,5 @@ arrowLaw7 fgen = property $ do
   f <- forAll $ fgen genSmallInteger genSmallInteger
   let x = first (first f) >>> arr assoc :: f ((Integer, Integer), Integer) (Integer, (Integer, Integer))
   let y = arr assoc >>> first f :: f ((Integer, Integer), Integer) (Integer, (Integer, Integer))
-  x === y
+  x `heq2` y
 

@@ -28,7 +28,7 @@ bifunctorIdentity :: forall f.
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Property
 bifunctorIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  bimap id id x === x 
+  bimap id id x `heq2` x 
 
 bifunctorFirstIdentity :: forall f.
   ( Bifunctor f
@@ -37,7 +37,7 @@ bifunctorFirstIdentity :: forall f.
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Property
 bifunctorFirstIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  first id x === x
+  first id x `heq2` x
 
 bifunctorSecondIdentity :: forall f.
   ( Bifunctor f
@@ -46,7 +46,7 @@ bifunctorSecondIdentity :: forall f.
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Property
 bifunctorSecondIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  second id x === x
+  second id x `heq2` x
 
 bifunctorComposition :: forall f.
   ( Bifunctor f
@@ -55,4 +55,5 @@ bifunctorComposition :: forall f.
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Property
 bifunctorComposition fgen = property $ do
   z <- forAll $ fgen genSmallInteger genSmallInteger
-  bimap id id z === ((first id . second id) z)
+  bimap id id z `heq2` ((first id . second id) z)
+

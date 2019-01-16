@@ -37,7 +37,9 @@ foldableFold ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableFold fgen = property $ do
   a <- forAll $ fgen genSmallSum
-  Foldable.fold a === Foldable.foldMap id a
+  let lhs = Foldable.fold a
+  let rhs = Foldable.foldMap id a
+  heqCtx lhs rhs NoContext
 
 foldableFoldMap ::
   ( Foldable f
@@ -47,7 +49,9 @@ foldableFoldMap fgen = property $ do
   a <- forAll $ fgen genSmallInteger
   e <- forAll genQuadraticEquation
   let f = Sum . runQuadraticEquation e
-  Foldable.foldMap f a === Foldable.foldr (mappend . f) mempty a
+  let lhs = Foldable.foldMap f a
+  let rhs = Foldable.foldr (mappend . f) mempty a
+  heqCtx lhs rhs NoContext  
 
 foldableFoldr ::
   ( Foldable f
@@ -58,7 +62,9 @@ foldableFoldr fgen = property $ do
   z <- forAll genSmallInteger
   t <- forAll $ fgen genSmallInteger
   let f = runLinearEquationTwo e
-  Foldable.foldr f z t === appEndo (Foldable.foldMap (Endo . f) t) z
+  let lhs = Foldable.foldr f z t
+  let rhs = appEndo (Foldable.foldMap (Endo . f) t) z
+  heqCtx lhs rhs NoContext  
 
 foldableFoldl ::
   ( Foldable f
@@ -69,7 +75,9 @@ foldableFoldl fgen = property $ do
   z <- forAll genSmallInteger
   t <- forAll $ fgen genSmallInteger
   let f = runLinearEquationTwo e
-  Foldable.foldl f z t === appEndo (getDual (Foldable.foldMap (Dual . Endo . flip f) t)) z
+  let lhs = Foldable.foldl f z t
+  let rhs = appEndo (getDual (Foldable.foldMap (Dual . Endo . flip f) t)) z
+  heqCtx lhs rhs NoContext
 
 foldableFoldr' ::
   ( Foldable f
@@ -93,7 +101,7 @@ foldableFoldr' fgen = property $ do
     case e of
       Left (_ :: ErrorCall) -> pure Nothing
       Right i -> pure (Just i)
-  r1 === r2
+  r1 `heq` r2
 
 foldableFoldl' ::
   ( Foldable f
@@ -117,7 +125,7 @@ foldableFoldl' fgen = property $ do
     case e of
       Left (_ :: ErrorCall) -> pure Nothing
       Right i -> pure (Just i) 
-  r1 === r2
+  heqCtx r1 r2 (Context "Your implementation of foldl' is not strict.")
 
 foldableFoldl1 ::
   ( Foldable f
@@ -130,7 +138,7 @@ foldableFoldl1 fgen = property $ do
     [] -> success
     (x:xs) ->
       let f = runLinearEquationTwo e
-      in Foldable.foldl1 f t === Foldable.foldl f x xs
+      in Foldable.foldl1 f t `heq` Foldable.foldl f x xs
 
 foldableFoldr1 ::
   ( Foldable f
@@ -143,7 +151,7 @@ foldableFoldr1 fgen = property $ do
     Nothing -> success
     Just (xs, x) ->
       let f = runLinearEquationTwo e
-      in Foldable.foldr1 f t === Foldable.foldr f x xs
+      in Foldable.foldr1 f t `heq` Foldable.foldr f x xs
 
 foldableToList ::
   ( Foldable f
@@ -151,7 +159,7 @@ foldableToList ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableToList fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  Foldable.toList t === Foldable.foldr (:) [] t
+  Foldable.toList t `heq` Foldable.foldr (:) [] t
 
 foldableNull ::
   ( Foldable f
@@ -159,7 +167,7 @@ foldableNull ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableNull fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  Foldable.null t === Foldable.foldr (const (const False)) True t
+  Foldable.null t `heq` Foldable.foldr (const (const False)) True t
 
 foldableLength ::
   ( Foldable f
@@ -167,7 +175,7 @@ foldableLength ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableLength fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  Foldable.length t === getSum (Foldable.foldMap (const (Sum 1)) t)
+  Foldable.length t `heq` getSum (Foldable.foldMap (const (Sum 1)) t)
 
 unsnoc :: [a] -> Maybe ([a], a)
 unsnoc = \case

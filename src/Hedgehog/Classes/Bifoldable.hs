@@ -41,12 +41,16 @@ type BifoldableProp f =
 bifoldableIdentity :: forall f. BifoldableProp f
 bifoldableIdentity fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
-  bifold x === bifoldMap id id x
+  let lhs = bifold x
+  let rhs = bifoldMap id id x
+  lhs === rhs
 
 bifoldableFoldMap :: forall f. BifoldableProp f
 bifoldableFoldMap fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  bifoldMap Sum Sum x === bifoldr (mappend . Sum) (mappend . Sum) mempty x
+  let lhs = (bifoldMap Sum Sum x)
+  let rhs = (bifoldr (mappend . Sum) (mappend . Sum) mempty x)
+  lhs === rhs
 
 bifoldableFoldr :: forall f. BifoldableProp f
 bifoldableFoldr fgen = property $ do
@@ -56,7 +60,9 @@ bifoldableFoldr fgen = property $ do
   let f = runLinearEquationTwo f'
   let g = runLinearEquationTwo g'
   let z0 = 0
-  bifoldr f g z0 x === appEndo (bifoldMap (Endo . f) (Endo . g) x) z0
+  let lhs = (bifoldr f g z0 x)
+  let rhs = (appEndo (bifoldMap (Endo . f) (Endo . g) x) z0)
+  lhs === rhs
 
 type BifoldableFunctorProp f =
   ( Bifoldable f, Bifunctor f
@@ -67,12 +73,17 @@ type BifoldableFunctorProp f =
 bifoldableFunctorComposition :: forall f. BifoldableFunctorProp f
 bifoldableFunctorComposition fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
-  bifoldMap Product Product x === bifold (bimap Product Product x)
+  let lhs = bifoldMap Product Product x
+  let rhs = bifold (bimap Product Product x)
+  lhs === rhs  
 
 bifoldableFunctorFoldMap :: forall f. BifoldableFunctorProp f
 bifoldableFunctorFoldMap fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
   let h (Sum s) = s * s
   let i (Sum s) = s + s
-  bifoldMap Sum Sum (bimap h i x) === bifoldMap (Sum . h) (Sum . i) x
+  let lhs = bifoldMap Sum Sum (bimap h i x)
+  let rhs = bifoldMap (Sum . h) (Sum . i) x
+  lhs === rhs
+
 

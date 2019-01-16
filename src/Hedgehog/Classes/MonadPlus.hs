@@ -27,7 +27,7 @@ monadPlusLeftIdentity :: forall f.
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 monadPlusLeftIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger
-  mplus mzero x === x
+  mplus mzero x `heq1` x
 
 monadPlusRightIdentity :: forall f.
   ( MonadPlus f
@@ -35,7 +35,7 @@ monadPlusRightIdentity :: forall f.
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 monadPlusRightIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger
-  mplus x mzero === x
+  mplus x mzero `heq1` x
 
 monadPlusAssociativity :: forall f.
   ( MonadPlus f
@@ -45,7 +45,7 @@ monadPlusAssociativity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
   b <- forAll $ fgen genSmallInteger
   c <- forAll $ fgen genSmallInteger
-  mplus a (mplus b c) === mplus (mplus a b) c
+  mplus a (mplus b c) `heq1` mplus (mplus a b) c
 
 monadPlusLeftZero :: forall f.
   ( MonadPlus f
@@ -53,7 +53,7 @@ monadPlusLeftZero :: forall f.
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 monadPlusLeftZero _ = property $ do
   k' :: LinearEquationM f <- forAll genLinearEquationM
-  (mzero >>= runLinearEquationM k') === mzero
+  (mzero >>= runLinearEquationM k') `heq1` mzero
 
 monadPlusRightZero :: forall f.
   ( MonadPlus f
@@ -61,6 +61,6 @@ monadPlusRightZero :: forall f.
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 monadPlusRightZero fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  (a >> (mzero :: f Integer)) === mzero 
+  (a >> (mzero :: f Integer)) `heq1` mzero 
 
 

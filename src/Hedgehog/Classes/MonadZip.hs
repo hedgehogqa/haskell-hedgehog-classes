@@ -29,4 +29,5 @@ monadZipNaturality fgen = property $ do
       g = runLinearEquation g'
   ma <- forAll $ fgen genSmallInteger
   mb <- forAll $ fgen genSmallInteger
-  (fmap (f *** g) (mzip ma mb)) === (mzip (fmap f ma) (fmap g mb))
+  (fmap (f *** g) (mzip ma mb)) `heq1` (mzip (fmap f ma) (fmap g mb))
+

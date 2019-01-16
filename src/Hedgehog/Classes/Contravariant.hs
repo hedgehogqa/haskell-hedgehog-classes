@@ -24,7 +24,7 @@ contravariantIdentity ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 contravariantIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  contramap id a === id a
+  contramap id a `heq1` id a
 
 contravariantComposition ::
   ( Contravariant f
@@ -36,4 +36,5 @@ contravariantComposition fgen = property $ do
   g' <- forAll genQuadraticEquation
   let f = runQuadraticEquation f'
   let g = runQuadraticEquation g'
-  (contramap f (contramap g a)) === (contramap (g . f) a)
+  (contramap f (contramap g a)) `heq1` (contramap (g . f) a)
+

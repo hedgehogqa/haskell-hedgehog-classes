@@ -35,44 +35,44 @@ type TraversableProp f =
 traversableNaturality :: TraversableProp f
 traversableNaturality fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  (apTrans (traverse func4 a)) === (traverse (apTrans . func4) a)
+  (apTrans (traverse func4 a)) `heq1` (traverse (apTrans . func4) a)
 
 traversableIdentity :: TraversableProp f
 traversableIdentity fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  (traverse Identity t) === (Identity t)
+  (traverse Identity t) `heq1` (Identity t)
 
 traversableComposition :: TraversableProp f
 traversableComposition fgen = property $ do
   t <- forAll $ fgen genSmallInteger 
-  let x = (traverse (Compose . fmap func5 . func6) t)
-  let y = (Compose (fmap (traverse func5) (traverse func6 t)))
-  x === y
+  let lhs = (traverse (Compose . fmap func5 . func6) t)
+  let rhs = (Compose (fmap (traverse func5) (traverse func6 t)))
+  lhs `heq1` rhs
 
 traversableSequenceNaturality :: TraversableProp f
 traversableSequenceNaturality fgen = property $ do
   x <- forAll $ fgen (genCompose genSmallInteger genTriple (genTuple genSetInteger))
   let a = fmap toSpecialApplicative x
-  (apTrans (sequenceA a)) === (sequenceA (fmap apTrans a)) 
+  (apTrans (sequenceA a)) `heq1` (sequenceA (fmap apTrans a)) 
 
 traversableSequenceIdentity :: TraversableProp f
 traversableSequenceIdentity fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  (sequenceA (fmap Identity t)) === (Identity t)
+  (sequenceA (fmap Identity t)) `heq1` (Identity t)
 
 traversableSequenceComposition :: TraversableProp f
 traversableSequenceComposition fgen = property $ do
   let genTripleInteger = genTriple genSmallInteger
   t <- forAll $ fgen (genTriple genTripleInteger)
-  (sequenceA (fmap Compose t)) === (Compose (fmap sequenceA (sequenceA t)))
-  True === True
+  (sequenceA (fmap Compose t)) `heq1` (Compose (fmap sequenceA (sequenceA t)))
 
 traversableFoldMap :: TraversableProp f
 traversableFoldMap fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  foldMap func3 t === foldMapDefault func3 t  
+  foldMap func3 t `heq1` foldMapDefault func3 t  
 
 traversableFmap :: TraversableProp f
 traversableFmap fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  fmap func3 t === fmapDefault func3 t  
+  fmap func3 t `heq1` fmapDefault func3 t
+

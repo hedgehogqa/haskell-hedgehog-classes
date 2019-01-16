@@ -25,7 +25,7 @@ alternativeLeftIdentity ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 alternativeLeftIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  (empty <|> a) === a
+  (empty <|> a) `heq1` a
 
 alternativeRightIdentity ::
   ( Alternative f
@@ -33,7 +33,7 @@ alternativeRightIdentity ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 alternativeRightIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  a === (empty <|> a)
+  a `heq1` (empty <|> a)
 
 alternativeAssociativity ::
   ( Alternative f
@@ -43,4 +43,4 @@ alternativeAssociativity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
   b <- forAll $ fgen genSmallInteger
   c <- forAll $ fgen genSmallInteger
-  (a <|> (b <|> c)) === ((a <|> b) <|> c)
+  (a <|> (b <|> c)) `heq1` ((a <|> b) <|> c)

@@ -37,7 +37,7 @@ categoryRightIdentity :: forall f.
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Property
 categoryRightIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  (x . id) === x
+  (x . id) `heq2` x
 
 categoryLeftIdentity :: forall f.
   ( Category f
@@ -46,7 +46,7 @@ categoryLeftIdentity :: forall f.
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Property
 categoryLeftIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  (id . x) === x
+  (id . x) `heq2` x
 
 categoryAssociativity :: forall f.
   ( Category f
@@ -57,7 +57,7 @@ categoryAssociativity fgen = property $ do
   f <- forAll $ fgen genSmallInteger genSmallInteger
   g <- forAll $ fgen genSmallInteger genSmallInteger 
   h <- forAll $ fgen genSmallInteger genSmallInteger 
-  (f . (g . h)) === ((f . g) . h)
+  (f . (g . h)) `heq2` ((f . g) . h)
 
 categoryCommutativity :: forall f.
   ( Category f
@@ -67,5 +67,6 @@ categoryCommutativity :: forall f.
 categoryCommutativity fgen = property $ do
   f <- forAll $ fgen genSmallInteger genSmallInteger
   g <- forAll $ fgen genSmallInteger genSmallInteger
-  (f . g) === (g . f) 
+  (f . g) `heq2` (g . f)
+
 
