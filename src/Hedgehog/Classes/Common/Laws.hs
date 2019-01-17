@@ -1,29 +1,79 @@
+{-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Hedgehog.Classes.Common.Laws
   ( Laws(..)
+  , LawContext(..)
 
   , lawsCheck
   , lawsCheckOne
   , lawsCheckMany
+  , lawsCheckMany'
+
+  , showLawContext
   ) where
 
-import Hedgehog (Gen)
-import Data.Monoid (All(..), Ap(..))
-import System.Exit (exitFailure)
 import Control.Monad.IO.Class (MonadIO(liftIO))
-import Hedgehog.Internal.Report (Report, Result(..), Progress(..), renderProgress, reportStatus)
+import Data.Coerce (coerce)
+import Data.Monoid (All(..), Ap(..))
+import Hedgehog (Gen, Group(..), checkParallel)
+import Hedgehog.Classes.Common.Property (Context(..))
+import Hedgehog.Internal.Property (Property(..), PropertyName(..), GroupName(..))
 import Hedgehog.Internal.Region (Region)
-import qualified Hedgehog.Internal.Region as Region
+import Hedgehog.Internal.Report (Report, Result(..), Progress(..), renderProgress, reportStatus)
 import Hedgehog.Internal.Runner (checkReport)
-import Hedgehog.Internal.Property (Property(..))
-import qualified Hedgehog.Internal.Seed as Seed
+import System.Exit (exitFailure)
+import qualified Data.List as List
 import qualified Hedgehog.Classes.Common.PP as PP
+import qualified Hedgehog.Internal.Region as Region
+import qualified Hedgehog.Internal.Seed as Seed
 
 data Laws = Laws
   { lawsTypeClass :: String
   , lawsProperties :: [(String, Property)]
   }
+
+consolidateGroups :: [Group] -> [Group]
+consolidateGroups = foldMap collapse . List.groupBy (\(Group n _) (Group m _) -> n == m)
+
+collapse :: [Group] -> [Group]
+collapse = \case
+  [] -> []
+  [x] -> [x]
+  (x@(Group n xs) : y@(Group m ys) : xxs) -> Group n (xs ++ ys) : collapse xxs
+
+lawsToGroup :: Laws -> Group
+lawsToGroup Laws{..} = Group (coerce lawsTypeClass) (coerce lawsProperties)
+
+data LawContext a = LawContext -- forall b. LawContext
+  { lawContextLawName :: String -- ^ law name
+  , lawContextLawBody :: String -- ^ law body
+  , lawContextTcName  :: String -- ^ typeclass name
+  , lawContextTcMethod :: (a -> a -> String) -- ^ how to show the specific property test
+  , lawContextLhs :: a -- ^ generated LHS
+  , lawContextRhs :: a -- ^ generated RHS
+--  , lawContextLhsReduced :: Maybe b -- ^ LHS
+--  , lawContextRhsReduced :: Maybe b -- ^ RHS
+--  , lawContextEquation :: (b -> b -> String) -- ^ how to show the reduced equation
+  }
+
+--showReduced :: (b -> b -> String) -> Maybe b -> Maybe b -> String
+--showReduced f (Just x) (Just y) = unlines
+--  [ "The reduced form of the equation is: "
+--  , "    " ++ f x y
+--  ]
+--showReduced _ _ _ = "Could not find a reduced form of the test case equation."
+
+showLawContext :: LawContext a -> Context
+showLawContext LawContext{..} = Context $ unlines
+  [ "When testing the " ++ lawContextLawName ++ " law, for the " ++ lawContextTcName ++ " typeclass, the following test failed: "
+  , "    " ++ lawContextTcMethod lawContextLhs lawContextRhs
+  , mempty
+--  , showReduced lawContextEquation lawContextLhsReduced lawContextRhsReduced
+--  , mempty 
+  , lawContextLawName ++ ": " ++ lawContextLawBody
+  ]
 
 lawsCheck :: Laws -> IO Bool
 lawsCheck = fmap getAll . lawsCheckInternal
@@ -63,6 +113,12 @@ lawsCheckManyInternal xs = do
       putStrLn "One or more tests failed"
       exitFailure
 
+lawsCheckMany' :: [Laws] -> IO Bool
+lawsCheckMany' xs = fmap getAll $ do
+  putStrLn "\nTesting properties for common typeclasses...\n"
+  let r = map lawsToGroup xs
+  foldMap (fmap All . checkParallel) r
+ 
 foldMapA :: (Foldable t, Monoid m, Applicative f) => (a -> f m) -> t a -> f m
 foldMapA f = getAp . foldMap (Ap . f)
 

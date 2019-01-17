@@ -16,21 +16,21 @@ module Hedgehog.Classes.Common.Property
   ( hLessThan, hGreaterThan
   , heq, heq1, heq2
   , heqCtx, heqCtx1, heqCtx2
+  , hneq, hneq1, hneq2
+  , hneqCtx, hneqCtx1, hneqCtx2 
   , bar
   , Context(..)
   ) where
 
 import Control.Exception (SomeException(..), displayException)
 import Data.Typeable (typeOf)
-import qualified Data.List as List
-import qualified Data.Char as Char
-import Hedgehog.Internal.Exception (tryEvaluate)
 import GHC.Stack
-import Hedgehog.Internal.Property
-  ( MonadTest, liftTest, mkTest, success, Failure(..), Log(..)
-  )
 import Hedgehog.Classes.Common.Compat
+import Hedgehog.Internal.Exception (tryEvaluate)
+import Hedgehog.Internal.Property (MonadTest, liftTest, mkTest, success, Failure(..), Log(..))
 import Text.Show.Pretty (ppShow)
+import qualified Data.Char as Char
+import qualified Data.List as List
 
 #if HAVE_QUANTIFIED_CONSTRAINTS == 0
 import qualified Data.Functor.Classes as C
@@ -38,6 +38,9 @@ import qualified Data.Functor.Classes as C
 
 bar :: String
 bar = "━━━"
+
+bar5 :: String
+bar5 = "━━━━━━━━━━━━━━━"
 
 evalNoSrc :: (MonadTest m, HasCallStack) => a -> m a
 evalNoSrc x = either (withFrozenCallStack failExceptionNoSrc) pure (tryEvaluate x)
@@ -57,20 +60,15 @@ data Context = NoContext | Context String
 
 contextToString :: Context -> String
 contextToString = \case
-  NoContext -> ""
-  Context ctx -> unlines [bar ++ " Context " ++ bar, ctx]
+  NoContext -> []
+  Context ctx -> bar ++ " Context " ++ bar ++ "\n" ++ ctx ++ bar5
 
 failContext::
   ( MonadTest m, HasCallStack
   , Show a, Show b
   ) => a -> b -> Context -> m ()
 failContext _x _y ctx = withFrozenCallStack $
-  failWithNoSrc $ unlines
-    [ --bar ++ " Not Equal " ++ bar
---    , "  " ++ ppShow x
---    , "  " ++ ppShow y
-      contextToString ctx 
-    ]
+  failWithNoSrc $ contextToString ctx
 
 -- | Fails the test if the right argument is less than or equal to the left.
 -- see https://github.com/hedgehogqa/haskell-hedgehog/pull/196 
@@ -96,6 +94,28 @@ hGreaterThan x y = do
       , ppShow x ++ " is not greater than " ++ ppShow y
       ]
 
+infix 4 `hneq`
+
+hneqCtx ::
+  ( MonadTest m
+  , HasCallStack
+  , Eq a
+  , Show a
+  ) => a -> a -> Context -> m ()
+hneqCtx x y ctx = do
+  ok <- withFrozenCallStack $ evalNoSrc (x `neq` y)
+  if ok
+    then success
+    else withFrozenCallStack $ failContext x y ctx
+
+hneq ::
+  ( MonadTest m
+  , HasCallStack
+  , Eq a
+  , Show a
+  ) => a -> a -> m ()
+hneq x y = hneqCtx x y NoContext
+
 infix 4 `heq`
 
 heqCtx ::
@@ -119,6 +139,38 @@ heq ::
 heq x y = heqCtx x y NoContext
 
 infix 4 `heq1`
+
+hneqCtx1 ::
+     ( MonadTest m
+     , HasCallStack
+     , Eq a
+     , Show a
+#if HAVE_QUANTIFIED_CONSTRAINTS
+     , forall x. Eq x => Eq (f x)
+     , forall x. Show x => Show (f x)
+#else
+     , C.Eq1 f
+#endif 
+     ) => f a -> f a -> Context -> m ()
+hneqCtx1 x y ctx = do
+  ok <- withFrozenCallStack $ evalNoSrc (x `neq1` y)
+  if ok
+    then success
+    else withFrozenCallStack $ failContext x y ctx
+
+hneq1 ::
+     ( MonadTest m
+     , HasCallStack
+     , Eq a
+     , Show a
+#if HAVE_QUANTIFIED_CONSTRAINTS
+     , forall x. Eq x => Eq (f x)
+     , forall x. Show x => Show (f x)
+#else
+     , C.Eq1 f
+#endif 
+     ) => f a -> f a -> m ()
+hneq1 x y = hneqCtx1 x y NoContext
 
 heqCtx1 ::
      ( MonadTest m
@@ -189,4 +241,42 @@ heq2 ::
 #endif 
      ) => f a b -> f a b -> m ()
 heq2 x y = heqCtx2 x y NoContext
+
+infix 4 `hneq2`
+
+hneqCtx2 ::
+     ( MonadTest m
+     , HasCallStack
+     , Eq a
+     , Eq b
+     , Show a
+     , Show b
+#if HAVE_QUANTIFIED_CONSTRAINTS
+     , forall x y. (Eq x, Eq y) => Eq (f x y)
+     , forall x y. (Show x, Show y) => Show (f x y)
+#else
+     , C.Eq2 f
+#endif 
+     ) => f a b -> f a b -> Context -> m ()
+hneqCtx2 x y ctx = do
+  ok <- withFrozenCallStack $ evalNoSrc (x `neq2` y)
+  if ok
+    then success
+    else withFrozenCallStack $ failContext x y ctx
+
+hneq2 ::
+     ( MonadTest m
+     , HasCallStack
+     , Eq a
+     , Eq b
+     , Show a
+     , Show b
+#if HAVE_QUANTIFIED_CONSTRAINTS
+     , forall x y. (Eq x, Eq y) => Eq (f x y)
+     , forall x y. (Show x, Show y) => Show (f x y)
+#else
+     , C.Eq2 f
+#endif 
+     ) => f a b -> f a b -> m ()
+hneq2 x y = hneqCtx2 x y NoContext
 

@@ -11,6 +11,7 @@ module Hedgehog.Classes
     lawsCheck
   , lawsCheckOne
   , lawsCheckMany
+  , lawsCheckMany'
 
     -- * Properties
     -- ** Ground types
@@ -68,7 +69,7 @@ import Hedgehog.Classes.Bifunctor (bifunctorLaws)
 import Hedgehog.Classes.Bitraversable (bitraversableLaws)
 import Hedgehog.Classes.Bits (bitsLaws)
 import Hedgehog.Classes.Category (categoryLaws, commutativeCategoryLaws)
-import Hedgehog.Classes.Common (lawsCheck, lawsCheckOne, lawsCheckMany, Laws(..))
+import Hedgehog.Classes.Common (lawsCheck, lawsCheckOne, lawsCheckMany, lawsCheckMany', Laws(..))
 import Hedgehog.Classes.Contravariant (contravariantLaws)
 import Hedgehog.Classes.Enum (enumLaws, boundedEnumLaws)
 import Hedgehog.Classes.Eq (eqLaws)
