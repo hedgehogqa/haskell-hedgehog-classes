@@ -4,3 +4,4 @@ import Hedgehog.Classes
 
 testOrd :: [(String, [Laws])]
 testOrd = []
+

@@ -9,7 +9,6 @@ module Hedgehog.Classes.Common.Laws
   , lawsCheck
   , lawsCheckOne
   , lawsCheckMany
-  , lawsCheckMany'
 
   , showLawContext
   ) where
@@ -33,15 +32,6 @@ data Laws = Laws
   { lawsTypeClass :: String
   , lawsProperties :: [(String, Property)]
   }
-
-consolidateGroups :: [Group] -> [Group]
-consolidateGroups = foldMap collapse . List.groupBy (\(Group n _) (Group m _) -> n == m)
-
-collapse :: [Group] -> [Group]
-collapse = \case
-  [] -> []
-  [x] -> [x]
-  (x@(Group n xs) : y@(Group m ys) : xxs) -> Group n (xs ++ ys) : collapse xxs
 
 lawsToGroup :: Laws -> Group
 lawsToGroup Laws{..} = Group (coerce lawsTypeClass) (coerce lawsProperties)
@@ -113,12 +103,6 @@ lawsCheckManyInternal xs = do
       putStrLn "One or more tests failed"
       exitFailure
 
-lawsCheckMany' :: [Laws] -> IO Bool
-lawsCheckMany' xs = fmap getAll $ do
-  putStrLn "\nTesting properties for common typeclasses...\n"
-  let r = map lawsToGroup xs
-  foldMap (fmap All . checkParallel) r
- 
 foldMapA :: (Foldable t, Monoid m, Applicative f) => (a -> f m) -> t a -> f m
 foldMapA f = getAp . foldMap (Ap . f)
 

@@ -13,7 +13,7 @@ import qualified Hedgehog.Range as Range
 testFoldable :: [(String, [Laws])]
 testFoldable =
   [ ("Set", listSet)
-  , ("BadList", listBadList) 
+--  , ("BadList", listBadList) 
   ]
 
 listSet :: [Laws]

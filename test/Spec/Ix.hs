@@ -5,8 +5,8 @@ import Hedgehog.Classes
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
-ranged :: (Bounded a, Num a) => (Range.Range a -> b) -> b
-ranged f = f (Range.constantBounded)
+ranged :: Integral a => (Range.Range a -> b) -> b
+ranged f = f (Range.linear 0 20)
 
 testIx :: [(String, [Laws])]
 testIx =

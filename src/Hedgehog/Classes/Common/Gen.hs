@@ -38,7 +38,7 @@ genSmallList :: Gen a -> Gen [a]
 genSmallList gen = Gen.list (Range.linear 0 6) gen
 
 genSmallString :: Gen String
-genSmallString = Gen.string (Range.linear 0 10) Gen.ascii
+genSmallString = Gen.string (Range.linear 0 6) Gen.ascii
 
 -- Haskell uses the operator precedences 0..9, the special function application
 -- precedence 10 and the precedence 11 for function arguments. Both show and
@@ -65,7 +65,7 @@ genValidRange :: Ix a => Gen a -> Gen (a, a)
 genValidRange gen = do
   Gen.filter (\(l,u) -> l <= u) (genTuple gen gen)
 
-genInRange :: Ix a => Gen a -> Gen (a, a, a)
+genInRange :: (Ix a) => Gen a -> Gen (a, a, a)
 genInRange gen = do
   Gen.filter (\(l,u,i) -> inRange (l,u) i) (genTuple3 gen gen gen)
  
@@ -73,3 +73,4 @@ genSetInteger :: Gen (S.Set Integer)
 genSetInteger = do
   xs <- sequence $ fmap (const genSmallInteger) [1..10 :: Integer]
   pure $ foldMap S.singleton xs
+

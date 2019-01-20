@@ -34,7 +34,7 @@ import Spec.Storable
 import Spec.Traversable
 
 main :: IO Bool
-main = lawsCheckMany' allLaws
+main = lawsCheckMany allLaws
 
 allNullaryLaws :: [(String, [Laws])]
 allNullaryLaws = testBits
@@ -78,17 +78,6 @@ allBinaryLaws = testArrow
   ++ testCategory
   ++ testCommutativeCategory
 
-allLaws :: [Laws]
-allLaws = foldMap snd allNullaryLaws
-
---allNullaryLaws ++ allUnaryLaws ++ allBinaryLaws
-
-{-
-tightenTypes :: [(String, [Laws])] -> [(String, [Laws])]
-tightenTypes = map tighten . List.groupBy (\(a,_) (c,_) -> a == c)
-  where
-    tighten :: [(String, [Laws])] -> (String, [Laws])
-    tighten xs = case foldMap (\(a,b) -> (Monoid.First (Just a), b)) xs of
-      (Monoid.First a, b) -> (fromMaybe mempty a, b) 
--}
+allLaws :: [(String, [Laws])]
+allLaws = allNullaryLaws ++ allUnaryLaws ++ allBinaryLaws
 
