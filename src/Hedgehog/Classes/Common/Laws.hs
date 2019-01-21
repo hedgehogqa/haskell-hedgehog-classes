@@ -14,16 +14,14 @@ module Hedgehog.Classes.Common.Laws
   ) where
 
 import Control.Monad.IO.Class (MonadIO(liftIO))
-import Data.Coerce (coerce)
 import Data.Monoid (All(..), Ap(..))
-import Hedgehog (Gen, Group(..), checkParallel)
+import Hedgehog (Gen)
 import Hedgehog.Classes.Common.Property (Context(..))
-import Hedgehog.Internal.Property (Property(..), PropertyName(..), GroupName(..))
+import Hedgehog.Internal.Property (Property(..))
 import Hedgehog.Internal.Region (Region)
 import Hedgehog.Internal.Report (Report, Result(..), Progress(..), renderProgress, reportStatus)
 import Hedgehog.Internal.Runner (checkReport)
 import System.Exit (exitFailure)
-import qualified Data.List as List
 import qualified Hedgehog.Classes.Common.PP as PP
 import qualified Hedgehog.Internal.Region as Region
 import qualified Hedgehog.Internal.Seed as Seed
@@ -33,16 +31,11 @@ data Laws = Laws
   , lawsProperties :: [(String, Property)]
   }
 
-lawsToGroup :: Laws -> Group
-lawsToGroup Laws{..} = Group (coerce lawsTypeClass) (coerce lawsProperties)
-
-data LawContext a = LawContext -- forall b. LawContext
+data LawContext = LawContext -- forall b. LawContext
   { lawContextLawName :: String -- ^ law name
   , lawContextLawBody :: String -- ^ law body
   , lawContextTcName  :: String -- ^ typeclass name
-  , lawContextTcMethod :: (a -> a -> String) -- ^ how to show the specific property test
-  , lawContextLhs :: a -- ^ generated LHS
-  , lawContextRhs :: a -- ^ generated RHS
+  , lawContextTcProp  :: String -- ^ how to show the specific property test
 --  , lawContextLhsReduced :: Maybe b -- ^ LHS
 --  , lawContextRhsReduced :: Maybe b -- ^ RHS
 --  , lawContextEquation :: (b -> b -> String) -- ^ how to show the reduced equation
@@ -55,14 +48,14 @@ data LawContext a = LawContext -- forall b. LawContext
 --  ]
 --showReduced _ _ _ = "Could not find a reduced form of the test case equation."
 
-showLawContext :: LawContext a -> Context
+showLawContext :: LawContext -> Context
 showLawContext LawContext{..} = Context $ unlines
   [ "When testing the " ++ lawContextLawName ++ " law, for the " ++ lawContextTcName ++ " typeclass, the following test failed: "
-  , "    " ++ lawContextTcMethod lawContextLhs lawContextRhs
+  , "    " ++ lawContextTcProp
   , mempty
 --  , showReduced lawContextEquation lawContextLhsReduced lawContextRhsReduced
 --  , mempty 
-  , lawContextLawName ++ ": " ++ lawContextLawBody
+  , lawContextLawName ++ " Law: " ++ lawContextLawBody
   ]
 
 lawsCheck :: Laws -> IO Bool

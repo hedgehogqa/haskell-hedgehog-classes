@@ -12,19 +12,17 @@ eqLaws gen = Laws "Eq"
   , ("Reflexive", eqReflexive gen) 
   ]
 
-transitiveLaw :: forall a. Show a => a -> a -> a -> LawContext a
+transitiveLaw :: forall a. Show a => a -> a -> a -> LawContext
 transitiveLaw a b c = LawContext
   { lawContextLawName = "Transitivity"
   , lawContextLawBody = "forall a b c. a == b ∧ b == c ⇒ a == c" 
   , lawContextTcName  = "Eq"
-  , lawContextTcMethod = \_ _ ->
+  , lawContextTcProp  =
       let showA = show a
           showB = show b
           showC = show c
       in showA ++ " == " ++ showB ++ " ∧ " ++ showB ++ " == " ++
          showC ++ " ⇒ " ++ showA ++ " == " ++ showC
-  , lawContextLhs = a
-  , lawContextRhs = a
   }
 
 eqTransitive :: forall a. (Eq a, Show a) => Gen a -> Property
@@ -41,17 +39,17 @@ eqTransitive gen = property $ do
       True -> hneqCtx a c ctx
       False -> success
 
-symmetricLaw :: forall a. Show a => a -> a -> LawContext a
-symmetricLaw lhs rhs = LawContext
+symmetricLaw :: forall a. Show a => a -> a -> LawContext
+symmetricLaw x y = LawContext
   { lawContextLawName = "Symmetry"
   , lawContextLawBody = "forall a b. a == b ⇒ b == a"
   , lawContextTcName  = "Eq"
-  , lawContextTcMethod = \x y -> show x ++ " == " ++ show y ++ " ⇒ " ++ show y ++ " == " ++ show x
-  , lawContextLhs = lhs
-  , lawContextRhs = rhs
---  , lawContextEquation = \_ _ -> mempty
---  , lawContextLhsReduced = Nothing
---  , lawContextRhsReduced = Nothing
+  , lawContextTcProp =
+      let showX = show x
+          showY = show y
+      in showX ++ " == " ++ showY
+         ++ " ⇒ "
+         ++ showY ++ " == " ++ showX
   }
 
 eqSymmetric :: forall a. (Eq a, Show a) => Gen a -> Property
@@ -63,17 +61,12 @@ eqSymmetric gen = property $ do
     True -> heqCtx b a ctx
     False -> hneqCtx b a ctx
 
-reflexiveLaw :: Show a => a -> LawContext a
+reflexiveLaw :: Show a => a -> LawContext
 reflexiveLaw a = LawContext
   { lawContextLawName = "Reflexivity"
   , lawContextLawBody = "forall a. a == a"
   , lawContextTcName = "Eq"
-  , lawContextTcMethod = \x y -> show x ++ " == " ++ show y
-  , lawContextLhs = a
-  , lawContextRhs = a
---  , lawContextEquation = \_ _ -> mempty
---  , lawContextLhsReduced = Nothing
---  , lawContextRhsReduced = Nothing
+  , lawContextTcProp = let showA = show a in showA ++ " == " ++ showA
   }
 
 eqReflexive :: forall a. (Eq a, Show a) => Gen a -> Property
