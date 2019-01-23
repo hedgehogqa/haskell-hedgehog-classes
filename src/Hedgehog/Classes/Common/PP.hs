@@ -21,7 +21,7 @@ module Hedgehog.Classes.Common.PP
   , renderResult
   ) where
 
---import Hedgehog.Range (Size)
+import Hedgehog.Range (Size)
 import Control.Monad.IO.Class (MonadIO(..))
 import qualified Data.List as List
 import Hedgehog.Internal.Report
@@ -30,7 +30,7 @@ import Hedgehog.Internal.Report
   )
 import qualified Text.PrettyPrint.Annotated.WL as WL
 import Text.PrettyPrint.Annotated.WL ( (<+>) )
---import qualified Hedgehog.Internal.Seed as Seed
+import qualified Hedgehog.Internal.Seed as Seed
 import Text.PrettyPrint.Annotated.WL (Doc)
 
 ppDoc :: Show x => x -> Doc a
@@ -99,11 +99,11 @@ ppTextLines = fmap WL.text . List.lines
 markup :: Markup -> Doc Markup -> Doc Markup
 markup = WL.annotate
 
---gutter :: Markup -> Doc Markup -> Doc Markup
---gutter m x = markup m ">" <+> x
+gutter :: Markup -> Doc Markup -> Doc Markup
+gutter m x = markup m ">" <+> x
 
 ppFailure :: MonadIO m => FailureReport -> m (Doc Markup)
-ppFailure (FailureReport _size _seed _ _inputs0 mlocation0 msg _mdiff msgs0) = do
+ppFailure (FailureReport size seed _ _inputs0 mlocation0 msg _mdiff msgs0) = do
   msgs <- case mlocation0 of
     Nothing ->
       let msgs1 = msgs0 ++ (if null msg then [] else [msg])
@@ -117,19 +117,18 @@ ppFailure (FailureReport _size _seed _ _inputs0 mlocation0 msg _mdiff msgs0) = d
 
   pure . WL.indent 2 . WL.vsep . WL.punctuate WL.line $ concat
     [ with msgs WL.vsep
---    , [ppReproduce size seed]
+    , [ppReproduce size seed]
     ]
 
---ppReproduce :: Size -> Seed.Seed -> Doc Markup
---ppReproduce size seed = WL.vsep
---  [ markup ReproduceHeader "This failure can be reproduced by running:"
---  , gutter ReproduceGutter . markup ReproduceSource $
---      "recheck" <+>
---      WL.text (showsPrec 11 size "") <+>
---      WL.text (showsPrec 11 seed "") <+>
---      "<property>"
---  ]
+ppReproduce :: Size -> Seed.Seed -> Doc Markup
+ppReproduce size seed = WL.vsep
+  [ markup ReproduceHeader "This failure can be reproduced by running:"
+  , gutter ReproduceGutter . markup ReproduceSource $
+      "recheck" <+>
+      WL.text (showsPrec 11 size "") <+>
+      WL.text (showsPrec 11 seed "") <+>
+      "<property>"
+  ]
 
 renderResult :: MonadIO m => Report Result -> m String
 renderResult x = renderDoc Nothing =<< ppResult x
-

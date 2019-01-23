@@ -22,65 +22,99 @@ applicativeLaws gen = Laws "Applicative"
   , ("LiftA2 Part 2", applicativeLiftA2_2 gen) 
   ]
 
-applicativeIdentity :: forall f.
+type ApplicativeProp f =
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
   ) => (forall x. Gen x -> Gen (f x)) -> Property
+
+applicativeIdentity :: forall f. ApplicativeProp f
 applicativeIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  (pure id <*> a) `heq1` a
+  let lhs = pure id <*> a
+  let rhs = a
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Identity", lawContextLawBody = "forall a. pure id <*> a = a"
+        , lawContextTcName = "Applicative", lawContextTcProp =
+             let showA = show a
+             in "pure id <*> " ++ showA ++ " == " ++ showA
+        }
+  heqCtx1 lhs rhs ctx
 
-applicativeComposition :: forall f.
-  ( Applicative f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeComposition :: forall f. ApplicativeProp f
 applicativeComposition fgen = property $ do
   u' <- forAll $ fgen genQuadraticEquation
   v' <- forAll $ fgen genQuadraticEquation
   w' <- forAll genSmallInteger
-
   let u = runQuadraticEquation <$> u'
       v = runQuadraticEquation <$> v'
       w = pure w'
-  (pure (.) <*> u <*> v <*> w) `heq1` (u <*> (v <*> w))
+  let lhs = pure (.) <*> u <*> v <*> w
+  let rhs = u <*> (v <*> w)
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "forall a b c. pure (.) <*> a <*> b <*> c == a <*> (b <*> c)"
+        , lawContextTcName = "Applicative", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx1 lhs rhs ctx
 
-applicativeHomomorphism :: forall f.
-  ( Applicative f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeHomomorphism :: forall f. ApplicativeProp f
 applicativeHomomorphism _ = property $ do
   e <- forAll genQuadraticEquation
   a <- forAll genSmallInteger
   let f = runQuadraticEquation e
-  (pure f <*> pure a) `heq1` (pure (f a) :: f Integer)
+  let lhs = pure f <*> pure a
+  let rhs = pure (f a) :: f Integer
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Homomorphism", lawContextLawBody = "forall f a. pure f <*> pure a == pure (f a)"
+        , lawContextTcName = "Applicative", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx1 lhs rhs ctx
 
-applicativeInterchange :: forall f.
-  ( Applicative f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeInterchange :: forall f. ApplicativeProp f
 applicativeInterchange fgen = property $ do
   u' <- forAll $ fgen genQuadraticEquation
   y <- forAll genSmallInteger
   let u = fmap runQuadraticEquation u'
-  (u <*> pure y) `heq1` (pure ($ y) <*> u)
+  let lhs = (u <*> pure y)
+  let rhs = pure ($ y) <*> u
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Interchange", lawContextLawBody = "forall a b. a <*> pure b == pure ($ b) <*> a"
+        , lawContextTcName = "Applicative", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx1 lhs rhs ctx
 
-applicativeLiftA2_1 :: forall f.
-  ( Applicative f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeLiftA2_1 :: forall f. ApplicativeProp f
 applicativeLiftA2_1 fgen = property $ do
   f' <- forAll $ fgen genQuadraticEquation
   x <- forAll $ fgen genSmallInteger
   let f = fmap runQuadraticEquation f'
-  (liftA2 id f x) `heq1` (f <*> x)
+  let lhs = liftA2 id f x
+  let rhs = f <*> x
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "LiftA2 1", lawContextLawBody = "forall f x. liftA2 id f x == f <*> x"
+        , lawContextTcName = "Applicative", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx1 lhs rhs ctx
 
-applicativeLiftA2_2 :: forall f.
-  ( Applicative f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+applicativeLiftA2_2 :: forall f. ApplicativeProp f
 applicativeLiftA2_2 fgen = property $ do
   x <- forAll $ fgen genSmallInteger
   y <- forAll $ fgen genSmallInteger
   let f a b = a * a - b
-  (liftA2 f x y) `heq1` (f <$> x <*> y)
+  let lhs = liftA2 f x y
+  let rhs = f <$> x <*> y
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "LiftA2 2", lawContextLawBody = "forall f x y. liftA2 f x y == f <$> x <*> y"
+        , lawContextTcName = "Applicative", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx1 lhs rhs ctx
 

@@ -43,14 +43,26 @@ bifoldableIdentity fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
   let lhs = bifold x
   let rhs = bifoldMap id id x
-  lhs === rhs
-
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Identity", lawContextLawBody = "forall x. bifold x == bifoldMap id id x"
+        , lawContextTcName = "Bifoldable", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx lhs rhs ctx
+        
 bifoldableFoldMap :: forall f. BifoldableProp f
 bifoldableFoldMap fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
   let lhs = (bifoldMap Sum Sum x)
   let rhs = (bifoldr (mappend . Sum) (mappend . Sum) mempty x)
-  lhs === rhs
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "FoldMap", lawContextLawBody = "forall f g x. bifoldMap f g x == bifoldr (mappend . f) (mappend . g) mempty x"
+        , lawContextTcName = "Bifoldable", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx lhs rhs ctx
 
 bifoldableFoldr :: forall f. BifoldableProp f
 bifoldableFoldr fgen = property $ do
@@ -62,7 +74,13 @@ bifoldableFoldr fgen = property $ do
   let z0 = 0
   let lhs = (bifoldr f g z0 x)
   let rhs = (appEndo (bifoldMap (Endo . f) (Endo . g) x) z0)
-  lhs === rhs
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Foldr", lawContextLawBody = "forall f g z t. bifoldr f g z t == appEndo (bifoldMap (Endo . f) (Endo . g) t) z"
+        , lawContextTcName = "Bifoldable", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx lhs rhs ctx 
 
 type BifoldableFunctorProp f =
   ( Bifoldable f, Bifunctor f
@@ -75,7 +93,13 @@ bifoldableFunctorComposition fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
   let lhs = bifoldMap Product Product x
   let rhs = bifold (bimap Product Product x)
-  lhs === rhs  
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "forall f g. bifoldMap f g == bifold . bimap f g"
+        , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx lhs rhs ctx 
 
 bifoldableFunctorFoldMap :: forall f. BifoldableFunctorProp f
 bifoldableFunctorFoldMap fgen = property $ do
@@ -84,6 +108,11 @@ bifoldableFunctorFoldMap fgen = property $ do
   let i (Sum s) = s + s
   let lhs = bifoldMap Sum Sum (bimap h i x)
   let rhs = bifoldMap (Sum . h) (Sum . i) x
-  lhs === rhs
-
+  let ctx = showLawContext $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "forall f g. bifoldMap f g . bimap hi == bifoldMap (f . h) (g . i)"
+        , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        }
+  heqCtx lhs rhs ctx
 
