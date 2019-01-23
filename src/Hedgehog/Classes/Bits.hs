@@ -33,215 +33,214 @@ genBitIndex = let n = finiteBitSize (undefined :: a) in if n > 0
   then fmap BitIndex (Gen.integral $ Range.linear 0 (n - 1))
   else pure (BitIndex 0)
 
-conjunctionIdempotence :: Show a => a -> LawContext
-conjunctionIdempotence x = LawContext
-  { lawContextLawName = "Conjunction Idempotence"
-  , lawContextLawBody = "forall n. n .&. n == n"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showX = show x
-      in showX ++ " .&. " ++ showX ++ " == " ++ showX
-  }
-
 bitsConjunctionIdempotence :: forall a. (Bits a, Show a) => Gen a -> Property
 bitsConjunctionIdempotence gen = property $ do
   n <- forAll gen
-  let ctx = showLawContext (conjunctionIdempotence n) 
-  heqCtx (n .&. n) n ctx  
-
-disjunctionIdempotence :: Show a => a -> LawContext
-disjunctionIdempotence x = LawContext
-  { lawContextLawName = "Conjunction Idempotence"
-  , lawContextLawBody = "forall n. n .|. n == n"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showX = show x
-      in showX ++ " .|. " ++ showX ++ " == " ++ showX
-  }
+  let lhs = n .&. n; rhs = n; 
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Conjunction Idempotence"
+        , lawContextLawBody = "n .&. n" ++ congruent ++ "n"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showN = show n;
+            in concat [ "n .&. n", congruent, "n, where", newline, tab, "n = ", showN ]
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx lhs rhs ctx
 
 bitsDisjunctionIdempotence :: forall a. (Bits a, Show a) => Gen a -> Property
 bitsDisjunctionIdempotence gen = property $ do
   n <- forAll gen
-  let ctx = showLawContext (disjunctionIdempotence n)
-  heqCtx (n .|. n) n ctx
-
-doubleComplement :: Show a => a -> LawContext
-doubleComplement x = LawContext
-  { lawContextLawName = "Double Complement"
-  , lawContextLawBody = "forall n. complement (complement n) == n"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showX = show x
-      in "complement (complement " ++ showX ++ ") == " ++ showX
-  }
+  let lhs = n .|. n; rhs = n; 
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Disjunction Idempotence"
+        , lawContextLawBody = "n .|. n" ++ congruent ++ "n"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showX = show n
+            in showX ++ " .|. " ++ showX ++ "" ++ congruent ++ "" ++ showX
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx lhs rhs ctx
 
 bitsDoubleComplement :: forall a. (Bits a, Show a) => Gen a -> Property
 bitsDoubleComplement gen = property $ do
   n <- forAll gen
-  let ctx = showLawContext (doubleComplement n) 
-  heqCtx (complement (complement n)) n ctx
-
-setBitLaw :: Show a => a -> Int -> LawContext
-setBitLaw x i = LawContext
-  { lawContextLawName = "Set Bit"
-  , lawContextLawBody = "forall n. setBit n i == n .|. bit i"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showX = show x
-          showI = show i
-      in "setBit " ++ showX ++ " " ++ showI ++ " == " ++ showX ++ " .|. bit " ++ showI
-  }
+  let lhs = complement (complement n); rhs = n;
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Double Complement"
+        , lawContextLawBody = "complement (complement n)" ++ congruent ++ "n"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showX = show n
+            in "complement (complement " ++ showX ++ ")" ++ congruent ++ "" ++ showX
+        , lawContextReduced = reduced lhs rhs 
+        }
+  
+  heqCtx lhs rhs ctx
 
 bitsSetBit :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsSetBit gen = property $ do
   n <- forAll gen
   (BitIndex i) :: BitIndex a <- forAll genBitIndex
-  let ctx = showLawContext (setBitLaw n i) 
-  heqCtx (setBit n i) (n .|. bit i) ctx
-
-clearBitLaw :: Show a => a -> Int -> LawContext
-clearBitLaw n i = LawContext
-  { lawContextLawName = "Clear Bit"
-  , lawContextLawBody = "forall n. clearBit n i == n .&. complement (bit i)"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showN = show n
-          showI = show i
-      in "clearBit " ++ showN ++ " " ++ showI ++ " == " ++ showN ++ " .&. complement (bit " ++ showI ++ ")"
-  }
+  let lhs = setBit n i; rhs = n .|. bit i;
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Set Bit"
+        , lawContextLawBody = "setBit n i" ++ congruent ++ "n .|. bit i"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showX = show n
+                showI = show i
+            in "setBit " ++ showX ++ " " ++ showI ++ "" ++ congruent ++ "" ++ showX ++ " .|. bit " ++ showI
+        , lawContextReduced = reduced lhs rhs 
+        } 
+  heqCtx lhs rhs ctx
 
 bitsClearBit :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsClearBit gen = property $ do
   n <- forAll gen
   (BitIndex i) :: BitIndex a <- forAll genBitIndex
-  let ctx = showLawContext (clearBitLaw n i)
-  heqCtx (clearBit n i) (n .&. complement (bit i)) ctx
-
-complementBitLaw :: Show a => a -> Int -> LawContext
-complementBitLaw n i = LawContext
-  { lawContextLawName = "Complement Bit"
-  , lawContextLawBody = "forall n. complement n i == xor n (bit i)"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showN = show n
-          showI = show i
-      in "complementBit " ++ showN ++ " " ++ showI ++ " == xor " ++ showN ++ " (bit " ++ showI ++ ")"
-  }
+  let lhs = clearBit n i; rhs = n .&. complement (bit i)
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Clear Bit"
+        , lawContextLawBody = "clearBit n i" ++ congruent ++ "n .&. complement (bit i)"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showN = show n
+                showI = show i
+            in "clearBit " ++ showN ++ " " ++ showI ++ congruent ++ showN ++ " .&. complement (bit " ++ showI ++ ")"
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx lhs rhs ctx
 
 bitsComplementBit :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsComplementBit gen = property $ do
   n <- forAll gen
   (BitIndex i) :: BitIndex a <- forAll genBitIndex
-  let ctx = showLawContext (complementBitLaw n i) 
-  heqCtx (complementBit n i) (xor n (bit i)) ctx
-
-clearZeroLaw :: Show a => a -> Int -> LawContext
-clearZeroLaw z i = LawContext
-  { lawContextLawName = "Clear Zero"
-  , lawContextLawBody = "clearBit zeroBits i == zeroBits"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showZ = show z
-          showI = show i
-      in "clearBit zeroBits " ++ showI ++ " == zeroBits," ++ "\n    where zeroBits = " ++ showZ
-  }
+  let lhs = complementBit n i; rhs = xor n (bit i);
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Complement Bit"
+        , lawContextLawBody = "complement n i" ++ congruent ++ "xor n (bit i)"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showN = show n
+                showI = show i
+            in "complementBit " ++ showN ++ " " ++ showI ++ congruent ++ "xor " ++ showN ++ " (bit " ++ showI ++ ")"
+        , lawContextReduced = reduced lhs rhs 
+        } 
+  heqCtx lhs rhs ctx
 
 bitsClearZero :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsClearZero _ = property $ do
-  (BitIndex n) :: BitIndex a <- forAll genBitIndex
+  (BitIndex i) :: BitIndex a <- forAll genBitIndex
   let z = zeroBits :: a
-  let ctx = showLawContext (clearZeroLaw z n)
-  heqCtx (clearBit z n) z ctx
-
-setZeroLaw :: Show a => a -> Int -> LawContext
-setZeroLaw z i = LawContext
-  { lawContextLawName = "Set Zero"
-  , lawContextLawBody = "setBit zeroBits i == zeroBits"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showZ = show z
-          showI = show i
-      in "setBit zeroBits " ++ showI ++ " == bit " ++ showI ++ ", \n    where zeroBits = " ++ showZ
-  }
+  let lhs = clearBit z i; rhs = z
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Clear Zero"
+        , lawContextLawBody = "clearBit zeroBits i" ++ congruent ++ "zeroBits"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showZ = show z
+                showI = show i
+            in concat
+              [ "clearBit zeroBits ", showI, congruent, "zeroBits, where"
+              , newline, tab, "zeroBits = ", showZ
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx lhs rhs ctx
 
 bitsSetZero :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsSetZero _ = property $ do
   (BitIndex i) :: BitIndex a <- forAll genBitIndex
   let z = zeroBits :: a
-  let ctx = showLawContext (setZeroLaw z i) 
-  heqCtx (setBit z i) (bit i) ctx
-
-testZeroLaw :: Show a => a -> Int -> LawContext
-testZeroLaw z i = LawContext
-  { lawContextLawName = "Test Zero"
-  , lawContextLawBody = "testBit zeroBits i == False"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showZ = show z
-          showI = show i
-      in "testBit zeroBits " ++ showI ++ " == False, \n    where zeroBits = " ++ showZ
-  }
+  let lhs = setBit z i; rhs = bit i;
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Set Zero"
+        , lawContextLawBody = "setBit zeroBits i" ++ congruent ++ "zeroBits"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showZ = show z
+                showI = show i
+            in concat
+              [ "setBit zeroBits ", showI, congruent, "bit ", showI, ", where"
+              , newline, tab, "zeroBits = ", showZ
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx lhs rhs ctx
 
 bitsTestZero :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsTestZero _ = property $ do
   (BitIndex i) :: BitIndex a <- forAll genBitIndex
   let z = zeroBits :: a
-  let ctx = showLawContext (testZeroLaw z i) 
-  heqCtx (testBit z i) False ctx  
-
-popZeroLaw :: Show a => a -> LawContext
-popZeroLaw z = LawContext
-  { lawContextLawName = "Pop Zero"
-  , lawContextLawBody = "popZero zeroBits = 0"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showZ = show z
-      in "popCount zeroBits == 0,\n    where zeroBits = " ++ showZ
-  }
+  let lhs = testBit z i; rhs = False;
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Test Zero"
+        , lawContextLawBody = "testBit zeroBits i" ++ congruent ++ "False"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showZ = show z
+                showI = show i
+            in concat [ "testBit zeroBits ", showI, congruent, "False, where", newline, tab, "zeroBits = ", showZ ]
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx lhs rhs ctx  
 
 bitsPopZero :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsPopZero _ = property $ do
   let z = zeroBits :: a
-  let ctx = showLawContext (popZeroLaw z)
-  heqCtx (popCount z) 0 ctx
-
-countLeadingZerosLaw :: (Show a, Show b) => a -> b -> LawContext
-countLeadingZerosLaw z f = LawContext
-  { lawContextLawName = "Leading Zeros"
-  , lawContextLawBody = "countLeadingZeros zeroBits == finiteBitSize (undefined @a)"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showZ = show z
-          showF = show f
-      in "countLeadingZeros zeroBits == finiteBitSize (undefined @a),\n    where"
-         ++ "\n        zeroBits = " ++ showZ
-         ++ "\n        finiteBitSize = " ++ showF
-  }
-
-countTrailingZerosLaw :: (Show a, Show b) => a -> b -> LawContext
-countTrailingZerosLaw z f = LawContext
-  { lawContextLawName = "Trailing Zeros"
-  , lawContextLawBody = "countTrailingZeros zeroBits == finiteBitSize (undefined :: a)"
-  , lawContextTcName = "Bits"
-  , lawContextTcProp =
-      let showZ = show z
-          showF = show f
-      in "countTrailingZeros zeroBits == finiteBitSize (undefined :: a),\n    where"
-         ++ "\n        zeroBits = " ++ showZ
-         ++ "\n        finiteBitSize = " ++ showF
-  }
+  let lhs = popCount z; rhs = 0;
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Pop Zero"
+        , lawContextLawBody = "popZero zeroBits = 0"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showZ = show z
+            in concat [ "popCount zeroBits", congruent, "0, where", newline, tab, "zeroBits = ", showZ ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
+  heqCtx lhs rhs ctx
 
 bitsCountLeadingZeros :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsCountLeadingZeros _ = property $ do
   let z = zeroBits :: a
   let f = finiteBitSize (undefined :: a)
-  let ctx = showLawContext (countLeadingZerosLaw z f)
-  heqCtx (countLeadingZeros z) f ctx
+  let lhs = countLeadingZeros z; rhs = f;
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Leading Zeros"
+        , lawContextLawBody = "countLeadingZeros zeroBits" ++ congruent ++ "finiteBitSize (undefined :: a)"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showZ = show z
+                showF = show f
+            in concat
+              [ "countLeadingZeros zeroBits", congruent, "finiteBitSize (undefined :: a), where"
+              , newline, tab, "zeroBits = " ++ showZ
+              , newline, tab, "finiteBitSize = " ++ showF
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
+  heqCtx lhs rhs ctx
 
 bitsCountTrailingZeros :: forall a. (FiniteBits a, Show a) => Gen a -> Property
 bitsCountTrailingZeros _ = property $ do
   let z = zeroBits :: a
   let f = finiteBitSize (undefined :: a)
-  let ctx = showLawContext (countTrailingZerosLaw z f)
-  heqCtx (countTrailingZeros z) f ctx
+  let lhs = countTrailingZeros z; rhs = f;
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Trailing Zeros"
+        , lawContextLawBody = "countTrailingZeros zeroBits" ++ congruent ++ "finiteBitSize (undefined :: a)"
+        , lawContextTcName = "Bits"
+        , lawContextTcProp =
+            let showZ = show z
+                showF = show f
+            in concat
+              [ "countTrailingZeros zeroBits", congruent, "finiteBitSize (undefined :: a), where"
+              , newline, tab, "zeroBits = " ++ showZ
+              , newline, tab, "finiteBitSize = " ++ showF
+              ]           
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx lhs rhs ctx
 

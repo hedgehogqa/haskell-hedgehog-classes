@@ -24,7 +24,19 @@ contravariantIdentity ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 contravariantIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
-  contramap id a `heq1` id a
+  let lhs = contramap id a
+  let rhs = id a
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Identity", lawContextLawBody = "contramap id == id"
+        , lawContextTcName = "Contravariant", lawContextTcProp =
+            let showA = show a
+            in concat
+              [ "contramap id x", congruent, "id x, where"
+              , newline, tab, "x = ", showA
+              ]
+        , lawContextReduced = reduced lhs rhs
+        }
+  heqCtx1 lhs rhs ctx
 
 contravariantComposition ::
   ( Contravariant f
@@ -36,5 +48,20 @@ contravariantComposition fgen = property $ do
   g' <- forAll genQuadraticEquation
   let f = runQuadraticEquation f'
   let g = runQuadraticEquation g'
-  (contramap f (contramap g a)) `heq1` (contramap (g . f) a)
+  let lhs = contramap f (contramap g a)
+  let rhs = contramap (g . f) a
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "contramap f . contramap g" ++ congruent ++ "contramap (g . f)"
+        , lawContextTcName = "Contravariant", lawContextTcProp =
+            let showF = show f'; showG = show g'; showA = show a;
+            in concat
+                 [ "contramap f . contramap g $ a", congruent, "contramap (g . f) a, where"
+                 , newline, newline
+                 , tab, "f = ", showF, newline
+                 , tab, "g = ", showG, newline
+                 , tab, "a = ", showA
+                 ]
+        , lawContextReduced = reduced lhs rhs
+        }
+  heqCtx1 lhs rhs ctx
 

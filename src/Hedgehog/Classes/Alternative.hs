@@ -29,11 +29,15 @@ alternativeLeftIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
   let lhs = empty <|> a
   let rhs = a
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Left Identity", lawContextLawBody = "forall a. empty <|> a == a"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Left Identity", lawContextLawBody = "forall a. empty <|> a" ++ congruent ++ "a"
         , lawContextTcName = "Alternative", lawContextTcProp =
-            let showX = show lhs; showY = show rhs;
-            in "empty <|> " ++ showX ++ " == " ++ showY
+            let showA = show a;
+            in concat
+              [ "empty <|> a ", congruent, "a, where", newline
+              , tab, "a = ", showA
+              ]
+        , lawContextReduced = reduced lhs rhs
         }
   heqCtx1 lhs rhs ctx
 
@@ -42,11 +46,15 @@ alternativeRightIdentity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
   let lhs = a <|> empty
   let rhs = a
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Right Identity", lawContextLawBody = "forall a. a <|> empty == a"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Right Identity", lawContextLawBody = "forall a. a <|> empty" ++ congruent ++ "a"
         , lawContextTcName = "Alternative", lawContextTcProp =
-            let showX = show lhs; showY = show rhs;
-            in showX ++ " <|> empty == " ++ showY
+            let showA = show a;
+            in concat
+              [ "a <|> empty", congruent, "a, where", newline
+              , tab, "a = ", showA
+              ]
+        , lawContextReduced = reduced lhs rhs
         }
   heqCtx1 lhs rhs ctx  
 
@@ -57,11 +65,17 @@ alternativeAssociativity fgen = property $ do
   c <- forAll $ fgen genSmallInteger
   let lhs = (a <|> (b <|> c))
   let rhs = ((a <|> b) <|> c)
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Associativity", lawContextLawBody = "forall a b c. a <|> (b <|> c) == (a <|> b) <|> c"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Associativity", lawContextLawBody = "forall a b c. a <|> (b <|> c)" ++ congruent ++ "(a <|> b) <|> c"
         , lawContextTcName = "Alternative", lawContextTcProp =
             let showA = show a; showB = show b; showC = show c;
-            in showA ++ " <|> (" ++ showB ++ " <|> " ++ showC ++ ") == ("
-               ++ showA ++ " <|> " ++ showB ++ ") <|> " ++ showC
+            in concat
+                 [ "a <|> (b <|> c)", congruent, "(a <|> b) <|> c), where"
+                 , newline
+                 , tab, "a = ", showA, newline
+                 , tab, "b = ", showB, newline
+                 , tab, "c = ", showC, newline
+                 ]
+        , lawContextReduced = reduced lhs rhs
         }
   heqCtx1 lhs rhs ctx

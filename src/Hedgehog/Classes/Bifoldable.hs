@@ -43,25 +43,38 @@ bifoldableIdentity fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
   let lhs = bifold x
   let rhs = bifoldMap id id x
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Identity", lawContextLawBody = "forall x. bifold x == bifoldMap id id x"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Identity", lawContextLawBody = "bifold" ++ congruent ++ "bifoldMap id id"
         , lawContextTcName = "Bifoldable", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
-        }
+             let showX = show x;
+             in concat
+                 [ "bimap id id x", congruent, "x, where"
+                 , newline
+                 , tab, "x = ", showX
+                 ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
   heqCtx lhs rhs ctx
         
 bifoldableFoldMap :: forall f. BifoldableProp f
 bifoldableFoldMap fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  let lhs = (bifoldMap Sum Sum x)
-  let rhs = (bifoldr (mappend . Sum) (mappend . Sum) mempty x)
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "FoldMap", lawContextLawBody = "forall f g x. bifoldMap f g x == bifoldr (mappend . f) (mappend . g) mempty x"
+  let f = Sum; g = Sum . (+1)
+  let lhs = (bifoldMap f g x)
+  let rhs = (bifoldr (mappend . f) (mappend . g) mempty x)
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "FoldMap", lawContextLawBody = "bifoldMap f g == bifoldr (mappend . f) (mappend . g) mempty"
         , lawContextTcName = "Bifoldable", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
-        }
+             let showX = show x;
+             in concat
+                 [ "bifoldMap f g x", congruent, "bifoldr (mappend . f) (mappend . g) mempty x, where"
+                 , newline
+                 , tab, "f = \\x -> Sum x"
+                 , tab, "g = \\x -> Sum (x + 1)"
+                 , tab, "x = ", showX
+                 ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
   heqCtx lhs rhs ctx
 
 bifoldableFoldr :: forall f. BifoldableProp f
@@ -74,11 +87,19 @@ bifoldableFoldr fgen = property $ do
   let z0 = 0
   let lhs = (bifoldr f g z0 x)
   let rhs = (appEndo (bifoldMap (Endo . f) (Endo . g) x) z0)
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Foldr", lawContextLawBody = "forall f g z t. bifoldr f g z t == appEndo (bifoldMap (Endo . f) (Endo . g) t) z"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Foldr", lawContextLawBody = "bifoldr f g z t" ++ congruent ++ "appEndo (bifoldMap (Endo . f) (Endo . g) t) z"
         , lawContextTcName = "Bifoldable", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x; showF = show f'; showG = show g'; showZ = show z0;
+            in concat
+              [ "bifoldr f g z t", congruent, "appEndo (bifoldMap (Endo . f) (Endo . g) t z, where"
+              , newline
+              , tab, "f = ", showF, newline
+              , tab, "g = ", showG, newline
+              , tab, "t = ", showX, newline
+              , tab, "z = ", showZ
+              ]
+        , lawContextReduced = reduced lhs rhs 
         }
   heqCtx lhs rhs ctx 
 
@@ -91,28 +112,46 @@ type BifoldableFunctorProp f =
 bifoldableFunctorComposition :: forall f. BifoldableFunctorProp f
 bifoldableFunctorComposition fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
-  let lhs = bifoldMap Product Product x
-  let rhs = bifold (bimap Product Product x)
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "forall f g. bifoldMap f g == bifold . bimap f g"
+  let f = Product; g = Product . (+1)
+  let lhs = bifoldMap f g x
+  let rhs = bifold (bimap f g x)
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g == bifold . bimap f g"
         , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x;
+            in concat
+              [ "bifoldMap f g x", congruent, "bifold . bimap f g $ x"
+              , newline
+              , tab, "f = \\x -> Product x", newline
+              , tab, "g = \\x -> Product (x + 1)", newline
+              , tab, "x = ", showX
+              ]
+        , lawContextReduced = reduced lhs rhs 
         }
   heqCtx lhs rhs ctx 
 
 bifoldableFunctorFoldMap :: forall f. BifoldableFunctorProp f
 bifoldableFunctorFoldMap fgen = property $ do
   x <- forAll $ fgen genSmallSum genSmallSum
-  let h (Sum s) = s * s
-  let i (Sum s) = s + s
-  let lhs = bifoldMap Sum Sum (bimap h i x)
-  let rhs = bifoldMap (Sum . h) (Sum . i) x
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "forall f g. bifoldMap f g . bimap hi == bifoldMap (f . h) (g . i)"
+  let h (Sum s) = s * s + 3; showH = "\\(Sum s) -> s * s + 3"
+  let i (Sum s) = s + s - 7; showI = "\\(Sum s) -> s + s - 7"
+  let f = Sum; showF = "\\x -> Sum x"; g = Sum . (+1); showG = "\\x -> Sum (x + 1)"
+  let lhs = bifoldMap f g (bimap h i x)
+  let rhs = bifoldMap (f . h) (g . i) x
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g . bimap h i" ++ congruent ++ "bifoldMap (f . h) (g . i)"
         , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x;
+            in concat
+              [ "bifoldMap f g . bimap h i $ x", congruent, "bifoldMap (f . h) (g . i) $ x, where"
+              , newline
+              , tab, "f = ", showF, newline
+              , tab, "g = ", showG, newline
+              , tab, "h = ", showH, newline
+              , tab, "i = ", showI, newline
+              , tab, "x = ", showX
+              ]
+        , lawContextReduced = reduced lhs rhs 
         }
   heqCtx lhs rhs ctx
 

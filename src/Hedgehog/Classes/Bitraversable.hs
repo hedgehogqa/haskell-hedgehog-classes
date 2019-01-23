@@ -37,15 +37,29 @@ bitraversableNaturality fgen = property $ do
   let t = apTrans; f = func4; g = func4
   let lhs = bitraverse (t . f) (t . g) x
   let rhs = t (bitraverse f g x)
-  lhs `heq1` rhs
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Naturality", lawContextLawBody = "bitraverse (t . f) (t . g)" ++ congruent ++ "t . bitraverse f g, for every applicative transformation t"
+        , lawContextTcName = "Bitraversable", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx1 lhs rhs ctx  
 
 bitraversableIdentity :: forall f. BitraversableProp f
 bitraversableIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
   let lhs = bitraverse Identity Identity x
   let rhs = Identity x
-  lhs `heq1` rhs
-
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Identity", lawContextLawBody = "bitraverse Identity Identity == Identity"
+        , lawContextTcName = "Bitraversable", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx1 lhs rhs ctx  
+  
 bitraversableComposition :: forall f. BitraversableProp f
 bitraversableComposition fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
@@ -55,4 +69,11 @@ bitraversableComposition fgen = property $ do
       
   let rhs :: Compose Triple (Compose Triple (WL.Writer (S.Set Integer))) (f Integer Integer)
       rhs = bitraverse (Compose . fmap g1 . f1) (Compose . fmap g2 . f2) x
-  lhs `heq1` rhs
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "Compose . fmap (bitraverse g1 g2) . bitraverse f1 f2 == bitraverse (Compose . fmap g1 . f1) (Compose . fmap g2 . f2)"
+        , lawContextTcName = "Bitraversable", lawContextTcProp =
+            let sLhs = show lhs; sRhs = show rhs;
+            in sLhs ++ " == " ++ sRhs
+        , lawContextReduced = reduced lhs rhs 
+        }
+  heqCtx1 lhs rhs ctx  

@@ -79,6 +79,9 @@ foldableFoldl fgen = property $ do
   let rhs = appEndo (getDual (Foldable.foldMap (Dual . Endo . flip f) t)) z
   heqCtx lhs rhs NoContext
 
+ctxNotStrict :: String -> Context
+ctxNotStrict str = Context $ "Your implementation of " ++ str ++ " is not strict."
+
 foldableFoldr' ::
   ( Foldable f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
@@ -90,18 +93,23 @@ foldableFoldr' fgen = property $ do
         BottomUndefined -> error "foldableFoldr': your foldr' is not strict!"
         BottomValue v -> if even v then v else b
   let z0 = 0
-  r1 <- liftIO $ do
+  (r1, ctx1) <- liftIO $ do
     let f' k x z = k $! f x z
     e <- try (evaluate (Foldable.foldl f' id xs z0))
     case e of
-      Left (_ :: ErrorCall) -> pure Nothing
-      Right i -> pure (Just i)
-  r2 <- liftIO $ do
+      Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldr'")
+      Right i -> pure (Just i, NoContext)
+  (r2, ctx2) <- liftIO $ do
     e <- try (evaluate (Foldable.foldr' f z0 xs))
     case e of
-      Left (_ :: ErrorCall) -> pure Nothing
-      Right i -> pure (Just i)
-  r1 `heq` r2
+      Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldr'")
+      Right i -> pure (Just i, NoContext)
+  let ctx = case ctx1 of
+        NoContext -> case ctx2 of
+          NoContext -> contextualise $ LawContext {}
+          c2 -> c2
+        c1 -> c1
+  heqCtx r1 r2 ctx
 
 foldableFoldl' ::
   ( Foldable f
@@ -114,18 +122,23 @@ foldableFoldl' fgen = property $ do
         BottomUndefined -> error "foldableFoldl': your foldl' is not strict!"
         BottomValue v -> if even v then a else v
   let z0 = 0
-  r1 <- liftIO $ do
+  (r1,ctx1) <- liftIO $ do
     let f' x k z = k $! f z x
     e <- try (evaluate (Foldable.foldr f' id xs z0))
     case e of
-      Left (_ :: ErrorCall) -> pure Nothing
-      Right i -> pure (Just i)
-  r2 <- liftIO $ do
+      Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldl'")
+      Right i -> pure (Just i, NoContext)
+  (r2,ctx2) <- liftIO $ do
     e <- try (evaluate (Foldable.foldl' f z0 xs))
     case e of
-      Left (_ :: ErrorCall) -> pure Nothing
-      Right i -> pure (Just i) 
-  heqCtx r1 r2 (Context "Your implementation of foldl' is not strict.")
+      Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldl'")
+      Right i -> pure (Just i, NoContext) 
+  let ctx = case ctx1 of
+        NoContext -> case ctx2 of
+          NoContext -> contextualise $ LawContext {}
+          c2 -> c2
+        c1 -> c1
+  heqCtx r1 r2 ctx  
 
 foldableFoldl1 ::
   ( Foldable f

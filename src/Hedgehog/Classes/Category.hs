@@ -68,5 +68,3 @@ categoryCommutativity fgen = property $ do
   f <- forAll $ fgen genSmallInteger genSmallInteger
   g <- forAll $ fgen genSmallInteger genSmallInteger
   (f . g) `heq2` (g . f)
-
-

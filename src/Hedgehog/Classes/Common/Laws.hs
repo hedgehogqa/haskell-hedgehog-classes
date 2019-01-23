@@ -10,7 +10,12 @@ module Hedgehog.Classes.Common.Laws
   , lawsCheckOne
   , lawsCheckMany
 
-  , showLawContext
+  , contextualise
+  , reduced
+
+  , congruent
+  , newline
+  , tab
   ) where
 
 import Control.Monad.IO.Class (MonadIO(liftIO))
@@ -26,6 +31,13 @@ import qualified Hedgehog.Classes.Common.PP as PP
 import qualified Hedgehog.Internal.Region as Region
 import qualified Hedgehog.Internal.Seed as Seed
 
+congruent :: String
+congruent = " ≡ "
+
+newline, tab :: String
+newline = "\n"
+tab = "    "
+
 data Laws = Laws
   { lawsTypeClass :: String
   , lawsProperties :: [(String, Property)]
@@ -36,25 +48,18 @@ data LawContext = LawContext -- forall b. LawContext
   , lawContextLawBody :: String -- ^ law body
   , lawContextTcName  :: String -- ^ typeclass name
   , lawContextTcProp  :: String -- ^ how to show the specific property test
---  , lawContextLhsReduced :: Maybe b -- ^ LHS
---  , lawContextRhsReduced :: Maybe b -- ^ RHS
---  , lawContextEquation :: (b -> b -> String) -- ^ how to show the reduced equation
+  , lawContextReduced :: String -- ^ reduced equation, eg "LHS = RHS" where neither LHS nor RHS are reducible
   }
 
---showReduced :: (b -> b -> String) -> Maybe b -> Maybe b -> String
---showReduced f (Just x) (Just y) = unlines
---  [ "The reduced form of the equation is: "
---  , "    " ++ f x y
---  ]
---showReduced _ _ _ = "Could not find a reduced form of the test case equation."
+reduced :: Show a => a -> a -> String
+reduced lhs rhs = show lhs ++ congruent ++ show rhs
 
-showLawContext :: LawContext -> Context
-showLawContext LawContext{..} = Context $ unlines
+contextualise :: LawContext -> Context
+contextualise LawContext{..} = Context $ unlines 
   [ "When testing the " ++ lawContextLawName ++ " law, for the " ++ lawContextTcName ++ " typeclass, the following test failed: "
-  , "    " ++ lawContextTcProp
-  , mempty
---  , showReduced lawContextEquation lawContextLhsReduced lawContextRhsReduced
---  , mempty 
+  , tab, lawContextTcProp, newline
+  , tab, "The reduced test is: ", newline
+  , tab, tab, lawContextReduced
   , lawContextLawName ++ " Law: " ++ lawContextLawBody
   ]
 

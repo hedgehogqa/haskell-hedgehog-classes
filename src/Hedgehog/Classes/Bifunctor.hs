@@ -32,12 +32,17 @@ bifunctorIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
   let lhs = bimap id id x
   let rhs = x
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Identity", lawContextLawBody = "forall x. bimap id id x == x"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Identity", lawContextLawBody = "bimap id id" ++ congruent ++ "id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
-        }
+             let showX = show x;
+             in concat
+                 [ "bimap id id x", congruent, "x, where"
+                 , newline
+                 , tab, "x = ", showX
+                 ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
   heqCtx2 lhs rhs ctx 
 
 bifunctorFirstIdentity :: forall f. BifunctorProp f
@@ -45,11 +50,16 @@ bifunctorFirstIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
   let lhs = first id x
   let rhs = x
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "First Identity", lawContextLawBody = "forall x. first id x == x"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "First Identity", lawContextLawBody = "first id" ++ congruent ++ "id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x;
+            in concat
+              [ "first id x", congruent, "x, where"
+              , newline
+              , tab, "x = ", showX
+              ]
+        , lawContextReduced = reduced lhs rhs 
         }
   heqCtx2 lhs rhs ctx
 
@@ -58,11 +68,16 @@ bifunctorSecondIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
   let lhs = second id x
   let rhs = x
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Second Identity", lawContextLawBody = "forall x. second id x == x"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Second Identity", lawContextLawBody = "second id" ++ congruent ++ "id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x;
+            in concat
+              [ "second id x", congruent, "x, where"
+              , newline
+              , tab, "x = ", showX
+              ]
+        , lawContextReduced = reduced lhs rhs 
         }
   heqCtx2 lhs rhs ctx
 
@@ -71,10 +86,15 @@ bifunctorComposition fgen = property $ do
   z <- forAll $ fgen genSmallInteger genSmallInteger
   let lhs = bimap id id z
   let rhs = (first id . second id) z
-  let ctx = showLawContext $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "forall x. bimap id id x == (first id . second id) x"
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Composition", lawContextLawBody = "bimap id id" ++ congruent ++ "first id . second id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
-        }
+            let showX = show z;
+            in concat
+              [ "bimap id id x", congruent, "first id . second id $ x, where"
+              , newline
+              , tab, "x = ", showX
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        }       
   heqCtx2 lhs rhs ctx

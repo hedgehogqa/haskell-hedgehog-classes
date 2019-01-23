@@ -17,7 +17,7 @@ testApplicative =
   , ("Maybe", lawsMaybe)
   , ("Either e", lawsEither)
   , ("Compose", lawsCompose)
---  , ("Bin", lawsBin)
+  , ("Bin", lawsBin)
   ]
 
 lawsList :: [Laws]
@@ -46,7 +46,6 @@ either genE genA =
       , (1 + fromIntegral n, Right <$> genA)
       ]
 
-{-
 data Bin a = Leaf | Node (Bin a) a (Bin a)
   deriving (Eq, Show)
 
@@ -73,4 +72,3 @@ genBin gen = Gen.frequency
 
 lawsBin :: [Laws]
 lawsBin = [applicativeLaws genBin]
--}
