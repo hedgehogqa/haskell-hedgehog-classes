@@ -30,7 +30,20 @@ fromToInverse :: forall a x.
   ) => Gen a -> Gen (Rep a x) -> Property
 fromToInverse _gena genr = property $ do
   r <- forAll genr
-  r === (from (to r :: a))
+  let lhs = r
+  let rhs = from (to r :: a)
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "From-To inverse", lawContextTcName = "Generic"
+        , lawContextLawBody = "from . to" `congruency` "id"
+        , lawContextTcProp =
+            let showR = show r
+            in lawWhere
+              [ "from . to $ r" `congruency` "id r, where"
+              , "r = " ++ showR
+              ]
+        , lawContextReduced = reduced lhs rhs
+        } 
+  heqCtx lhs rhs ctx
 
 toFromInverse :: forall a x.
   ( Generic a
@@ -39,8 +52,21 @@ toFromInverse :: forall a x.
   ) => Gen a -> Gen (Rep a x) -> Property
 toFromInverse gena _genr = property $ do
   v <- forAll gena
-  to (from v) === v
-
+  let lhs = to (from v)
+  let rhs = v
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "To-From inverse", lawContextTcName = "Generic"
+        , lawContextLawBody = "to . from" `congruency` "id"
+        , lawContextTcProp =
+            let showV = show v
+            in lawWhere
+              [ "to . from $ v" `congruency` "id v, where"
+              , "v = " ++ showV
+              ]
+        , lawContextReduced = reduced lhs rhs
+        } 
+  heqCtx lhs rhs ctx
+       
 {-
 type Generic1Prop f =
   ( Generic1 f

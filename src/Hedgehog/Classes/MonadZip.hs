@@ -18,10 +18,12 @@ monadZipLaws gen = Laws "Monad"
   [ ("Naturality", monadZipNaturality gen)
   ]
 
-monadZipNaturality :: forall f.
+type MonadZipProp f =
   ( MonadZip f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
   ) => (forall x. Gen x -> Gen (f x)) -> Property
+
+monadZipNaturality :: forall f. MonadZipProp f
 monadZipNaturality fgen = property $ do
   f' <- forAll genLinearEquation
   g' <- forAll genLinearEquation
@@ -29,5 +31,20 @@ monadZipNaturality fgen = property $ do
       g = runLinearEquation g'
   ma <- forAll $ fgen genSmallInteger
   mb <- forAll $ fgen genSmallInteger
-  (fmap (f *** g) (mzip ma mb)) `heq1` (mzip (fmap f ma) (fmap g mb))
-
+  let lhs = fmap (f *** g) (mzip ma mb)
+  let rhs = mzip (fmap f ma) (fmap g mb)
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Naturality", lawContextTcName = "MonadZip"
+        , lawContextLawBody = "(fmap (f *** g) .) . mzip" `congruency` "(. fmap g) . mzip . fmap f"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp =
+            let showF = show f'; showG = show g'; showMA = show ma; showMB = show mb;
+            in lawWhere
+              [ "fmap (f *** g) (mzip ma mb)" `congruency` "mzip (fmap f ma) (fmap g mb), where"
+              , "f = " ++ showF
+              , "g = " ++ showG
+              , "ma = " ++ showMA  
+              , "mb = " ++ showMB
+              ]
+        }
+  heqCtx1 lhs rhs ctx

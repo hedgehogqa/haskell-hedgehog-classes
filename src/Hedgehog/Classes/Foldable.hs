@@ -243,7 +243,7 @@ foldableFoldl1 fgen = property $ do
           lhs = Foldable.foldl1 f t
           rhs = Foldable.foldl f x xs
           ctx = contextualise $ LawContext
-            { lawContextLawName = "Foldl'"
+            { lawContextLawName = "Foldl1"
             , lawContextLawBody = "foldl1 f t" `congruency` "let (x:xs) = toList t in foldl f x xs"
             , lawContextTcName = "Foldable"
             , lawContextTcProp =
@@ -273,7 +273,27 @@ foldableFoldr1 fgen = property $ do
     Nothing -> success
     Just (xs, x) ->
       let f = runLinearEquationTwo e
-      in Foldable.foldr1 f t `heq` Foldable.foldr f x xs
+          lhs = Foldable.foldr1 f t
+          rhs = Foldable.foldr f x xs
+          ctx = contextualise $ LawContext
+            { lawContextLawName = "Foldr1"
+            , lawContextLawBody = "foldr1 f t" `congruency` "let (xs, x) = unsnoc (toList t) in foldr f x xs"
+            , lawContextTcName = "Foldable"
+            , lawContextTcProp =
+                let showF = show e
+                    showT = show t
+                    showX = show x
+                    showXS = show xs
+                in lawWhere
+                  [ "foldr1 f t" `congruency` "let (xs, x) = unsnoc (toList t) in foldr f x xs, where"
+                  , "f = " ++ showF
+                  , "t = " ++ showT
+                  , "x = " ++ showX
+                  , "xs = " ++ showXS
+                  ]
+            , lawContextReduced = reduced lhs rhs
+            }
+      in heqCtx lhs rhs ctx
 
 foldableToList ::
   ( Foldable f
@@ -281,7 +301,21 @@ foldableToList ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableToList fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  Foldable.toList t `heq` Foldable.foldr (:) [] t
+  let lhs = Foldable.toList t
+  let rhs = Foldable.foldr (:) [] t
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "ToList"
+        , lawContextLawBody = "toList" `congruency` "foldr (:) []"
+        , lawContextTcName = "Foldable"
+        , lawContextTcProp =
+            let showT = show t
+            in lawWhere
+              [ "toList t" `congruency` "foldr (:) [] t, where"
+              , "t = " ++ showT
+              ]
+        , lawContextReduced = reduced lhs rhs
+        } 
+  heqCtx lhs rhs ctx
 
 foldableNull ::
   ( Foldable f
@@ -289,7 +323,21 @@ foldableNull ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableNull fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  Foldable.null t `heq` Foldable.foldr (const (const False)) True t
+  let lhs = Foldable.null t
+  let rhs = Foldable.foldr (const (const False)) True t
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Null"
+        , lawContextLawBody = "null" `congruency` "foldr (const (const False)) True"
+        , lawContextTcName = "Foldable"
+        , lawContextTcProp =
+            let showT = show t
+            in lawWhere
+              [ "null t" `congruency` "foldr (const (const False)) True t, where"
+              , "t = " ++ showT
+              ]
+        , lawContextReduced = reduced lhs rhs
+        } 
+  heqCtx lhs rhs ctx  
 
 foldableLength ::
   ( Foldable f
@@ -297,7 +345,21 @@ foldableLength ::
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableLength fgen = property $ do
   t <- forAll $ fgen genSmallInteger
-  Foldable.length t `heq` getSum (Foldable.foldMap (const (Sum 1)) t)
+  let lhs = Foldable.length t
+  let rhs = getSum (Foldable.foldMap (const (Sum 1)) t)
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Length"
+        , lawContextLawBody = "length" `congruency` "getSum . foldMap (const (Sum 1))"
+        , lawContextTcName = "Foldable"
+        , lawContextTcProp =
+            let showT = show t
+            in lawWhere
+              [ "length t" `congruency` "getSum . foldMap (const (Sum 1)) $ t, where"
+              , "t = " ++ showT
+              ]
+        , lawContextReduced = reduced lhs rhs
+        }
+  heqCtx lhs rhs ctx
 
 unsnoc :: [a] -> Maybe ([a], a)
 unsnoc = \case

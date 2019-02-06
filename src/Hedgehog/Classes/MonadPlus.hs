@@ -21,46 +21,107 @@ monadPlusLaws gen = Laws "Monad"
   , ("Right Zero", monadPlusRightZero gen)
   ]
 
-monadPlusLeftIdentity :: forall f.
+type MonadPlusProp f =
   ( MonadPlus f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
   ) => (forall x. Gen x -> Gen (f x)) -> Property
+
+monadPlusLeftIdentity :: forall f. MonadPlusProp f
 monadPlusLeftIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger
-  mplus mzero x `heq1` x
+  let lhs = mplus mzero x
+  let rhs = x
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Left Identity", lawContextTcName = "MonadPlus"
+        , lawContextLawBody = "mplus mzero" `congruency` "id"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp  =
+            let showX = show x; showMZero = show (mzero :: f Integer);
+            in lawWhere
+              [ "mplus mzero x" `congruency` "id x, where"
+              , "x = " ++ showX
+              , "mzero = " ++ showMZero
+              ]
+        }
+  heqCtx1 lhs rhs ctx  
 
-monadPlusRightIdentity :: forall f.
-  ( MonadPlus f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+monadPlusRightIdentity :: forall f. MonadPlusProp f
 monadPlusRightIdentity fgen = property $ do
   x <- forAll $ fgen genSmallInteger
-  mplus x mzero `heq1` x
+  let lhs = mplus x mzero
+  let rhs = x
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Right Identity", lawContextTcName = "MonadPlus"
+        , lawContextLawBody = "flip mplus mzero" `congruency` "id"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp  =
+            let showX = show x; showMZero = show (mzero :: f Integer);
+            in lawWhere
+              [ "mplus x mzero" `congruency` "id x, where"
+              , "x = " ++ showX
+              , "mzero = " ++ showMZero
+              ]
+        } 
+  heqCtx1 lhs rhs ctx  
 
-monadPlusAssociativity :: forall f.
-  ( MonadPlus f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+monadPlusAssociativity :: forall f. MonadPlusProp f
 monadPlusAssociativity fgen = property $ do
   a <- forAll $ fgen genSmallInteger
   b <- forAll $ fgen genSmallInteger
   c <- forAll $ fgen genSmallInteger
-  mplus a (mplus b c) `heq1` mplus (mplus a b) c
+  let lhs = mplus a (mplus b c)
+  let rhs = mplus (mplus a b) c
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Associativity", lawContextTcName = "MonadPlus"
+        , lawContextLawBody = "mplus a (mplus b c)" `congruency` "mplus (mplus a b) c"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp =
+            let showA = show a; showB = show b; showC = show c;
+            in lawWhere
+              [ "mplus a (mplus b c)" `congruency` "mplus (mplus a b) c, where"
+              , "a = " ++ showA
+              , "b = " ++ showB
+              , "c = " ++ showC
+              ]
+        }
+  heqCtx1 lhs rhs ctx 
 
-monadPlusLeftZero :: forall f.
-  ( MonadPlus f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+monadPlusLeftZero :: forall f. MonadPlusProp f
 monadPlusLeftZero _ = property $ do
   k' :: LinearEquationM f <- forAll genLinearEquationM
-  (mzero >>= runLinearEquationM k') `heq1` mzero
+  let lhs = mzero >>= runLinearEquationM k'
+  let rhs = mzero
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Left Zero", lawContextTcName = "MonadPlus"
+        , lawContextLawBody = "mzero >>= f" `congruency` "mzero"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp  =
+            let showF = show k'; showMZero = show (mzero :: f Integer);
+            in lawWhere
+              [ "mzero >>= f" `congruency` "mzero, where"
+              , "f = " ++ showF
+              , "mzero = " ++ showMZero
+              ]
+        }
+  heqCtx1 lhs rhs ctx
 
-monadPlusRightZero :: forall f.
-  ( MonadPlus f
-  , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
-  ) => (forall x. Gen x -> Gen (f x)) -> Property
+monadPlusRightZero :: forall f. MonadPlusProp f
 monadPlusRightZero fgen = property $ do
-  a <- forAll $ fgen genSmallInteger
-  (a >> (mzero :: f Integer)) `heq1` mzero 
+  v <- forAll $ fgen genSmallInteger
+  let lhs = v >> (mzero :: f Integer)
+  let rhs = mzero
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Right Zero", lawContextTcName = "MonadPlus"
+        , lawContextLawBody = "v >> mzero" `congruency` "mzero"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp  =
+            let showV = show v; showMZero = show (mzero :: f Integer);
+            in lawWhere
+              [ "v >> mzero" `congruency` "mzero, where"
+              , "v = " ++ showV
+              , "mzero = " ++ showMZero
+              ]
+        } 
+  heqCtx1 lhs rhs ctx   
 
 
