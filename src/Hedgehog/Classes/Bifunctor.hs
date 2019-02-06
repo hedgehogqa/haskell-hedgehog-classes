@@ -33,13 +33,12 @@ bifunctorIdentity fgen = property $ do
   let lhs = bimap id id x
   let rhs = x
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Identity", lawContextLawBody = "bimap id id" ++ congruent ++ "id"
+        { lawContextLawName = "Identity", lawContextLawBody = "bimap id id" `congruency` "id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
              let showX = show x;
-             in concat
-                 [ "bimap id id x", congruent, "x, where"
-                 , newline
-                 , tab, "x = ", showX
+             in lawWhere
+                 [ "bimap id id x" `congruency` "x, where"
+                 , "x = " ++ showX
                  ]
         , lawContextReduced = reduced lhs rhs 
         } 
@@ -51,13 +50,12 @@ bifunctorFirstIdentity fgen = property $ do
   let lhs = first id x
   let rhs = x
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "First Identity", lawContextLawBody = "first id" ++ congruent ++ "id"
+        { lawContextLawName = "First Identity", lawContextLawBody = "first id" `congruency` "id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
             let showX = show x;
-            in concat
-              [ "first id x", congruent, "x, where"
-              , newline
-              , tab, "x = ", showX
+            in lawWhere
+              [ "first id x" `congruency` "x, where"
+              , "x = " ++ showX
               ]
         , lawContextReduced = reduced lhs rhs 
         }
@@ -69,13 +67,12 @@ bifunctorSecondIdentity fgen = property $ do
   let lhs = second id x
   let rhs = x
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Second Identity", lawContextLawBody = "second id" ++ congruent ++ "id"
+        { lawContextLawName = "Second Identity", lawContextLawBody = "second id" `congruency` "id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
             let showX = show x;
-            in concat
-              [ "second id x", congruent, "x, where"
-              , newline
-              , tab, "x = ", showX
+            in lawWhere
+              [ "second id x" `congruency` "x, where"
+              , "x = " ++ showX
               ]
         , lawContextReduced = reduced lhs rhs 
         }
@@ -87,13 +84,12 @@ bifunctorComposition fgen = property $ do
   let lhs = bimap id id z
   let rhs = (first id . second id) z
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "bimap id id" ++ congruent ++ "first id . second id"
+        { lawContextLawName = "Composition", lawContextLawBody = "bimap id id" `congruency` "first id . second id"
         , lawContextTcName = "Bifunctor", lawContextTcProp =
             let showX = show z;
-            in concat
-              [ "bimap id id x", congruent, "first id . second id $ x, where"
-              , newline
-              , tab, "x = ", showX
+            in lawWhere
+              [ "bimap id id x" `congruency` "first id . second id $ x, where"
+              , "x = " ++ showX
               ]
         , lawContextReduced = reduced lhs rhs 
         }       

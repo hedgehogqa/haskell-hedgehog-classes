@@ -44,13 +44,12 @@ bifoldableIdentity fgen = property $ do
   let lhs = bifold x
   let rhs = bifoldMap id id x
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Identity", lawContextLawBody = "bifold" ++ congruent ++ "bifoldMap id id"
+        { lawContextLawName = "Identity", lawContextLawBody = "bifold" `congruency` "bifoldMap id id"
         , lawContextTcName = "Bifoldable", lawContextTcProp =
              let showX = show x;
-             in concat
-                 [ "bimap id id x", congruent, "x, where"
-                 , newline
-                 , tab, "x = ", showX
+             in lawWhere
+                 [ "bimap id id x" `congruency` "x, where"
+                 , "x = " ++ showX
                  ]
         , lawContextReduced = reduced lhs rhs 
         } 
@@ -63,15 +62,14 @@ bifoldableFoldMap fgen = property $ do
   let lhs = (bifoldMap f g x)
   let rhs = (bifoldr (mappend . f) (mappend . g) mempty x)
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "FoldMap", lawContextLawBody = "bifoldMap f g == bifoldr (mappend . f) (mappend . g) mempty"
+        { lawContextLawName = "FoldMap", lawContextLawBody = "bifoldMap f g" `congruency` "bifoldr (mappend . f) (mappend . g) mempty"
         , lawContextTcName = "Bifoldable", lawContextTcProp =
              let showX = show x;
-             in concat
-                 [ "bifoldMap f g x", congruent, "bifoldr (mappend . f) (mappend . g) mempty x, where"
-                 , newline
-                 , tab, "f = \\x -> Sum x"
-                 , tab, "g = \\x -> Sum (x + 1)"
-                 , tab, "x = ", showX
+             in lawWhere
+                 [ "bifoldMap f g x" `congruency` "bifoldr (mappend . f) (mappend . g) mempty x, where"
+                 , "f = \\x -> Sum x"
+                 , "g = \\x -> Sum (x + 1)"
+                 , "x = " ++ showX
                  ]
         , lawContextReduced = reduced lhs rhs 
         } 
@@ -88,16 +86,15 @@ bifoldableFoldr fgen = property $ do
   let lhs = (bifoldr f g z0 x)
   let rhs = (appEndo (bifoldMap (Endo . f) (Endo . g) x) z0)
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Foldr", lawContextLawBody = "bifoldr f g z t" ++ congruent ++ "appEndo (bifoldMap (Endo . f) (Endo . g) t) z"
+        { lawContextLawName = "Foldr", lawContextLawBody = "bifoldr f g z t" `congruency` "appEndo (bifoldMap (Endo . f) (Endo . g) t) z"
         , lawContextTcName = "Bifoldable", lawContextTcProp =
             let showX = show x; showF = show f'; showG = show g'; showZ = show z0;
-            in concat
-              [ "bifoldr f g z t", congruent, "appEndo (bifoldMap (Endo . f) (Endo . g) t z, where"
-              , newline
-              , tab, "f = ", showF, newline
-              , tab, "g = ", showG, newline
-              , tab, "t = ", showX, newline
-              , tab, "z = ", showZ
+            in lawWhere
+              [ "bifoldr f g z t" `congruency` "appEndo (bifoldMap (Endo . f) (Endo . g) t z, where"
+              , "f = " ++ showF
+              , "g = " ++ showG
+              , "t = " ++ showX
+              , "z = " ++ showZ
               ]
         , lawContextReduced = reduced lhs rhs 
         }
@@ -119,12 +116,11 @@ bifoldableFunctorComposition fgen = property $ do
         { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g == bifold . bimap f g"
         , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
             let showX = show x;
-            in concat
-              [ "bifoldMap f g x", congruent, "bifold . bimap f g $ x"
-              , newline
-              , tab, "f = \\x -> Product x", newline
-              , tab, "g = \\x -> Product (x + 1)", newline
-              , tab, "x = ", showX
+            in lawWhere
+              [ "bifoldMap f g x" `congruency` "bifold . bimap f g $ x"
+              , "f = \\x -> Product x"
+              , "g = \\x -> Product (x + 1)"
+              , "x = " ++ showX
               ]
         , lawContextReduced = reduced lhs rhs 
         }
@@ -139,17 +135,16 @@ bifoldableFunctorFoldMap fgen = property $ do
   let lhs = bifoldMap f g (bimap h i x)
   let rhs = bifoldMap (f . h) (g . i) x
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g . bimap h i" ++ congruent ++ "bifoldMap (f . h) (g . i)"
+        { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g . bimap h i" `congruency` "bifoldMap (f . h) (g . i)"
         , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
             let showX = show x;
-            in concat
-              [ "bifoldMap f g . bimap h i $ x", congruent, "bifoldMap (f . h) (g . i) $ x, where"
-              , newline
-              , tab, "f = ", showF, newline
-              , tab, "g = ", showG, newline
-              , tab, "h = ", showH, newline
-              , tab, "i = ", showI, newline
-              , tab, "x = ", showX
+            in lawWhere
+              [ "bifoldMap f g . bimap h i $ x" `congruency` "bifoldMap (f . h) (g . i) $ x, where"
+              , "f = " ++ showF
+              , "g = " ++ showG
+              , "h = " ++ showH
+              , "i = " ++ showI
+              , "x = " ++ showX
               ]
         , lawContextReduced = reduced lhs rhs 
         }

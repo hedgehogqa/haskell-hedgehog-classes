@@ -5,6 +5,7 @@ module Spec.Contravariant (testContravariant) where
 import Hedgehog
 import Hedgehog.Classes
 
+import Data.Functor.Contravariant
 import Data.Functor.Const (Const(..))
 import Data.Functor.Sum (Sum(..))
 import Data.Functor.Product (Product(..))
@@ -19,6 +20,7 @@ testContravariant =
   , ("Const", listConst)
   , ("Sum", listSum)
   , ("Product", listProduct)
+  , ("Bad Contravariant", listBadContravariant) 
   ]
 
 listProxy :: [Laws]
@@ -32,6 +34,9 @@ listSum = [contravariantLaws genSum]
 
 listProduct :: [Laws]
 listProduct = [contravariantLaws genProduct]
+
+listBadContravariant :: [Laws]
+listBadContravariant = [contravariantLaws genBadContravariant]
 
 genProxy :: Gen a -> Gen (Proxy a)
 genProxy = const (pure Proxy)
@@ -50,3 +55,19 @@ genSum _genA =
 genProduct :: Gen a -> Gen (Product (Const ()) (Const ()) a)
 genProduct _genA = do
   pure (Pair (Const ()) (Const ()))
+
+newtype BadContravariant a = BadContravariant (a -> a)
+
+instance Show (BadContravariant a) where
+  show _ = "BadContravariant <<Endo>>"
+
+instance Eq a => Eq (BadContravariant a) where
+  BadContravariant f == BadContravariant g = False
+
+instance Contravariant BadContravariant where
+  contramap f _ = BadContravariant id
+
+genBadContravariant :: Gen a -> Gen (BadContravariant a)
+genBadContravariant = fmap (BadContravariant . const)
+
+

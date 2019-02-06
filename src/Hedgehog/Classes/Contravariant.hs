@@ -27,12 +27,12 @@ contravariantIdentity fgen = property $ do
   let lhs = contramap id a
   let rhs = id a
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Identity", lawContextLawBody = "contramap id == id"
+        { lawContextLawName = "Identity", lawContextLawBody = "contramap id" `congruency` "id"
         , lawContextTcName = "Contravariant", lawContextTcProp =
             let showA = show a
-            in concat
-              [ "contramap id x", congruent, "id x, where"
-              , newline, tab, "x = ", showA
+            in lawWhere
+              [ "contramap id x" `congruency` "id x, where"
+              , "x = " ++ showA
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -51,15 +51,14 @@ contravariantComposition fgen = property $ do
   let lhs = contramap f (contramap g a)
   let rhs = contramap (g . f) a
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "contramap f . contramap g" ++ congruent ++ "contramap (g . f)"
+        { lawContextLawName = "Composition", lawContextLawBody = "contramap f . contramap g" `congruency` "contramap (g . f)"
         , lawContextTcName = "Contravariant", lawContextTcProp =
             let showF = show f'; showG = show g'; showA = show a;
-            in concat
-                 [ "contramap f . contramap g $ a", congruent, "contramap (g . f) a, where"
-                 , newline, newline
-                 , tab, "f = ", showF, newline
-                 , tab, "g = ", showG, newline
-                 , tab, "a = ", showA
+            in lawWhere
+                 [ "contramap f . contramap g $ a" `congruency` "contramap (g . f) a, where"
+                 , "f = " ++ showF
+                 , "g = " ++ showG
+                 , "a = " ++ showA
                  ]
         , lawContextReduced = reduced lhs rhs
         }

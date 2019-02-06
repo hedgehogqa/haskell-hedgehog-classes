@@ -33,13 +33,12 @@ applicativeIdentity fgen = property $ do
   let lhs = pure id <*> a
   let rhs = a
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Identity", lawContextLawBody = "pure id <*> v" ++ congruent ++ "v"
+        { lawContextLawName = "Identity", lawContextLawBody = "pure id <*> v" `congruency` "v"
         , lawContextTcName = "Applicative", lawContextTcProp =
              let showA = show a
-             in concat
-                 [ "pure id <*> v", congruent, "v, where"
-                 , newline
-                 , tab, "v = ", showA
+             in lawWhere
+                 [ "pure id <*> v" `congruency` "v, where"
+                 , "v = " ++ showA
                  ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -59,14 +58,11 @@ applicativeComposition fgen = property $ do
         { lawContextLawName = "Composition", lawContextLawBody = "pure (.) <*> u <*> v <*> w == u <*> (v <*> w)"
         , lawContextTcName = "Applicative", lawContextTcProp =
             let showU = show u'; showV = show v'; showW = show w';
-            in concat
+            in lawWhere
                  [ "pure (.) <*> u <*> v <*> w", congruent, "u <*> (v <*> w), where"
-                 , newline, newline
-                 , tab, "u = ", showU
-                 , newline
-                 , tab, "v = ", showV
-                 , newline
-                 , tab, "w = ", showW
+                 , "u = " ++ showU
+                 , "v = " ++ showV
+                 , "w = " ++ showW
                  ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -81,15 +77,13 @@ applicativeHomomorphism _ = property $ do
   let lhs = pure f <*> pure a
   let rhs = pure (f a) :: f Integer
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Homomorphism", lawContextLawBody = "pure f <*> pure x" ++ congruent ++ "pure (f x)"
+        { lawContextLawName = "Homomorphism", lawContextLawBody = "pure f <*> pure x" `congruency` "pure (f x)"
         , lawContextTcName = "Applicative", lawContextTcProp =
             let showF = show e; showX = show a;
-            in concat
+            in lawWhere
               [ "pure f <*> pure x", congruent, "pure (f x), where"
-              , newline, newline
-              , tab, "f = ", showF
-              , newline
-              , tab, "x = ", showX
+              , "f = " ++ showF
+              , "x = " ++ showX
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -103,15 +97,13 @@ applicativeInterchange fgen = property $ do
   let lhs = (u <*> pure y)
   let rhs = pure ($ y) <*> u
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Interchange", lawContextLawBody = "u <*> pure y" ++ congruent ++ "pure ($ y) <*> u"
+        { lawContextLawName = "Interchange", lawContextLawBody = "u <*> pure y" `congruency` "pure ($ y) <*> u"
         , lawContextTcName = "Applicative", lawContextTcProp =
             let showU = show u'; showY = show y;
-            in concat
+            in lawWhere
               [ "u <*> pure y", congruent, "pure ($ y) <*> u, where"
-              , newline, newline
-              , tab, "u = ", showU
-              , newline
-              , tab, "y = ", showY
+              , "u = " ++ showU
+              , "y = " ++ showY
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -128,12 +120,10 @@ applicativeLiftA2_1 fgen = property $ do
         { lawContextLawName = "LiftA2 1", lawContextLawBody = "liftA2 id f x == f <*> x"
         , lawContextTcName = "Applicative", lawContextTcProp =
             let showF = show f'; showX = show x;
-            in concat
+            in lawWhere
               [ "liftA2 id f x", congruent, "f <*> x, where"
-              , newline, newline
-              , tab, "f = ", showF
-              , newline
-              , tab, "x = ", showX
+              , "f = " ++ showF
+              , "x = " ++ showX
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -151,14 +141,11 @@ applicativeLiftA2_2 fgen = property $ do
         { lawContextLawName = "LiftA2 2", lawContextLawBody = "liftA2 f x y == f <$> x <*> y"
         , lawContextTcName = "Applicative", lawContextTcProp =
             let showF = show f'; showX = show x; showY = show y;
-            in concat
-              [ "liftA2 f x y", congruent, "f <$> x <*> y, where"
-              , newline, newline
-              , tab, "f = ", showF
-              , newline
-              , tab, "x = ", showX
-              , newline
-              , tab, "y = ", showY
+            in lawWhere
+              [ "liftA2 f x y" `congruency` "f <$> x <*> y, where"
+              , "f = " ++ showF
+              , "x = " ++ showX
+              , "y = " ++ showY
               ]
         , lawContextReduced = reduced lhs rhs
         }

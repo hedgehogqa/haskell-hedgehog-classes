@@ -38,10 +38,13 @@ bitraversableNaturality fgen = property $ do
   let lhs = bitraverse (t . f) (t . g) x
   let rhs = t (bitraverse f g x)
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Naturality", lawContextLawBody = "bitraverse (t . f) (t . g)" ++ congruent ++ "t . bitraverse f g, for every applicative transformation t"
+        { lawContextLawName = "Naturality", lawContextLawBody = "bitraverse (t . f) (t . g)" `congruency` "t . bitraverse f g, for every applicative transformation t"
         , lawContextTcName = "Bitraversable", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x;
+            in lawWhere
+                 [ "bitraverse (t . f) (t . g) $ x" `congruency` "t . bitraverse f g $ x, for every applicative transformation t, where"
+                 , "x = " ++ showX
+                 ]
         , lawContextReduced = reduced lhs rhs 
         }
   heqCtx1 lhs rhs ctx  
@@ -54,8 +57,11 @@ bitraversableIdentity fgen = property $ do
   let ctx = contextualise $ LawContext
         { lawContextLawName = "Identity", lawContextLawBody = "bitraverse Identity Identity == Identity"
         , lawContextTcName = "Bitraversable", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x;
+            in lawWhere
+                 [ "bitraverse Identity Identity x" `congruency` "Identity x, where"
+                 , "x = " ++ showX
+                 ]
         , lawContextReduced = reduced lhs rhs 
         }
   heqCtx1 lhs rhs ctx  
@@ -72,8 +78,11 @@ bitraversableComposition fgen = property $ do
   let ctx = contextualise $ LawContext
         { lawContextLawName = "Composition", lawContextLawBody = "Compose . fmap (bitraverse g1 g2) . bitraverse f1 f2 == bitraverse (Compose . fmap g1 . f1) (Compose . fmap g2 . f2)"
         , lawContextTcName = "Bitraversable", lawContextTcProp =
-            let sLhs = show lhs; sRhs = show rhs;
-            in sLhs ++ " == " ++ sRhs
+            let showX = show x;  
+            in lawWhere
+                 [ "Compose . fmap (bitraverse g1 g2) . bitraverse f1 f2 $ x" `congruency` "bitraverse (Compose . fmap g1 . f1) (Compose . fmap g2 . f2) $ x, where"
+                 , "x = " ++ showX
+                 ]
         , lawContextReduced = reduced lhs rhs 
         }
-  heqCtx1 lhs rhs ctx  
+  heqCtx1 lhs rhs ctx

@@ -30,12 +30,12 @@ alternativeLeftIdentity fgen = property $ do
   let lhs = empty <|> a
   let rhs = a
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Left Identity", lawContextLawBody = "forall a. empty <|> a" ++ congruent ++ "a"
+        { lawContextLawName = "Left Identity", lawContextLawBody = "empty <|> a" `congruency` "a"
         , lawContextTcName = "Alternative", lawContextTcProp =
             let showA = show a;
-            in concat
-              [ "empty <|> a ", congruent, "a, where", newline
-              , tab, "a = ", showA
+            in lawWhere
+              [ "empty <|> a" `congruency` "a, where"
+              , "a = " ++ showA
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -47,12 +47,12 @@ alternativeRightIdentity fgen = property $ do
   let lhs = a <|> empty
   let rhs = a
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Right Identity", lawContextLawBody = "forall a. a <|> empty" ++ congruent ++ "a"
+        { lawContextLawName = "Right Identity", lawContextLawBody = "a <|> empty" `congruency` "a"
         , lawContextTcName = "Alternative", lawContextTcProp =
             let showA = show a;
-            in concat
-              [ "a <|> empty", congruent, "a, where", newline
-              , tab, "a = ", showA
+            in lawWhere
+              [ "a <|> empty" `congruency` "a, where"
+              , "a = " ++ showA
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -66,15 +66,14 @@ alternativeAssociativity fgen = property $ do
   let lhs = (a <|> (b <|> c))
   let rhs = ((a <|> b) <|> c)
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Associativity", lawContextLawBody = "forall a b c. a <|> (b <|> c)" ++ congruent ++ "(a <|> b) <|> c"
+        { lawContextLawName = "Associativity", lawContextLawBody = "a <|> (b <|> c)" `congruency` "(a <|> b) <|> c"
         , lawContextTcName = "Alternative", lawContextTcProp =
             let showA = show a; showB = show b; showC = show c;
-            in concat
-                 [ "a <|> (b <|> c)", congruent, "(a <|> b) <|> c), where"
-                 , newline
-                 , tab, "a = ", showA, newline
-                 , tab, "b = ", showB, newline
-                 , tab, "c = ", showC, newline
+            in lawWhere
+                 [ "a <|> (b <|> c)" `congruency` "(a <|> b) <|> c), where"
+                 , "a = " ++ showA
+                 , "b = " ++ showB
+                 , "c = " ++ showC
                  ]
         , lawContextReduced = reduced lhs rhs
         }

@@ -39,7 +39,20 @@ foldableFold fgen = property $ do
   a <- forAll $ fgen genSmallSum
   let lhs = Foldable.fold a
   let rhs = Foldable.foldMap id a
-  heqCtx lhs rhs NoContext
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Fold"
+        , lawContextLawBody = "fold" `congruency` "foldMap id"
+        , lawContextTcName = "Foldable"
+        , lawContextTcProp =
+            let showA = show a
+            in lawWhere
+              [ "fold a" `congruency` "foldMap id a, where"
+              , "a = " ++ showA
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
+
+  heqCtx lhs rhs ctx
 
 foldableFoldMap ::
   ( Foldable f
@@ -51,7 +64,21 @@ foldableFoldMap fgen = property $ do
   let f = Sum . runQuadraticEquation e
   let lhs = Foldable.foldMap f a
   let rhs = Foldable.foldr (mappend . f) mempty a
-  heqCtx lhs rhs NoContext  
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "FoldMap"
+        , lawContextLawBody = "foldMap f" `congruency` "foldr (mappend . f) mempty"
+        , lawContextTcName = "Foldable"
+        , lawContextTcProp =
+            let showA = show a
+                showF = "Sum $ " ++ show e
+            in lawWhere
+              [ "foldMap f a" `congruency` "foldr (mappend . f) mempty, where"
+              , "f = " ++ showF
+              , "a = " ++ showA
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
+  heqCtx lhs rhs ctx
 
 foldableFoldr ::
   ( Foldable f
@@ -64,8 +91,24 @@ foldableFoldr fgen = property $ do
   let f = runLinearEquationTwo e
   let lhs = Foldable.foldr f z t
   let rhs = appEndo (Foldable.foldMap (Endo . f) t) z
-  heqCtx lhs rhs NoContext  
-
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Foldr"
+        , lawContextLawBody = "foldr f z t" `congruency` "appEndo (foldMap (Endo . f) t) z"
+        , lawContextTcName = "Foldable"
+        , lawContextTcProp =
+            let showT = show t
+                showF = show e
+                showZ = show z
+            in lawWhere
+              [ "foldr f z t" `congruency` "appEndo (foldMap (Endo . f) t) z"
+              , "f = " ++ showF
+              , "z = " ++ showZ
+              , "t = " ++ showT
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
+  heqCtx lhs rhs ctx
+ 
 foldableFoldl ::
   ( Foldable f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
@@ -77,7 +120,23 @@ foldableFoldl fgen = property $ do
   let f = runLinearEquationTwo e
   let lhs = Foldable.foldl f z t
   let rhs = appEndo (getDual (Foldable.foldMap (Dual . Endo . flip f) t)) z
-  heqCtx lhs rhs NoContext
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Foldl"
+        , lawContextLawBody = "foldl f z t" `congruency` "appEndo (getDual (foldMap (Dual . Endo . flip f) t)) z"
+        , lawContextTcName = "Foldable"
+        , lawContextTcProp =
+            let showT = show t
+                showF = show e
+                showZ = show z
+            in lawWhere
+              [ "foldl f z t" `congruency` "appEndo (getDual (foldMap (Dual . Endo . flip f) t)) z"
+              , "f = " ++ showF
+              , "z = " ++ showZ
+              , "t = " ++ showT
+              ]
+        , lawContextReduced = reduced lhs rhs 
+        } 
+  heqCtx lhs rhs ctx
 
 ctxNotStrict :: String -> Context
 ctxNotStrict str = Context $ "Your implementation of " ++ str ++ " is not strict."
@@ -92,24 +151,39 @@ foldableFoldr' fgen = property $ do
       f a b = case a of
         BottomUndefined -> error "foldableFoldr': your foldr' is not strict!"
         BottomValue v -> if even v then v else b
-  let z0 = 0
-  (r1, ctx1) <- liftIO $ do
+  z0 <- forAll genSmallInteger
+  (rhs, ctx1) <- liftIO $ do
     let f' k x z = k $! f x z
     e <- try (evaluate (Foldable.foldl f' id xs z0))
     case e of
       Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldr'")
       Right i -> pure (Just i, NoContext)
-  (r2, ctx2) <- liftIO $ do
+  (lhs, ctx2) <- liftIO $ do
     e <- try (evaluate (Foldable.foldr' f z0 xs))
     case e of
       Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldr'")
       Right i -> pure (Just i, NoContext)
   let ctx = case ctx1 of
         NoContext -> case ctx2 of
-          NoContext -> contextualise $ LawContext {}
+          NoContext -> contextualise $ LawContext
+            { lawContextLawName = "Foldr'"
+            , lawContextLawBody = "foldr' f z0 t" `congruency` "foldl f' id t z0, where f' k x z = k $! f x z"
+            , lawContextTcName = "Foldable"
+            , lawContextTcProp =
+                let showT = show xs
+                    showF = "\\a b -> case a of\n  BottomUndefined -> error \"foldableFoldr': not strict\"\n  BottomValue v -> if even v then v else b"
+                    showZ = show z0
+                in lawWhere
+                  [ "foldr' f z0 t" `congruency` "foldl f' id t z0, where f' k x z = k $! f x z"
+                  , "f = " ++ showF
+                  , "z0 = " ++ showZ
+                  , "t = " ++ showT
+                  ]
+            , lawContextReduced = reduced lhs rhs 
+            } 
           c2 -> c2
         c1 -> c1
-  heqCtx r1 r2 ctx
+  heqCtx lhs rhs ctx
 
 foldableFoldl' ::
   ( Foldable f
@@ -122,24 +196,39 @@ foldableFoldl' fgen = property $ do
         BottomUndefined -> error "foldableFoldl': your foldl' is not strict!"
         BottomValue v -> if even v then a else v
   let z0 = 0
-  (r1,ctx1) <- liftIO $ do
+  (rhs,ctx1) <- liftIO $ do
     let f' x k z = k $! f z x
     e <- try (evaluate (Foldable.foldr f' id xs z0))
     case e of
       Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldl'")
       Right i -> pure (Just i, NoContext)
-  (r2,ctx2) <- liftIO $ do
+  (lhs,ctx2) <- liftIO $ do
     e <- try (evaluate (Foldable.foldl' f z0 xs))
     case e of
       Left (_ :: ErrorCall) -> pure (Nothing, ctxNotStrict "foldl'")
       Right i -> pure (Just i, NoContext) 
   let ctx = case ctx1 of
         NoContext -> case ctx2 of
-          NoContext -> contextualise $ LawContext {}
+          NoContext -> contextualise $ LawContext
+            { lawContextLawName = "Foldl'"
+            , lawContextLawBody = "foldl' f z0 xs" `congruency` "foldr f' id xs z0, where f' x k z = k $! f z x"
+            , lawContextTcName = "Foldable"
+            , lawContextTcProp =
+                let showT = show xs
+                    showF = "\\a b -> case a of\n  BottomUndefined -> error \"foldableFoldr': not strict\"\n  BottomValue v -> if even v then v else b"
+                    showZ = show z0
+                in lawWhere
+                  [ "foldl' f z0 xs" `congruency` "foldr f' id xs z0, where f' x k z = k $! f z x"
+                  , "f = " ++ showF
+                  , "z0 = " ++ showZ
+                  , "t = " ++ showT
+                  ]
+            , lawContextReduced = reduced lhs rhs 
+            } 
           c2 -> c2
         c1 -> c1
-  heqCtx r1 r2 ctx  
-
+  heqCtx lhs rhs ctx
+ 
 foldableFoldl1 ::
   ( Foldable f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
@@ -151,7 +240,27 @@ foldableFoldl1 fgen = property $ do
     [] -> success
     (x:xs) ->
       let f = runLinearEquationTwo e
-      in Foldable.foldl1 f t `heq` Foldable.foldl f x xs
+          lhs = Foldable.foldl1 f t
+          rhs = Foldable.foldl f x xs
+          ctx = contextualise $ LawContext
+            { lawContextLawName = "Foldl'"
+            , lawContextLawBody = "foldl1 f t" `congruency` "let (x:xs) = toList t in foldl f x xs"
+            , lawContextTcName = "Foldable"
+            , lawContextTcProp =
+                let showF = show e
+                    showT = show t
+                    showX = show x
+                    showXS = show xs
+                in lawWhere
+                  [ "foldl1 f t" `congruency` "let (x:xs) = toList t in foldl f x xs, where"
+                  , "f = " ++ showF
+                  , "t = " ++ showT
+                  , "x = " ++ showX
+                  , "xs = " ++ showXS
+                  ] 
+            , lawContextReduced = reduced lhs rhs
+            }
+      in heqCtx lhs rhs ctx
 
 foldableFoldr1 ::
   ( Foldable f

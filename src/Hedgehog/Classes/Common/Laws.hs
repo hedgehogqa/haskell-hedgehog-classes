@@ -12,10 +12,13 @@ module Hedgehog.Classes.Common.Laws
 
   , contextualise
   , reduced
+  , lawWhere
+  , congruency
 
   , congruent
   , newline
   , tab
+  , tab2
   ) where
 
 import Control.Monad.IO.Class (MonadIO(liftIO))
@@ -34,9 +37,21 @@ import qualified Hedgehog.Internal.Seed as Seed
 congruent :: String
 congruent = " ≡ "
 
-newline, tab :: String
+congruency :: String -> String -> String
+congruency x y = x ++ congruent ++ y
+
+newline, tab, tab2 :: String
 newline = "\n"
 tab = "    "
+tab2 = "  "
+
+-- | For footnotes
+dagger :: String
+dagger = "†"
+
+lawWhere :: [String] -> String
+lawWhere [] = []
+lawWhere (l:ls) = l ++ newline ++ tab2 ++ lawWhere ls
 
 data Laws = Laws
   { lawsTypeClass :: String
@@ -56,11 +71,12 @@ reduced lhs rhs = show lhs ++ congruent ++ show rhs
 
 contextualise :: LawContext -> Context
 contextualise LawContext{..} = Context $ unlines 
-  [ "When testing the " ++ lawContextLawName ++ " law, for the " ++ lawContextTcName ++ " typeclass, the following test failed: "
-  , tab, lawContextTcProp, newline
-  , tab, "The reduced test is: ", newline
-  , tab, tab, lawContextReduced
-  , lawContextLawName ++ " Law: " ++ lawContextLawBody
+  [ "When testing the " ++ lawContextLawName ++ " law(" ++ dagger ++"), for the " ++ lawContextTcName ++ " typeclass, the following test failed: "
+  , newline ++ lawContextTcProp
+  , newline ++ "The reduced test is: "
+  , tab2 ++ lawContextReduced
+  , newline ++ "The law in question: "
+  , tab2 ++ "(" ++ dagger ++ ") " ++ lawContextLawName ++ " Law: " ++ lawContextLawBody
   ]
 
 lawsCheck :: Laws -> IO Bool
@@ -105,7 +121,7 @@ foldMapA :: (Foldable t, Monoid m, Applicative f) => (a -> f m) -> t a -> f m
 foldMapA f = getAp . foldMap (Ap . f)
 
 prettyHeader :: String -> String
-prettyHeader s = concat [topLine, "\n", middleLine, "\n", bottomLine]
+prettyHeader s = unlines [topLine, middleLine, bottomLine]
   where
     line = replicate (length s + 6) '-'
     topLine = line

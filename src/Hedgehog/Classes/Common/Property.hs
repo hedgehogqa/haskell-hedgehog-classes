@@ -149,7 +149,7 @@ hneqCtx1 ::
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
 #else
-     , C.Eq1 f
+     , C.Eq1 f, C.Show1 f
 #endif 
      ) => f a -> f a -> Context -> m ()
 hneqCtx1 x y ctx = do
@@ -167,7 +167,7 @@ hneq1 ::
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
 #else
-     , C.Eq1 f
+     , C.Eq1 f, C.Show1 f
 #endif 
      ) => f a -> f a -> m ()
 hneq1 x y = hneqCtx1 x y NoContext
@@ -181,7 +181,7 @@ heqCtx1 ::
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
 #else
-     , C.Eq1 f
+     , C.Eq1 f, C.Show1 f
 #endif 
      ) => f a -> f a -> Context -> m ()
 heqCtx1 x y ctx = do
@@ -199,7 +199,7 @@ heq1 ::
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
 #else
-     , C.Eq1 f
+     , C.Eq1 f, C.Show1 f
 #endif 
      ) => f a -> f a -> m ()
 heq1 x y = heqCtx1 x y NoContext
@@ -217,7 +217,7 @@ heqCtx2 ::
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
 #else
-     , C.Eq2 f
+     , C.Eq2 f, C.Show2 f
 #endif 
      ) => f a b -> f a b -> Context -> m ()
 heqCtx2 x y ctx = do
@@ -237,7 +237,7 @@ heq2 ::
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
 #else
-     , C.Eq2 f
+     , C.Eq2 f, C.Show2 f
 #endif 
      ) => f a b -> f a b -> m ()
 heq2 x y = heqCtx2 x y NoContext
@@ -255,7 +255,7 @@ hneqCtx2 ::
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
 #else
-     , C.Eq2 f
+     , C.Eq2 f, C.Show2 f
 #endif 
      ) => f a b -> f a b -> Context -> m ()
 hneqCtx2 x y ctx = do
@@ -275,7 +275,7 @@ hneq2 ::
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
 #else
-     , C.Eq2 f
+     , C.Eq2 f, C.Show2 f
 #endif 
      ) => f a b -> f a b -> m ()
 hneq2 x y = hneqCtx2 x y NoContext

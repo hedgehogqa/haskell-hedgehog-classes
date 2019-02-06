@@ -20,7 +20,7 @@ testEq =
   , ("Word16", listWord16)
   , ("Word32", listWord32)
   , ("Word64", listWord64)
---  , ("BadReflexive", listBadEq)
+  , ("BadEq", listBadEq)
   ]
 
 listInt, listInt8, listInt16, listInt32, listInt64 :: [Laws]

@@ -22,11 +22,11 @@ eqTransitive gen = property $ do
         { lawContextLawName = "Transitivity", lawContextLawBody = "a == b ∧ b == c ⇒ a == c"
         , lawContextTcName = "Eq", lawContextTcProp =
             let showA = show a; showB = show b; showC = show c;
-            in concat
+            in lawWhere
               [ "a == b ∧ b == c ⇒ a == c, where"
-              , newline, tab, "a = ", showA
-              , newline, tab, "b = ", showB
-              , newline, tab, "c = ", showC
+              , "a = " ++ showA
+              , "b = " ++ showB
+              , "c = " ++ showC
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -43,10 +43,10 @@ eqSymmetric gen = property $ do
         { lawContextLawName = "Symmetry", lawContextLawBody = "a == b ⇒ b == a"
         , lawContextTcName = "Eq", lawContextTcProp =
             let showA = show a; showB = show b;
-            in concat
-              [ "a == b ⇒  b == a, where", newline
-              , tab, "a = ", showA, newline
-              , tab, "b = ", showB
+            in lawWhere
+              [ "a == b ⇒  b == a, where"
+              , "a = " ++ showA
+              , "b = " ++ showB
               ]
         , lawContextReduced = reduced lhs rhs
         }
@@ -58,9 +58,9 @@ eqReflexive :: forall a. (Eq a, Show a) => Gen a -> Property
 eqReflexive gen = property $ do
   a <- forAll gen
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Reflexivity", lawContextLawBody = "forall a. a == a"
+        { lawContextLawName = "Reflexivity", lawContextLawBody = "a == a"
         , lawContextTcName = "Eq"
-        , lawContextTcProp = let showA = show a in concat [ "a", congruent, "a, where", newline, tab, "a = ", showA ]
+        , lawContextTcProp = let showA = show a in lawWhere [ "a" ++ congruent ++ "a, where", "a = " ++ showA ]
         , lawContextReduced = reduced a a
         }
   heqCtx a a ctx
