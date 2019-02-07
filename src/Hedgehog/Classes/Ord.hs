@@ -21,7 +21,7 @@ ordAntisymmetric gen = property $ do
   let rhs = a == b
   let ctx = contextualise $ LawContext
         { lawContextLawName = "Antisymmetry", lawContextTcName = "Ord"
-        , lawContextLawBody = "if x <= y && y <= x" `congruency` "x == y"
+        , lawContextLawBody = "x <= y && y <= x" `congruency` "x == y"
         , lawContextReduced = reduced lhs rhs
         , lawContextTcProp =
             let showA = show a; showB = show b;
@@ -35,9 +35,27 @@ ordAntisymmetric gen = property $ do
 
 ordTransitive :: forall a. (Ord a, Show a) => Gen a -> Property
 ordTransitive gen = property $ do
-  a <- forAll gen
-  b <- forAll gen
-  c <- forAll gen
+  x <- forAll gen
+  y <- forAll gen
+  z <- forAll gen
+  let lhs = x <= y && y <= z
+  let rhs = x <= z
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Transitivity", lawContextTcName = "Ord"
+        , lawContextLawBody = "x <= y && y <= z" `congruency` "x <= z"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp =
+            let showX = show x; showY = show y; showZ = show z;
+            in lawWhere
+              [ "x <= y && y <= z" `congruency` "x <= z, where"
+              , "x = " ++ showX
+              , "y = " ++ showY
+              , "z = " ++ showZ
+              ]
+        }
+  heqCtx lhs rhs ctx
+
+{-
   case (compare a b, compare b c) of
     (LT,LT) -> a `hLessThan` c
     (LT,EQ) -> a `hLessThan` c
@@ -48,6 +66,7 @@ ordTransitive gen = property $ do
     (GT,LT) -> success
     (GT,EQ) -> a `hGreaterThan` c
     (GT,GT) -> a `hGreaterThan` c
+-}
 
 ordTotal :: forall a. (Ord a, Show a) => Gen a -> Property
 ordTotal gen = property $ do
