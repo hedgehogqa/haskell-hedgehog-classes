@@ -11,6 +11,10 @@ import Data.Bifoldable (Bifoldable(..))
 import Data.Bifunctor (Bifunctor(..))
 import Data.Monoid (Endo(..), Sum(..), Product(..))
 
+-- " ≡ "
+-- | Tests the following laws:
+--
+-- [__Identity__]: @
 bifoldableLaws :: forall f.
   ( Bifoldable f
   , forall x y. (Eq x, Eq y) => Eq (f x y)

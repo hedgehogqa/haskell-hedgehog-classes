@@ -56,8 +56,18 @@ module Hedgehog.Classes
   , categoryLaws
   , commutativeCategoryLaws
 
-    -- * Types
+    -- * Defining your own laws
   , Laws(..)
+  , LawContext(..)
+  , Context(..)
+  , contextualise
+
+    -- * Hedgehog equality tests sans source information
+  , hLessThan, hGreaterThan
+  , heq, heq1, heq2
+  , heqCtx, heqCtx1, heqCtx2
+  , hneq, hneq1, hneq2
+  , hneqCtx, hneqCtx1, hneqCtx2
   ) where
 
 import Hedgehog.Classes.Alternative (alternativeLaws)
@@ -68,7 +78,7 @@ import Hedgehog.Classes.Bifunctor (bifunctorLaws)
 import Hedgehog.Classes.Bitraversable (bitraversableLaws)
 import Hedgehog.Classes.Bits (bitsLaws)
 import Hedgehog.Classes.Category (categoryLaws, commutativeCategoryLaws)
-import Hedgehog.Classes.Common (lawsCheck, lawsCheckOne, lawsCheckMany, Laws(..))
+import Hedgehog.Classes.Common
 import Hedgehog.Classes.Contravariant (contravariantLaws)
 import Hedgehog.Classes.Enum (enumLaws, boundedEnumLaws)
 import Hedgehog.Classes.Eq (eqLaws)

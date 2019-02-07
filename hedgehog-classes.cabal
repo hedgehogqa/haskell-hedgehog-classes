@@ -36,10 +36,7 @@ build-type:
 extra-doc-files:
     README.md
   , CHANGELOG.md
-tested-with:
-    GHC == 8.2.2
-  , GHC == 8.4.4
-  , GHC == 8.6.3
+tested-with: GHC == 8.6.1, GHC == 8.6.2, GHC == 8.6.3
 
 source-repository head
   type:                git
@@ -53,21 +50,21 @@ flag aeson
   default: True
   manual: True
 
-flag semigroupoids
-  description:
-    You can disable the use of the `semirings` package using `-f-semirings`.
-    .
-    This may be useful for accelerating builds in sandboxes for expert users.
-  default: True
-  manual: True
+-- flag semigroupoids
+--   description:
+--     You can disable the use of the `semirings` package using `-f-semirings`.
+--     .
+--     This may be useful for accelerating builds in sandboxes for expert users.
+--   default: True
+--   manual: True
 
-flag semirings
-  description:
-    You can disable the use of the `semirings` package using `-f-semirings`.
-    .
-    This may be useful for accelerating builds in sandboxes for expert users.
-  default: True
-  manual: True
+-- flag semirings
+--   description:
+--     You can disable the use of the `semirings` package using `-f-semirings`.
+--     .
+--     This may be useful for accelerating builds in sandboxes for expert users.
+--   default: True
+--   manual: True
 
 library
   hs-source-dirs:
@@ -111,13 +108,13 @@ library
     Hedgehog.Classes.Monoid
     Hedgehog.Classes.Ord
     Hedgehog.Classes.Semigroup
-    Hedgehog.Classes.Semiring
+--    Hedgehog.Classes.Semiring
     Hedgehog.Classes.Show
     Hedgehog.Classes.ShowRead
     Hedgehog.Classes.Storable
     Hedgehog.Classes.Traversable
   build-depends:
-      base                >= 4.10.1.0 && < 4.13.0.0
+      base                >= 4.12.0.0 && < 4.14.0.0
     , hedgehog            >= 0.5.0.0  && < 0.7.0.0
     , containers          >= 0.5.9.2  && < 0.7.0.0
     , pretty-show         >= 1.6.0.0  && < 2.0.0.0
@@ -127,6 +124,8 @@ library
     -Wall
   default-language:
     Haskell2010
+  if impl(ghc < 8.5)
+    buildable: False
   if impl(ghc >= 8.5)
     cpp-options: -DHAVE_QUANTIFIED_CONSTRAINTS
   if flag(aeson)
@@ -135,9 +134,9 @@ library
 --  if flag(semigroupoids)
 --    build-depends: semigroupoids >= 0.5.3.0 && < 0.6.0.0
 --    cpp-options: -DHAVE_SEMIGROUPOIDS
-  if flag(semirings)
-    build-depends: semirings >= 0.3.1.1 && < 0.4.0.0
-    cpp-options: -DHAVE_SEMIRINGS
+--  if flag(semirings)
+--    build-depends: semirings >= 0.3.1.1 && < 0.4.0.0
+--    cpp-options: -DHAVE_SEMIRINGS
 --  if flag(vector)
 --    build-depends: vector >= 0.12.0.0 && < 0.13.0.0 
 --    cpp-options: -DHAVE_VECTOR
@@ -176,7 +175,7 @@ test-suite spec
                        Spec.Storable
                        Spec.Traversable
 
-  build-depends:       base >= 4.10.1.0 && < 4.13
+  build-depends:       base >= 4.12.0.0 && < 4.13
                      , aeson 
                      , containers 
                      , hedgehog 
