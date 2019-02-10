@@ -9,6 +9,20 @@ import Hedgehog.Classes.Common
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
+-- | Tests the following 'Bits' laws:
+--
+-- [__Conjunction Idempotence__]: @n '.&.' n@ ≡ @n@
+-- [__Disjunction Idempotence__]: @n '.|.' n@ ≡ @n@
+-- [__Double Complement__]: @'complement' '.' 'complement'@ ≡ @id@
+-- [__Set Bit__]: @'setBit' n i ≡ n '.|.' 'bit' i@
+-- [__Clear Bit__]: @'clearBit' n i@ ≡ @n '.&.' 'complement' ('bit' i)@
+-- [__Complement Bit__]: @'complement' n i@ ≡ @'xor' n ('bit' i)@
+-- [__Clear Zero__]: @'clearBit' 'zeroBits' i@ ≡ @'zeroBits'@
+-- [__Set Zero__]: @'setBit' 'zeroBits' i@ ≡ @'zeroBits'@
+-- [__Test Zero__]: @'testBit' 'zeroBits' i@ ≡ @'False'@
+-- [__Pop Zero__]: @'popCount' 'zeroBits'@ ≡ @0@
+-- [__Count Leading Zeros of Zero__]: @'countLeadingZeros' 'zeroBits'@ ≡ @'finiteBitSize' ('undefined' :: a)@
+-- [__Count Trailing Zeros of Zero__]: @'countTrailingZeros' 'zeroBits'@ ≡ @'finiteBitSize' ('undefined' :: a)@
 bitsLaws :: (FiniteBits a, Show a) => Gen a -> Laws
 bitsLaws gen = Laws "Bits"
   [ ("Conjunction Idempotence", bitsConjunctionIdempotence gen)
@@ -211,7 +225,7 @@ bitsPopZero _ = property $ do
   let lhs = popCount z; rhs = 0;
   let ctx = contextualise $ LawContext
         { lawContextLawName = "Pop Zero"
-        , lawContextLawBody = "popZero zeroBits" `congruency` "0"
+        , lawContextLawBody = "popCount zeroBits" `congruency` "0"
         , lawContextTcName = "Bits"
         , lawContextTcProp =
             let showZ = show z
@@ -229,7 +243,7 @@ bitsCountLeadingZeros _ = property $ do
   let f = finiteBitSize (undefined :: a)
   let lhs = countLeadingZeros z; rhs = f;
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Leading Zeros"
+        { lawContextLawName = "Count Leading Zeros of Zero"
         , lawContextLawBody = "countLeadingZeros zeroBits" `congruency` "finiteBitSize (undefined :: a)"
         , lawContextTcName = "Bits"
         , lawContextTcProp =
@@ -250,7 +264,7 @@ bitsCountTrailingZeros _ = property $ do
   let f = finiteBitSize (undefined :: a)
   let lhs = countTrailingZeros z; rhs = f;
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Trailing Zeros"
+        { lawContextLawName = "Count Trailing Zeros of Zero"
         , lawContextLawBody = "countTrailingZeros zeroBits" `congruency` "finiteBitSize (undefined :: a)"
         , lawContextTcName = "Bits"
         , lawContextTcProp =

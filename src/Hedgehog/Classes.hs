@@ -20,7 +20,7 @@ module Hedgehog.Classes
   , monoidLaws
   , commutativeMonoidLaws
   , ordLaws
-  , ixLaws
+--  , ixLaws
   , enumLaws
   , boundedEnumLaws
   , semigroupLaws
@@ -86,7 +86,7 @@ import Hedgehog.Classes.Foldable (foldableLaws)
 import Hedgehog.Classes.Functor (functorLaws)
 import Hedgehog.Classes.Generic (genericLaws)
 import Hedgehog.Classes.Integral (integralLaws)
-import Hedgehog.Classes.Ix (ixLaws)
+--import Hedgehog.Classes.Ix (ixLaws)
 import Hedgehog.Classes.Json (jsonLaws)
 import Hedgehog.Classes.Monad (monadLaws)
 import Hedgehog.Classes.MonadIO (monadIOLaws)

@@ -9,6 +9,13 @@ import Control.Monad (ap)
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Monad' laws:
+--
+-- [__Left Identity__]: @'return' a '>>=' k@ ≡ @k a@
+-- [__Right Identity__]: @m '>>=' 'return'@ ≡ @m@
+-- [__Associativity__]: @m '>>=' (\\x -> k x '>>=' h)@ ≡ @(m '>>=' k) '>>=' h@
+-- [__Return__]: @'return'@ ≡ @'pure'@
+-- [__Ap__]: @'ap' f x@ ≡ @f '<*>' x@
 monadLaws ::
   ( Monad f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

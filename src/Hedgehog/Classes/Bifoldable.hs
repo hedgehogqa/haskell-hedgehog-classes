@@ -11,10 +11,11 @@ import Data.Bifoldable (Bifoldable(..))
 import Data.Bifunctor (Bifunctor(..))
 import Data.Monoid (Endo(..), Sum(..), Product(..))
 
--- " ≡ "
--- | Tests the following laws:
+-- | Tests the following 'Bifoldable' laws:
 --
--- [__Identity__]: @
+-- [__Identity__]: @'bifold'@ ≡ @'bifoldMap' 'id' 'id'@ 
+-- [__FoldMap__]: @'bifoldMap' f g@ ≡ @'bifoldr' ('mappend' '.' f) ('mappend' '.' g) 'mempty'@
+-- [__Foldr__]: @'bifoldr' f g z t@ ≡ @'appEndo' ('bifoldMap' ('Endo' '.' f) ('Endo' '.' g) t) z@
 bifoldableLaws :: forall f.
   ( Bifoldable f
   , forall x y. (Eq x, Eq y) => Eq (f x y)
@@ -26,6 +27,10 @@ bifoldableLaws gen = Laws "Bifoldable"
   , ("Foldr", bifoldableFoldr gen)
   ]
 
+-- | Tests the following 'Bifoldable' / 'Bifunctor' laws:
+--
+-- [__Composition__]: @'bifoldMap' f g@ ≡ @'bifold' '.' 'bimap' f g@
+-- [__FoldMap__]: @'bifoldMap' f g '.' 'bimap' h i@ ≡ @'bifoldMap' (f '.' h) (g '.' i)@
 bifoldableFunctorLaws :: forall f.
   ( Bifoldable f, Bifunctor f
   , forall x y. (Eq x, Eq y) => Eq (f x y)
@@ -117,7 +122,7 @@ bifoldableFunctorComposition fgen = property $ do
   let lhs = bifoldMap f g x
   let rhs = bifold (bimap f g x)
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g == bifold . bimap f g"
+        { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g" `congruency` "bifold . bimap f g"
         , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
             let showX = show x;
             in lawWhere
@@ -139,7 +144,7 @@ bifoldableFunctorFoldMap fgen = property $ do
   let lhs = bifoldMap f g (bimap h i x)
   let rhs = bifoldMap (f . h) (g . i) x
   let ctx = contextualise $ LawContext
-        { lawContextLawName = "Composition", lawContextLawBody = "bifoldMap f g . bimap h i" `congruency` "bifoldMap (f . h) (g . i)"
+        { lawContextLawName = "FoldMap", lawContextLawBody = "bifoldMap f g . bimap h i" `congruency` "bifoldMap (f . h) (g . i)"
         , lawContextTcName = "Bifoldable/Bifunctor", lawContextTcProp =
             let showX = show x;
             in lawWhere

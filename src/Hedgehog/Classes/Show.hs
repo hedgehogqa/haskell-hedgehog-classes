@@ -5,6 +5,11 @@ module Hedgehog.Classes.Show (showLaws) where
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Show' laws:
+--
+-- [__ __]: @@ ≡ @@
+-- [__ __]: @@ ≡ @@
+-- [__ __]: @@ ≡ @@
 showLaws :: (Show a) => Gen a -> Laws
 showLaws gen = Laws "Show"
   [ ("Show", showShowsPrecZero gen)

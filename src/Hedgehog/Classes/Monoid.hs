@@ -5,14 +5,23 @@ module Hedgehog.Classes.Monoid (monoidLaws, commutativeMonoidLaws) where
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Monoid' laws:
+--
+-- [__Left Identity__]: @'mappend' 'mempty'@ ≡ @'id'@
+-- [__Right Identity__]: @'flip' 'mappend' 'mempty'@ ≡ @'id'@
+-- [__Associativity__]: @'mappend' a ('mappend' b c)@ ≡ @'mappend' ('mappend' a b) c@
+-- [__Concatenation__]: @'mconcat'@ ≡ @'foldr' 'mappend' 'mempty'@
 monoidLaws :: (Eq a, Monoid a, Show a) => Gen a -> Laws
 monoidLaws gen = Laws "Monoid"
-  [ ("Associativity", monoidAssociative gen)
-  , ("Left Identity", monoidLeftIdentity gen)
+  [ ("Left Identity", monoidLeftIdentity gen)
   , ("Right Identity", monoidRightIdentity gen)
+  , ("Associativity", monoidAssociative gen)
   , ("Concatenation", monoidConcatenation gen)
   ]
 
+-- | Tests the following 'Monoid' laws:
+--
+-- [__Commutativity__]: @'mappend' a b@ ≡ @'mappend' b a@
 commutativeMonoidLaws :: (Eq a, Monoid a, Show a) => Gen a -> Laws
 commutativeMonoidLaws gen = Laws "Commutative Monoid"
   [ ("Commutativity", monoidCommutative gen)

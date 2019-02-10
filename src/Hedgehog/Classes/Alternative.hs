@@ -9,11 +9,11 @@ import Control.Applicative (Alternative(..))
 import Hedgehog
 import Hedgehog.Classes.Common
 
--- | Tests the following laws:
+-- | Tests the following 'Alternative' laws:
 -- 
--- [__Left Identity__]: @'empty' '<|>' a ≡ a@
--- [__Right Identity__]: @a '<|>' 'empty' ≡ a@
--- [__Associativity__]: @a '<|>' (b '<|>' c) ≡ (a '<|>' b) '<|>' c@
+-- [__Left Identity__]: @'empty' '<|>' a@ ≡ @a@
+-- [__Right Identity__]: @a '<|>' 'empty'@ ≡ @a@
+-- [__Associativity__]: @a '<|>' (b '<|>' c)@ ≡ @(a '<|>' b) '<|>' c@
 alternativeLaws ::
   ( Alternative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

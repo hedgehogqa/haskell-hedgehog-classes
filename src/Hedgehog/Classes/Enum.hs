@@ -7,12 +7,20 @@ import Hedgehog.Classes.Common
 
 import qualified Hedgehog.Gen as Gen
 
+-- | Tests the following 'Enum' laws:
+--
+-- [__Succ-Pred Identity__]: @'succ' '.' 'pred'@ ≡ @'id'@
+-- [__Pred-Succ Identity__]: @'pred' '.' 'succ'@ ≡ @'id'@
 enumLaws :: (Enum a, Eq a, Show a) => Gen a -> Laws
 enumLaws gen = Laws "Enum"
   [ ("Succ Pred Identity", succPredIdentity gen)
   , ("Pred Succ Identity", predSuccIdentity gen)
   ]
 
+-- | Tests the same laws as 'enumLaws', but uses the 'Bounded'
+--   constraint to ensure that 'succ' and 'pred' behave as though
+--   they are total. This should always be preferred if your type
+--   has a 'Bounded' instance.
 boundedEnumLaws :: (Bounded a, Enum a, Eq a, Show a) => Gen a -> Laws
 boundedEnumLaws gen = Laws "Bounded Enum"
   [ ("Succ Pred Identity", succPredBoundedIdentity gen)

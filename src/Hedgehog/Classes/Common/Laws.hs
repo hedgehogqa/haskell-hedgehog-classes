@@ -53,12 +53,14 @@ lawWhere :: [String] -> String
 lawWhere [] = []
 lawWhere (l:ls) = l ++ newline ++ tab2 ++ lawWhere ls
 
+-- | A 'Laws' is the name of the typeclass and the set of named properties associated with that typeclass.
 data Laws = Laws
   { lawsTypeClass :: String
   , lawsProperties :: [(String, Property)]
   }
 
-data LawContext = LawContext -- forall b. LawContext
+-- | The context surrounding the property test of a law. Use 'contextualise' to turn this into a 'Context'.
+data LawContext = LawContext
   { lawContextLawName :: String -- ^ law name
   , lawContextLawBody :: String -- ^ law body
   , lawContextTcName  :: String -- ^ typeclass name
@@ -69,6 +71,7 @@ data LawContext = LawContext -- forall b. LawContext
 reduced :: Show a => a -> a -> String
 reduced lhs rhs = show lhs ++ congruent ++ show rhs
 
+-- | Turn a 'LawContext' into a 'Context'.
 contextualise :: LawContext -> Context
 contextualise LawContext{..} = Context $ unlines 
   [ "When testing the " ++ lawContextLawName ++ " law(" ++ dagger ++"), for the " ++ lawContextTcName ++ " typeclass, the following test failed: "
@@ -79,13 +82,116 @@ contextualise LawContext{..} = Context $ unlines
   , tab2 ++ "(" ++ dagger ++ ") " ++ lawContextLawName ++ " Law: " ++ lawContextLawBody
   ]
 
-lawsCheck :: Laws -> IO Bool
+-- | A convenience function for testing the properties of a typeclass.
+--   For example, in GHCi:
+--
+-- >>> genOrdering :: Gen Ordering; genOrdering = frequency [(1,pure EQ),(1,pure LT),(1,pure GT)]
+-- >>> lawsCheck (monoidLaws genOrdering)
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+-- True
+lawsCheck ::
+     Laws -- ^ The 'Laws' you would like to check.
+  -> IO Bool -- ^ 'True' if your tests pass, 'False' otherwise.
 lawsCheck = fmap getAll . lawsCheckInternal
 
-lawsCheckOne :: Gen a -> [Gen a -> Laws] -> IO Bool
+-- | A convenience function for testing many typeclass instances of
+--   a single type.
+--
+-- >>> lawsCheckOne (word8 constantBounded) [jsonLaws, showReadLaws]
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+-- True
+lawsCheckOne ::
+     Gen a -- ^ The generator for your type.
+  -> [Gen a -> Laws] -- ^ Functions that take a generator and output 'Laws'.
+  -> IO Bool -- ^ 'True' if your tests pass. 'False' otherwise.
 lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 
-lawsCheckMany :: [(String, [Laws])] -> IO Bool
+-- | A convenience function for checking many typeclass instances of
+--   multiple types.
+--
+-- @
+-- import Control.Applicative (liftA2)
+--
+-- import Data.Map (Map)
+-- import Data.Set (Set)
+--
+-- import qualified Data.List as List
+-- import qualified Data.Set as Set
+-- import qualified Data.Map as Map
+--
+-- import qualified Hedgehog.Gen as Gen
+-- import qualified Hedgehog.Range as Range
+--
+-- import Hedgehog (Gen)
+-- import Hedgehog.Classes
+--
+-- -- Generate a small @Set Int@
+-- genSet :: Gen (Set Int)
+-- genSet = Set.fromList <$> (Gen.list (Range.linear 2 10) (Gen.int Range.constantBounded))
+--
+-- -- Generate a small @Map String Int@
+-- genMap :: Gen (Map String Int)
+-- genMap = Map.fromList <$> (liftA2 List.zip genStrings genInts)
+--   where
+--     rng = Range.linear 2 6
+--     genStrings = Gen.list rng (Gen.string rng Gen.lower)
+--     genInts = Gen.list rng (Gen.int Range.constantBounded)
+--
+-- commonLaws :: (Eq a, Monoid a, Show a) => Gen a -> [Laws]
+-- commonLaws p = [eqLaws p, monoidLaws p]
+--
+-- tests :: [(String, [Laws])]
+-- tests =
+--   [ ("Set Int", commonLaws genSet)
+--   , ("Map String Int", commonLaws genMap)
+--   ]
+-- @
+--
+-- Now, in GHCi:
+--
+-- >>> lawsCheckMany tests
+--
+-- Testing properties for common typeclasses...
+--
+-- -------------
+-- -- Set Int --
+-- -------------
+-- 
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+-- 
+-- --------------------
+-- -- Map String Int --
+-- --------------------
+-- 
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+--   ✓ <interactive> passed 100 tests.
+-- 
+-- 
+-- All tests succeeded
+-- True
+lawsCheckMany ::
+     [(String, [Laws])] -- ^ Pairs of type names and their associated laws to test.
+  -> IO Bool -- ^ 'True' if your tests pass. 'False' otherwise.
 lawsCheckMany = fmap getAll . lawsCheckManyInternal
 
 lawsCheckInternal :: Laws -> IO All

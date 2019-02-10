@@ -9,6 +9,10 @@ import Data.Functor.Contravariant (Contravariant(..))
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Contravariant' laws:
+--
+-- [__Identity__]: @'contramap' 'id'@ ≡ @'id'@
+-- [__Composition__]: @'contramap' f '.' 'contramap' g@ ≡ @'contramap' (g '.' f)@
 contravariantLaws ::
   ( Contravariant f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

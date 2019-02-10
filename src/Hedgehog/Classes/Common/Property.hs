@@ -56,11 +56,12 @@ failExceptionNoSrc (SomeException x) = withFrozenCallStack $
       , List.dropWhileEnd Char.isSpace (displayException x)
     ]
 
+-- | You can provide a 'Context' to 'heqCtx','heqCtx1','heqCtx2','hneqCtx','hneqCtx1',or 'hneqCtx2'. The 'Context' is used to provide useful error messages in the event of a failure.
 data Context = NoContext | Context String
 
 contextToString :: Context -> String
 contextToString = \case
-  NoContext -> []
+  NoContext -> "No Context provided."
   Context ctx -> bar ++ " Context " ++ bar ++ "\n" ++ ctx ++ bar5
 
 failContext::
@@ -96,6 +97,8 @@ hGreaterThan x y = do
 
 infix 4 `hneq`
 
+-- | Passes the test if the given arguments are not equal. Otherwise fails
+--   with the given 'Context'.
 hneqCtx ::
   ( MonadTest m
   , HasCallStack
@@ -108,6 +111,8 @@ hneqCtx x y ctx = do
     then success
     else withFrozenCallStack $ failContext x y ctx
 
+-- | Passes the test if the given arguments are not equal. Otherwise fails
+--   with 'NoContext'.
 hneq ::
   ( MonadTest m
   , HasCallStack
@@ -118,6 +123,8 @@ hneq x y = hneqCtx x y NoContext
 
 infix 4 `heq`
 
+-- | Passes the test if the given arguments are equal. Otherwise fails
+--   with the given 'Context'.
 heqCtx ::
     ( MonadTest m
     , HasCallStack
@@ -130,6 +137,8 @@ heqCtx x y ctx = do
     then success
     else withFrozenCallStack $ failContext x y ctx
 
+-- | Passes the test if the given arguments are equal. Otherwise fails
+--   with 'NoContext'.
 heq ::
     ( MonadTest m
     , HasCallStack
@@ -140,6 +149,8 @@ heq x y = heqCtx x y NoContext
 
 infix 4 `heq1`
 
+-- | Passes the test if the given arguments are not equal. Otherwise fails
+--   with the given 'Context'.
 hneqCtx1 ::
      ( MonadTest m
      , HasCallStack
@@ -158,6 +169,8 @@ hneqCtx1 x y ctx = do
     then success
     else withFrozenCallStack $ failContext x y ctx
 
+-- | Passes the test if the given arguments are not equal. Otherwise fails
+--   with 'NoContext'.
 hneq1 ::
      ( MonadTest m
      , HasCallStack
@@ -172,6 +185,8 @@ hneq1 ::
      ) => f a -> f a -> m ()
 hneq1 x y = hneqCtx1 x y NoContext
 
+-- | Passes the test if the given arguments are equal. Otherwise fails
+--   with the given 'Context'.
 heqCtx1 ::
      ( MonadTest m
      , HasCallStack
@@ -190,6 +205,8 @@ heqCtx1 x y ctx = do
     then success
     else withFrozenCallStack $ failContext x y ctx
 
+-- | Passes the test if the given arguments are equal. Otherwise fails
+--   with 'NoContext'.
 heq1 ::
      ( MonadTest m
      , HasCallStack
@@ -206,6 +223,8 @@ heq1 x y = heqCtx1 x y NoContext
 
 infix 4 `heq2`
 
+-- | Passes the test if the given arguments are equal. Otherwise fails
+--   with the given 'Context'.
 heqCtx2 ::
      ( MonadTest m
      , HasCallStack
@@ -226,6 +245,8 @@ heqCtx2 x y ctx = do
     then success
     else withFrozenCallStack $ failContext x y ctx
 
+-- | Passes the test if the given arguments are equal. Otherwise fails
+--   with 'NoContext'.
 heq2 ::
      ( MonadTest m
      , HasCallStack
@@ -244,6 +265,8 @@ heq2 x y = heqCtx2 x y NoContext
 
 infix 4 `hneq2`
 
+-- | Passes the test if the given arguments are not equal. Otherwise fails
+--   with the given 'Context'.
 hneqCtx2 ::
      ( MonadTest m
      , HasCallStack
@@ -264,6 +287,8 @@ hneqCtx2 x y ctx = do
     then success
     else withFrozenCallStack $ failContext x y ctx
 
+-- | Passes the test if the given arguments are not equal. Otherwise fails
+--   with 'NoContext'.
 hneq2 ::
      ( MonadTest m
      , HasCallStack

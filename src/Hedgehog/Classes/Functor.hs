@@ -7,6 +7,11 @@ module Hedgehog.Classes.Functor (functorLaws) where
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Functor' laws:
+--
+-- [__Identity__]: @'fmap' 'id'@ ≡ @'id'@
+-- [__Composition__]: @'fmap' f '.' 'fmap' g@ ≡ @'fmap' (f '.' g)@
+-- [__Const__]: @'fmap' ('const' x)@ ≡ @x '<$'@
 functorLaws ::
   ( Functor f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

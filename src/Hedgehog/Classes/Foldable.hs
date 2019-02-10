@@ -13,6 +13,19 @@ import Control.Exception (ErrorCall(..), try, evaluate)
 import Data.Monoid (Sum(..), Endo(..), Dual(..))
 import qualified Data.Foldable as Foldable
 
+-- | Tests the following 'Foldable' laws:
+--
+-- [__Fold__]: @'Foldable.fold' ≡ 'Foldable.foldMap' 'id'@
+-- [__FoldMap__]: @'Foldable.foldMap' f ≡ 'Foldable.foldr' ('mappend' '.' f) 'mempty'@
+-- [__Foldr__]: @'Foldable.foldr' f z t ≡ 'appEndo' ('Foldable.foldMap' ('Endo' '.' f) t) z@
+-- [__Foldr'__]: @'Foldable.foldr'' f z0 t ≡ 'Foldable.foldl' f' 'id' t z0, where f' k x z = k '$!' f x z@
+-- [__Foldl__]: @'Foldable.foldl' f z t ≡ 'appEndo' ('getDual' ('Foldable.foldMap' ('Dual' '.' 'Endo' '.' 'flip' f) t)) z@
+-- [__Foldl'__]: @'Foldable.foldl'' f z0 xs ≡ 'Foldable.foldr' f' 'id' xs z0, where f' x k z = k '$!' f z x@
+-- [__Foldl1__]: @'Foldable.foldl1' f t ≡ let (x:xs) = 'Foldable.toList' t in 'foldl' f x xs@
+-- [__Foldr1__]: @'Foldable.foldr1' f t ≡ let (xs,x)@ = @unsnoc ('Foldable.toList' t) in 'foldr' f x xs@
+-- [__ToList__]: @'Foldable.toList' ≡ 'Foldable.foldr' (:) []@
+-- [__Null__]: @'Foldable.null' ≡ 'Foldable.foldr' ('const' ('const' 'False')) 'True'@
+-- [__Length__]: @'Foldable.length' ≡ 'getSum' '.' 'Foldable.foldMap' ('const' ('Sum' 1))@
 foldableLaws ::
   ( Foldable f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
@@ -72,7 +85,7 @@ foldableFoldMap fgen = property $ do
             let showA = show a
                 showF = "Sum $ " ++ show e
             in lawWhere
-              [ "foldMap f a" `congruency` "foldr (mappend . f) mempty, where"
+              [ "foldMap f a" `congruency` "foldr (mappend . f) mempty  a, where"
               , "f = " ++ showF
               , "a = " ++ showA
               ]

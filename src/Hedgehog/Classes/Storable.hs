@@ -16,6 +16,11 @@ import GHC.Ptr (Ptr(..), plusPtr)
 import Foreign.Storable (Storable(..))
 import System.IO.Unsafe (unsafePerformIO)
 
+-- | Tests the following 'Storable' laws:
+--
+-- [__ __]: @@ ≡ @@
+-- [__ __]: @@ ≡ @@
+-- [__ __]: @@ ≡ @@
 storableLaws :: (Eq a, Show a, Storable a) => Gen a -> Laws
 storableLaws gen = Laws "Storable"
   [ ("Set-Get (you get back what you put in)", storableSetGet gen)

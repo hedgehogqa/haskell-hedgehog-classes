@@ -10,17 +10,25 @@ import Hedgehog.Classes.Common
 import Control.Category(Category(..))
 import Prelude hiding (id, (.))
 
+-- | Tests the following 'Category' laws:
+--
+-- [__Left Identity__]: @'id' '.' f@ ≡ @f@
+-- [__Right Identity__]: @f '.' 'id'@ ≡ @f@
+-- [__Associativity__]: @f '.' (g '.' h)@ ≡ @(f '.' g) '.' h@
 categoryLaws :: forall f.
   ( Category f
   , forall x y. (Eq x, Eq y) => Eq (f x y)
   , forall x y. (Show x, Show y) => Show (f x y)
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Laws
 categoryLaws gen = Laws "Category"
-  [ ("Right Identity", categoryRightIdentity gen)
-  , ("Left Identity", categoryLeftIdentity gen)
+  [ ("Left Identity", categoryLeftIdentity gen)
+  , ("Right Identity", categoryRightIdentity gen)
   , ("Associativity", categoryAssociativity gen)
   ]
 
+-- | Tests the following 'Category' laws:
+--
+-- [__Commutativity__]: @f '.' g@ ≡ @g '.' f@
 commutativeCategoryLaws :: forall f.
   ( Category f
   , forall x y. (Eq x, Eq y) => Eq (f x y)

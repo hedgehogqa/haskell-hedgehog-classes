@@ -12,6 +12,16 @@ import Data.Functor.Identity
 import Data.Functor.Compose
 import Data.Traversable (Traversable(..), foldMapDefault, fmapDefault)
 
+-- | Tests the following 'Traversable' laws:
+--
+-- [__Naturality__]: @t '.' 'traverse' f@ ≡ @'traverse' (t '.' f), for every applicative transformation t@
+-- [__Identity__]: @'traverse' 'Identity'@ ≡ @'Identity'@
+-- [__Composition__]: @'traverse' ('Compose' '.' 'fmap' g '.' f)@ ≡ @'Compose' '.' 'fmap' ('traverse' g) '.' 'traverse' f@
+-- [__SequenceA Naturality__]: @t '.' 'sequenceA'@ ≡ @'sequenceA' '.' 'fmap' t, for every applicative transformation t@
+-- [__SequenceA Identity__]: @'sequenceA' '.' 'fmap' 'Identity'@ ≡ @'Identity'@
+-- [__SequenceA Composition__]: @'sequenceA' '.' 'fmap' 'Compose'@ ≡ @'Compose' '.' 'fmap' 'sequenceA' '.' 'sequenceA'@
+-- [__FoldMap__]: @'foldMap'@ ≡ @'foldMapDefault'@
+-- [__Fmap__]: @'fmap'@ ≡ @'fmapDefault'@
 traversableLaws ::
   ( Traversable f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

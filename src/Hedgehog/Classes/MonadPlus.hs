@@ -9,6 +9,13 @@ import Control.Monad (MonadPlus(..))
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'MonadPlus' laws:
+--
+-- [__Left Identity__]: @'mplus' 'mzero'@ ≡ @'id'@
+-- [__Right Identity__]: @'flip' 'mplus' 'mzero'@ ≡ @'id'@
+-- [__Associativity__]: @'mplus' a ('mplus' b c)@ ≡ @'mplus' ('mplus' a b) c@
+-- [__Left Zero__]: @'mzero' '>>=' f@ ≡ @'mzero'@
+-- [__Right Zero__]: @v '>>' 'mzero'@ ≡ @'mzero'@
 monadPlusLaws ::
   ( MonadPlus f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

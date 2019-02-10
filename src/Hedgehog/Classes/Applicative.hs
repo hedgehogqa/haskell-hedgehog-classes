@@ -9,14 +9,14 @@ import Control.Applicative (Applicative(..))
 import Hedgehog
 import Hedgehog.Classes.Common
 
--- | Tests the following laws:
+-- | Tests the following 'Applicative' laws:
 --
--- [__Identity__]: @'pure' 'id' '<*>' v ≡ v@
--- [__Composition__]: @'pure' ('.') '<*>' u '<*>' v '<*>' w ≡ u '<*>' (v '<*>' w)@
--- [__Homomorphism__]: @'pure' f '<*>' 'pure' x ≡ 'pure' (f x)@
--- [__Interchange__]: @u '<*>' 'pure' y ≡ 'pure' ('$' y) '<*>' u@
--- [__LiftA2 1__]: @'liftA2' 'id' f x ≡ f '<*>' x@
--- [__LiftA2 2__]: @'liftA2' f x y ≡ f '<$>' x '<*>' y@
+-- [__Identity__]: @'pure' 'id' '<*>' v@ ≡ @v@
+-- [__Composition__]: @'pure' ('.') '<*>' u '<*>' v '<*>' w@ ≡ @u '<*>' (v '<*>' w)@
+-- [__Homomorphism__]: @'pure' f '<*>' 'pure'@ x ≡ @'pure' (f x)@
+-- [__Interchange__]: @u '<*>' 'pure' y@ ≡ @'pure' ('$' y) '<*>' u@
+-- [__LiftA2 1__]: @'liftA2' 'id' f x@ ≡ @f '<*>' x@
+-- [__LiftA2 2__]: @'liftA2' f x y@ ≡ @f '<$>' x '<*>' y@
 applicativeLaws ::
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

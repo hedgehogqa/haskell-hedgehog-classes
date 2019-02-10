@@ -9,6 +9,10 @@ import Control.Monad.IO.Class (MonadIO(..))
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'MonadIO' laws:
+--
+-- [__Return__]: @'liftIO' '.' 'return'@ ≡ @'return'@
+-- [__Lift__]: @'liftIO' (m '>>=' f)@ ≡ @'liftIO' m '>>=' ('liftIO' '.' f)@
 monadIOLaws ::
   ( MonadIO f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)

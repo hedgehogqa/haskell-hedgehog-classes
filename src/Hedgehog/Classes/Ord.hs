@@ -5,6 +5,12 @@ module Hedgehog.Classes.Ord (ordLaws) where
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Ord' laws:
+--
+-- [__Antisymmetry__]: @@ ≡ @@
+-- [__Transitivity__]: @@ ≡ @@
+-- [__Reflexivity__]: @@ ≡ @@
+-- [__Totality__]: @@ ≡ @@
 ordLaws :: forall a. (Ord a, Show a) => Gen a -> Laws
 ordLaws gen = Laws "Ord"
   [ ("Antisymmetry", ordAntisymmetric gen)

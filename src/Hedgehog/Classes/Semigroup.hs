@@ -16,28 +16,45 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import qualified Data.Foldable as Foldable
 
+-- | Tests the following 'Semigroup' laws:
+--
+-- [__Associativity__]: @@ ≡ @@
+-- [__Concatenation__]: @@ ≡ @@
+-- [__Times__]: @@ ≡ @@
 semigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 semigroupLaws gen = Laws "Semigroup"
-  [ ("Associative", semigroupAssociative gen)
+  [ ("Associativity", semigroupAssociative gen)
   , ("Concatenation", semigroupConcatenation gen)
   , ("Times", semigroupTimes gen)
   ]
 
+-- | Tests the following 'Semigroup' laws:
+--
+-- [__Commutativity__]: @@ ≡ @@
 commutativeSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 commutativeSemigroupLaws gen = Laws "Commutative Semigroup"
   [ ("Commutative", semigroupCommutative gen)
   ]
 
+-- | Tests the following 'Semigroup' laws:
+--
+-- [__Exponential__]: @@ ≡ @@
 exponentialSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 exponentialSemigroupLaws gen = Laws "Exponential Semigroup"
   [ ("Exponential", semigroupExponential gen)
   ]
 
+-- | Tests the following 'Semigroup' laws:
+--
+-- [__Idempotent__]: @@ ≡ @@
 idempotentSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 idempotentSemigroupLaws gen = Laws "Idempotent Semigroup"
   [ ("Idempotent", semigroupIdempotent gen)
   ]
 
+-- | Tests the following 'Semigroup' laws:
+--
+-- [__Rectangular Band__]: @@ ≡ @@
 rectangularBandSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 rectangularBandSemigroupLaws gen = Laws "Rectangular Band Semigroup"
   [ ("Rectangular Band", semigroupRectangularBand gen)

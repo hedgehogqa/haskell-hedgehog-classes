@@ -79,5 +79,4 @@ allBinaryLaws = testArrow
   ++ testCommutativeCategory
 
 allLaws :: [(String, [Laws])]
-allLaws = testJson ++ testEq --allNullaryLaws ++ allUnaryLaws ++ allBinaryLaws
-
+allLaws = allNullaryLaws ++ allUnaryLaws ++ allBinaryLaws

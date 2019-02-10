@@ -8,6 +8,11 @@ import Hedgehog.Classes.Common
 import Text.Read (readListDefault, readMaybe)
 import Text.Show (showListWith)
 
+-- | Tests the following 'Show' / 'Read' laws:
+--
+-- [__ __]: @@ ≡ @@
+-- [__ __]: @@ ≡ @@
+-- [__ __]: @@ ≡ @@
 showReadLaws :: (Eq a, Read a, Show a) => Gen a -> Laws
 showReadLaws gen = Laws "Show/Read"
   [ ("Partial Isomorphism: show/read", showReadPartialIsomorphism gen)

@@ -10,6 +10,9 @@ import Control.Monad.Zip (MonadZip(mzip))
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'MonadZip' laws:
+--
+-- [__Naturality__]: @'fmap' (f '***' g) ('mzip' ma mb)@ ≡ @'mzip' ('fmap' f ma) ('fmap' g mb)@
 monadZipLaws ::
   ( MonadZip f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
@@ -35,7 +38,7 @@ monadZipNaturality fgen = property $ do
   let rhs = mzip (fmap f ma) (fmap g mb)
   let ctx = contextualise $ LawContext
         { lawContextLawName = "Naturality", lawContextTcName = "MonadZip"
-        , lawContextLawBody = "(fmap (f *** g) .) . mzip" `congruency` "(. fmap g) . mzip . fmap f"
+        , lawContextLawBody = "(fmap (f *** g) (mzip ma mb)" `congruency` "mzip (fmap f ma) (fmap g mb)"
         , lawContextReduced = reduced lhs rhs
         , lawContextTcProp =
             let showF = show f'; showG = show g'; showMA = show ma; showMB = show mb;

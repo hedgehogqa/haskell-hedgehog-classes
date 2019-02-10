@@ -5,6 +5,11 @@ module Hedgehog.Classes.Integral (integralLaws) where
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Integral' laws:
+--
+-- [__Quotient Remainder__]: @'quot' x y '*' y '+' ('rem' x y)@ ≡ @x@
+-- [__Division Modulus__]: @('div' x y) '*' y '+' ('mod' x y)@ ≡ @x@
+-- [__Integer Roundtrip__]: @'fromInteger' '.' 'toInteger'@ ≡ @'id'@
 integralLaws :: (Integral a, Show a) => Gen a -> Laws
 integralLaws gen = Laws "Integral"
   [ ("Quotient Remainder", integralQuotientRemainder gen)

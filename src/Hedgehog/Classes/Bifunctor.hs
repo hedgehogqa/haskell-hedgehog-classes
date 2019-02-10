@@ -9,6 +9,12 @@ import Hedgehog.Classes.Common
 
 import Data.Bifunctor (Bifunctor(..))
 
+-- | Tests the following 'Bifunctor' laws:
+--
+-- [__Identity__]: @'bimap' 'id' 'id'@ ≡ @'id'@
+-- [__First Identity__]: @'first' 'id'@ ≡ @'id'@
+-- [__Second Identity__]: @'second' 'id'@ ≡ @'id'@
+-- [__Composition__]: @'bimap' 'id' 'id'@ ≡ @'first' 'id' '.' 'second' 'id'@
 bifunctorLaws :: forall f.
   ( Bifunctor f
   , forall x y. (Eq x, Eq y) => Eq (f x y)
@@ -18,7 +24,7 @@ bifunctorLaws gen = Laws "Bifunctor"
   [ ("Identity", bifunctorIdentity gen)
   , ("First Identity", bifunctorFirstIdentity gen)
   , ("Second Identity", bifunctorSecondIdentity gen)
-  , ("Bifunctor Composition", bifunctorComposition gen) 
+  , ("Composition", bifunctorComposition gen) 
   ]
 
 type BifunctorProp f =

@@ -7,6 +7,10 @@ import Hedgehog.Classes.Common
 import Data.Aeson (FromJSON, ToJSON(toJSON))
 import qualified Data.Aeson as Aeson
 
+-- | Tests the following 'ToJSON' / 'FromJSON' laws:
+--
+-- [__Encoding Partial Isomorphism__]: @'Aeson.decode' '.' 'Aeson.encode'@ ≡ @'Just'@
+-- [__Encoding Equals Value__]: @'Aeson.decode' '.' 'Aeson.encode'@ ≡ @'Just' '.' 'Aeson.toJSON'@
 jsonLaws :: (FromJSON a, ToJSON a, Eq a, Show a) => Gen a -> Laws
 jsonLaws gen = Laws "ToJSON/FromJSON"
   [ ("Partial Isomorphism", jsonEncodingPartialIsomorphism gen)

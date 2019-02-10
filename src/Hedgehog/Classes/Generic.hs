@@ -11,6 +11,10 @@ import Hedgehog.Classes.Common
 
 import GHC.Generics (Generic(..))
 
+-- | Tests the following 'Generic' laws:
+--
+-- [__From-To Inverse__]: @'from' '.' 'to'@ ≡ @'id'@
+-- [__To-From Inverse__]: @'to' '.' 'from'@ ≡ @'id'@
 genericLaws ::
   ( Generic a, Eq a, Show a
   , Eq (Rep a x), Show (Rep a x)

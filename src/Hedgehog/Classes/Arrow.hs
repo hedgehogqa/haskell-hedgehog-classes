@@ -12,6 +12,15 @@ import Control.Category(Category(..))
 import Prelude hiding (id, (.))
 import qualified Prelude
 
+-- | Tests the following 'Arrow' laws:
+--
+-- [__Arr Identity__]: @'arr' 'id'@ ≡ @'id'@
+-- [__Arr Composition__]: @'arr' (f '>>>' g)@ ≡ @'arr' f '>>>' 'arr' g@
+-- [__Arr-First inverse__]: @'first' ('arr' f)@ ≡ @'arr' ('first' f)@
+-- [__First Composition__]: @'first' (f '>>>' g)@ ≡ @'first' f '>>>' 'first' g@
+-- [__Arrow Law 5__]: @'first' f '>>>' 'arr' 'fst'@ ≡ @'arr' 'fst' '>>>' f@
+-- [__Arrow Law 6__]: @'first' f '>>>' 'arr' ('id' '***' g)@ ≡ @'arr' ('id' '***' g) '>>>' 'first' f@
+-- [__Arrow Law 7__]: @'first' ('first' f) '>>>' 'arr' assoc@ ≡ @'arr' assoc '>>>' 'first' f, where assoc ((a,b),c) = (a,(b,c))@
 arrowLaws :: forall f.
   ( Arrow f
   , forall x y. (Eq x, Eq y) => Eq (f x y)
