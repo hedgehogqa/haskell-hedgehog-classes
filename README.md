@@ -7,7 +7,7 @@ hedgehog-classes [![Hackage][hackage-shield]][hackage]
 
 ## Motivation
 
-`hedgehog-classes` is a wrapper around [Hedgehog](http://hedgehog.qa/) that aims to provide a simple, straightforward API for testing common typeclass laws <i>quickly</i>, while providing good error messages in helping debug any failing tests. It is inspired by the [quickcheck-classes](http://hackage.haskell.org/package/quickcheck-classes) library.
+`hedgehog-classes` is a wrapper around [Hedgehog](http://hedgehog.qa/) that aims to provide a simple, straightforward API for testing common typeclass laws <i>quickly</i>, while providing good error messages to help debug any failing tests. It is inspired by the [quickcheck-classes](http://hackage.haskell.org/package/quickcheck-classes) library.
 
 ## API Overview
 
@@ -24,7 +24,7 @@ data Laws = Laws
 
 It is a typeclass name along with a list of named property tests.
 
-The second part of `hedgehog-classes` are the functions, which follow a simple structure. All functions in `hedgehog-classes` have one of the following three type signatures, based on the kind of the type which the corresponding typeclass parameterises. Below, 'Ctx' refers to the typeclass in question:
+The second part of `hedgehog-classes` are the functions, which follow a simple structure. All functions in `hedgehog-classes` have one of the following three type signatures, based on the kind of the type which the corresponding typeclass parameterises (Nullary, Unary, or Binary). Note that they all return a 'Laws', only the inputs are different. Below, 'Ctx' refers to the typeclass in question:
 
 ```haskell
 -- Typeclasses that have kind 'Type -> Constraint', e.g. 'Eq'
@@ -45,9 +45,7 @@ tcLaw2 ::
   ) => (forall x y. Gen x -> Gen y -> Gen (f x y)) -> Laws
 ```
 
-The third and last part of `hedgehog-classes` are the three convenience functions used to run
-
-your tests. They all return an `IO Bool`, where `True` is returned if all the tests pass, and `False` otherwise. They are as following:
+The third and last part of `hedgehog-classes` are the three convenience functions used to run your tests. They all return an `IO Bool`, where `True` is returned if all the tests pass, and `False` otherwise. They are as following:
 
 ```haskell
 -- Test a single typeclasses' laws.
@@ -61,7 +59,7 @@ lawsCheckOne :: Gen a -> [Gen a -> Laws] -> IO Bool
 lawsCheckMany :: [(String, [Laws])] -> IO Bool
 ```
 
-That is all there is to using `hedgehog-classes` in your test suite. For usage examples, see the [haddocks](http://hackage.haskell.org/package/hedgehog-classes)
+That is all there is to using `hedgehog-classes` in your test suite. For usage examples, see the [haddocks](http://hackage.haskell.org/package/hedgehog-classes).
 
 ## Distributing your own `Laws`
 
@@ -86,7 +84,8 @@ There are a number of libraries that have similar goals to `hedgehog-classes`, a
       - Does not make an effort to provide custom error messages
       - Currently the only thing `hedgehog-checkers` can do that this library cannot
         is test properties of higher-kinded typeclass laws where the construction of
-        the type 
+        the type requires constraints on its type arguments (e.g. `Ord` for something
+        like `Data.Set.Set`
       
   - [hedgehog-laws](https://github.com/qfpl/hedgehog-laws):
       - All of the things that apply to `hedgehog-checkers`, but even more incomplete.
@@ -138,7 +137,7 @@ To use this library for testing, just add it to a test stanza of your cabal file
 To use this library to export your own `Laws` functions which you wish to distribute, add it to the library stanza of your cabal file.
 
   [hackage]: http://hackage.haskell.org/package/hedgehog-classes
-  [hackage-shield]: https://img.shields.io/badge/hackage-v0.6.1-blue.svg
+  [hackage-shield]: https://img.shields.io/badge/hackage-v0.1.1.0-blue.svg
 
 ## Improvements
 
