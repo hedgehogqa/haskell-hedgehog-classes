@@ -125,7 +125,7 @@ semigroupConcatenation gen = property $ do
 semigroupTimes :: forall a. (Eq a, Semigroup a, Show a) => Gen a -> Property
 semigroupTimes gen = property $ do
   a <- forAll gen
-  n <- forAll (Gen.int Range.constantBounded)
+  n <- forAll (Gen.int (Range.linear 2 5))
   let lhs = stimes n a
   let rhs = Foldable.foldr1 (<>) (replicate n a)
   let ctx = contextualise $ LawContext
@@ -146,7 +146,7 @@ semigroupExponential :: forall a. (Eq a, Semigroup a, Show a) => Gen a -> Proper
 semigroupExponential gen = property $ do
   a <- forAll gen
   b <- forAll gen
-  n <- forAll (Gen.int Range.constantBounded)
+  n <- forAll (Gen.int (Range.linear 2 5))
   let lhs = stimes n (a <> b)
   let rhs = stimes n a <> stimes n b
   let ctx = contextualise $ LawContext

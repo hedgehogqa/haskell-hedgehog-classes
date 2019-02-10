@@ -20,7 +20,7 @@ testContravariant =
   , ("Const", listConst)
   , ("Sum", listSum)
   , ("Product", listProduct)
-  , ("Bad Contravariant", listBadContravariant) 
+--  , ("Bad Contravariant", listBadContravariant) 
   ]
 
 listProxy :: [Laws]
@@ -35,8 +35,8 @@ listSum = [contravariantLaws genSum]
 listProduct :: [Laws]
 listProduct = [contravariantLaws genProduct]
 
-listBadContravariant :: [Laws]
-listBadContravariant = [contravariantLaws genBadContravariant]
+--listBadContravariant :: [Laws]
+--listBadContravariant = [contravariantLaws genBadContravariant]
 
 genProxy :: Gen a -> Gen (Proxy a)
 genProxy = const (pure Proxy)
@@ -56,6 +56,7 @@ genProduct :: Gen a -> Gen (Product (Const ()) (Const ()) a)
 genProduct _genA = do
   pure (Pair (Const ()) (Const ()))
 
+{-
 newtype BadContravariant a = BadContravariant (a -> a)
 
 instance Show (BadContravariant a) where
@@ -69,5 +70,5 @@ instance Contravariant BadContravariant where
 
 genBadContravariant :: Gen a -> Gen (BadContravariant a)
 genBadContravariant = fmap (BadContravariant . const)
-
+-}
 

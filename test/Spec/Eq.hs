@@ -20,7 +20,7 @@ testEq =
   , ("Word16", listWord16)
   , ("Word32", listWord32)
   , ("Word64", listWord64)
-  , ("BadEq", listBadEq)
+--  , ("BadEq", listBadEq)
   ]
 
 listInt, listInt8, listInt16, listInt32, listInt64 :: [Laws]
@@ -37,6 +37,7 @@ listWord16 = [eqLaws (ranged Gen.word16)]
 listWord32 = [eqLaws (ranged Gen.word32)]
 listWord64 = [eqLaws (ranged Gen.word64)]
 
+{-
 listBadEq :: [Laws]
 listBadEq = [ eqLaws $ pure BadReflexive ]
   ++ [ eqLaws $ Gen.frequency [(1, pure BadSymmetric1),(1,pure BadSymmetric2)] ]
@@ -55,4 +56,4 @@ instance Eq BadSymmetric where
   BadSymmetric2 == BadSymmetric2 = True
   BadSymmetric2 == BadSymmetric1 = True
   BadSymmetric1 == BadSymmetric2 = False
-
+-}

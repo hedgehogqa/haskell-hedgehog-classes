@@ -141,46 +141,46 @@ library
 --    build-depends: vector >= 0.12.0.0 && < 0.13.0.0 
 --    cpp-options: -DHAVE_VECTOR
  
---test-suite spec
---  type:                exitcode-stdio-1.0
---  hs-source-dirs:      test
---  main-is:             Spec.hs
---
---  other-modules:       Spec.Alternative
---                       Spec.Applicative
---                       Spec.Arrow
---                       Spec.Bifoldable
---                       Spec.Bifunctor
---                       Spec.Bitraversable
---                       Spec.Bits
---                       Spec.Category
---                       Spec.Contravariant
---                       Spec.Enum
---                       Spec.Eq
---                       Spec.Foldable
---                       Spec.Functor
---                      Spec.Generic
---                       Spec.Integral
+test-suite spec
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+
+  other-modules:       Spec.Alternative
+                       Spec.Applicative
+                       Spec.Arrow
+                       Spec.Bifoldable
+                       Spec.Bifunctor
+                       Spec.Bitraversable
+                       Spec.Bits
+                       Spec.Category
+                       Spec.Contravariant
+                       Spec.Enum
+                       Spec.Eq
+                       Spec.Foldable
+                       Spec.Functor
+                       Spec.Generic
+                       Spec.Integral
 --                       Spec.Ix
---                       Spec.Json
---                       Spec.Monad
---                       Spec.MonadIO
---                       Spec.MonadPlus
---                       Spec.MonadZip
---                       Spec.Monoid
---                       Spec.Ord
---                       Spec.Semigroup
---                       Spec.Show
---                       Spec.ShowRead
---                       Spec.Storable
---                       Spec.Traversable
---
---  build-depends:       base >= 4.12.0.0 && < 4.13
---                     , aeson 
---                     , containers 
---                     , hedgehog 
---                     , hedgehog-classes
---
---  ghc-options:         -Wall
--- 
---  default-language:    Haskell2010
+                       Spec.Json
+                       Spec.Monad
+                       Spec.MonadIO
+                       Spec.MonadPlus
+                       Spec.MonadZip
+                       Spec.Monoid
+                       Spec.Ord
+                       Spec.Semigroup
+                       Spec.Show
+                       Spec.ShowRead
+                       Spec.Storable
+                       Spec.Traversable
+
+  build-depends:       base >= 4.12.0.0 && < 4.13
+                     , aeson 
+                     , containers 
+                     , hedgehog 
+                     , hedgehog-classes
+
+  ghc-options:         -Wall
+ 
+  default-language:    Haskell2010

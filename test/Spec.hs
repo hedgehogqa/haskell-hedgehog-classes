@@ -19,7 +19,7 @@ import Spec.Foldable
 import Spec.Functor
 import Spec.Generic
 import Spec.Integral
-import Spec.Ix
+--import Spec.Ix
 import Spec.Json
 import Spec.Monad
 import Spec.MonadIO
@@ -43,7 +43,7 @@ allNullaryLaws = testBits
   ++ testEq
   ++ testGeneric
   ++ testIntegral
-  ++ testIx
+--  ++ testIx
   ++ testJson
   ++ testMonoid
   ++ testCommutativeMonoid
