@@ -7,12 +7,12 @@ import Hedgehog.Classes.Common
 
 -- | Tests the following 'Show' laws:
 --
--- [__ __]: @@ ≡ @@
--- [__ __]: @@ ≡ @@
--- [__ __]: @@ ≡ @@
+-- [__ShowsPrec Zero__]: @'show' a@ ≡ @'showsPrec' 0 a \"\"@
+-- [__ShowsPrec Equivariance__]: @'showsPrec' p a r '++' s@ ≡ @'showsPrec p a (r '++' s)@
+-- [__ShowsPrec ShowList__]: @'showList' as r '++' s@ ≡ @'showList' as (r '++' s)@
 showLaws :: (Show a) => Gen a -> Laws
 showLaws gen = Laws "Show"
-  [ ("Show", showShowsPrecZero gen)
+  [ ("ShowsPrec Zero", showShowsPrecZero gen)
   , ("Equivariance: showsPrec", equivarianceShowsPrec gen)
   , ("Equivariance: showList", equivarianceShowList gen)
   ]

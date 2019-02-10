@@ -10,16 +10,18 @@ import Text.Show (showListWith)
 
 -- | Tests the following 'Show' / 'Read' laws:
 --
--- [__ __]: @@ ≡ @@
--- [__ __]: @@ ≡ @@
--- [__ __]: @@ ≡ @@
+-- [__Partial Isomorphism: show/read__]: @'readMaybe' '.' 'show'@ ≡ @'Just'@
+-- [__Partial Isomorphism: show/read with initial space__]: @'readMaybe' '.' (\" \" '++') '.' 'show'@ ≡ @'Just'@
+-- [__Partial Isomorphism: showsPrec/readPrec__]: @(a,\"\") `elem` 'readsPrec' p ('showsPrec' p a \"\")@ ≡ @'True'@
+-- [__Partial Isomorphism: showList/readList__]: @(as,\"\") `elem` 'readList' ('showList' as \"\")@ ≡ @'True'@
+-- [__Partial Isomorphism: showListWith shows/readListDefault__]: @(as,\"\") `elem` 'readListDefault' ('showListWith' 'shows' as \"\")@ ≡ @'True'@
 showReadLaws :: (Eq a, Read a, Show a) => Gen a -> Laws
 showReadLaws gen = Laws "Show/Read"
   [ ("Partial Isomorphism: show/read", showReadPartialIsomorphism gen)
   , ("Partial Isomorphism: show/read with initial space", showReadSpacePartialIsomorphism gen)
   , ("Partial Isomorphism: showsPrec/readsPrec", showsPrecReadsPrecPartialIsomorphism gen)
   , ("Partial Isomorphism: showList/readList", showListReadListPartialIsomorphism gen)
-  , ("Partial Isomorphism: showListWith shows / readListDefault", showListWithShowsReadListDefaultPartialIsomorphism gen)
+  , ("Partial Isomorphism: showListWith shows/readListDefault", showListWithShowsReadListDefaultPartialIsomorphism gen)
   ]
 
 showReadPartialIsomorphism :: forall a. (Eq a, Read a, Show a) => Gen a -> Property
@@ -47,12 +49,12 @@ showReadSpacePartialIsomorphism gen = property $ do
   let rhs = Just a
   let ctx = contextualise $ LawContext
         { lawContextLawName = "Show/Read Partial Isomorphism With Initial Space", lawContextTcName = "Show/Read"
-        , lawContextLawBody = "readMaybe . (\" \" ++ show)" `congruency` "Just"
+        , lawContextLawBody = "readMaybe . (\" \" ++) . show" `congruency` "Just"
         , lawContextReduced = reduced lhs rhs
         , lawContextTcProp =
             let showA = show a;
             in lawWhere
-              [ "readMaybe . (\" \" ++ show) $ a" `congruency` "Just a, where"
+              [ "readMaybe . (\" \" ++) . show $ a" `congruency` "Just a, where"
               , "a = " ++ showA
               ]
         }

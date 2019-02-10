@@ -160,6 +160,7 @@ lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 --
 -- >>> lawsCheckMany tests
 --
+-- @
 -- Testing properties for common typeclasses...
 --
 -- -------------
@@ -189,6 +190,7 @@ lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 -- 
 -- All tests succeeded
 -- True
+-- @
 lawsCheckMany ::
      [(String, [Laws])] -- ^ Pairs of type names and their associated laws to test.
   -> IO Bool -- ^ 'True' if your tests pass. 'False' otherwise.

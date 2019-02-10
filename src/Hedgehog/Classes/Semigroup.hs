@@ -18,9 +18,9 @@ import qualified Data.Foldable as Foldable
 
 -- | Tests the following 'Semigroup' laws:
 --
--- [__Associativity__]: @@ ≡ @@
--- [__Concatenation__]: @@ ≡ @@
--- [__Times__]: @@ ≡ @@
+-- [__Associativity__]: @a '<>' (b '<>' c)@ ≡ @(a '<>' b) '<>' c@
+-- [__Concatenation__]: @'sconcat'@ ≡ @'Foldable.foldr1' ('<>')@
+-- [__Times__]: @'stimes' n a@ ≡ @'foldr1' ('<>') ('replicate' n a)@
 semigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 semigroupLaws gen = Laws "Semigroup"
   [ ("Associativity", semigroupAssociative gen)
@@ -30,7 +30,7 @@ semigroupLaws gen = Laws "Semigroup"
 
 -- | Tests the following 'Semigroup' laws:
 --
--- [__Commutativity__]: @@ ≡ @@
+-- [__Commutativity__]: @a '<>' b@ ≡ @b '<>' a@
 commutativeSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 commutativeSemigroupLaws gen = Laws "Commutative Semigroup"
   [ ("Commutative", semigroupCommutative gen)
@@ -38,7 +38,7 @@ commutativeSemigroupLaws gen = Laws "Commutative Semigroup"
 
 -- | Tests the following 'Semigroup' laws:
 --
--- [__Exponential__]: @@ ≡ @@
+-- [__Exponentiality__]: @'stimes' n (a '<>' b)@ ≡ @'stimes' n a '<>' 'stimes' n b@
 exponentialSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 exponentialSemigroupLaws gen = Laws "Exponential Semigroup"
   [ ("Exponential", semigroupExponential gen)
@@ -46,7 +46,7 @@ exponentialSemigroupLaws gen = Laws "Exponential Semigroup"
 
 -- | Tests the following 'Semigroup' laws:
 --
--- [__Idempotent__]: @@ ≡ @@
+-- [__Idempotency__]: @a '<>' a@ ≡ @a@
 idempotentSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 idempotentSemigroupLaws gen = Laws "Idempotent Semigroup"
   [ ("Idempotent", semigroupIdempotent gen)
@@ -54,7 +54,7 @@ idempotentSemigroupLaws gen = Laws "Idempotent Semigroup"
 
 -- | Tests the following 'Semigroup' laws:
 --
--- [__Rectangular Band__]: @@ ≡ @@
+-- [__Rectangular Bandedness__]: @a '<>' b '<>' a@ ≡ @a@
 rectangularBandSemigroupLaws :: (Eq a, Semigroup a, Show a) => Gen a -> Laws
 rectangularBandSemigroupLaws gen = Laws "Rectangular Band Semigroup"
   [ ("Rectangular Band", semigroupRectangularBand gen)
@@ -130,7 +130,7 @@ semigroupTimes gen = property $ do
   let rhs = Foldable.foldr1 (<>) (replicate n a)
   let ctx = contextualise $ LawContext
         { lawContextLawName = "Times", lawContextTcName = "Semigroup"
-        , lawContextLawBody = "stimes" `congruency` "(foldr1 (<>) .) . replicate"
+        , lawContextLawBody = "stimes n a" `congruency` "foldr1 (<>) (replicate n a)"
         , lawContextReduced = reduced lhs rhs
         , lawContextTcProp =
             let showN = show n; showA = show a;

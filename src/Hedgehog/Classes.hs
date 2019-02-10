@@ -1,5 +1,9 @@
 {-| This library provides sets of properties that should hold for common
     typeclasses.
+
+    /Note:/ functions that test laws of a subclass never test the laws of
+    a superclass. For example, 'commutativeSemigroupLaws' never tests
+    the laws provided by 'semigroupLaws'.
 -}
 module Hedgehog.Classes
   ( -- * Running

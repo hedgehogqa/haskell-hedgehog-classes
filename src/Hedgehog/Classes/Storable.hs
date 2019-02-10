@@ -18,18 +18,22 @@ import System.IO.Unsafe (unsafePerformIO)
 
 -- | Tests the following 'Storable' laws:
 --
--- [__ __]: @@ ≡ @@
--- [__ __]: @@ ≡ @@
--- [__ __]: @@ ≡ @@
+-- [__Set-Get__]: @'pokeElemOff' ptr ix a '>>' 'peekElemOff' ptr ix@ ≡ @'pure' a@
+-- [__Get-Set__]: @'peekElemOff' ptr ix '>>=' 'pokeElemOff' ptr ix@ ≡ @'pure' ()@ (Putting back what you got out has no effect)
+-- [__List Conversion Roundtrips__]: Mallocing a list and then reconstructing it gives you the same list
+-- [__PeekElemOff/Peek__]: @'peekElemOff' a i@ ≡ @'peek' ('plusPtr' a (i '*' 'sizeOf' 'undefined'))@
+-- [__PokeElemOff/Poke__]: @'pokeElemOff' a i x@ ≡ @'poke' ('plusPtr' a (i '*' 'sizeOf' 'undefined')) x@
+-- [__PeekByteOff/Peek__]: @'peekByteOff' a i@ ≡ @'peek' ('plusPtr' a i)@
+-- [__PokeByteOff/Peek__]: @'pokeByteOff' a i x@ ≡ @'poke' ('plusPtr' a i) x@
 storableLaws :: (Eq a, Show a, Storable a) => Gen a -> Laws
 storableLaws gen = Laws "Storable"
   [ ("Set-Get (you get back what you put in)", storableSetGet gen)
   , ("Get-Set (putting back what you got out has no effect)", storableGetSet gen)
   , ("List Conversion Roundtrips", storableList gen)
   , ("peekElemOff a i ≡ peek (plusPtr a (i * sizeOf undefined))", storablePeekElem gen)
-  , ("peekElemOff a i x ≡ poke (plusPtr a (i * sizeOf undefined)) x ≡ id ", storablePokeElem gen)
+  , ("pokeElemOff a i x ≡ poke (plusPtr a (i * sizeOf undefined)) x ≡ id ", storablePokeElem gen)
   , ("peekByteOff a i ≡ peek (plusPtr a i)", storablePeekByte gen)
-  , ("peekByteOff a i x ≡ poke (plusPtr a i) x ≡ id ", storablePokeByte gen)
+  , ("pokeByteOff a i x ≡ poke (plusPtr a i) x ≡ id ", storablePokeByte gen)
   ]
 
 genArray :: forall a. (Storable a) => Gen a -> Int -> IO (Ptr a)

@@ -7,10 +7,10 @@ import Hedgehog.Classes.Common
 
 -- | Tests the following 'Ord' laws:
 --
--- [__Antisymmetry__]: @@ ≡ @@
--- [__Transitivity__]: @@ ≡ @@
--- [__Reflexivity__]: @@ ≡ @@
--- [__Totality__]: @@ ≡ @@
+-- [__Antisymmetry__]: @x '<=' y '&&' y '<=' x@ ≡ @x '==' y@
+-- [__Transitivity__]: @x '<=' y '&&' y '<=' z@ ≡ @x '<=' z@
+-- [__Reflexivity__]: @x '<=' x@ ≡ @'True'@
+-- [__Totality__]: @x '<=' y '||' y '<=' x@ ≡ @'True'@
 ordLaws :: forall a. (Ord a, Show a) => Gen a -> Laws
 ordLaws gen = Laws "Ord"
   [ ("Antisymmetry", ordAntisymmetric gen)
