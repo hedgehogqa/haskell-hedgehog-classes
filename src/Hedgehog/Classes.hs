@@ -1,10 +1,5 @@
 {-| This library provides sets of properties that should hold for common
     typeclasses.
-
-    /Note:/ on GHC < 8.5, this library uses the higher-kinded typeclasses
-    ('Data.Functor.Classes.Show1', 'Data.Functor.Classes.Eq1', 'Data.Functor.Classes.Ord1', etc.),
-    but on GHC >= 8.5, it uses `-XQuantifiedConstraints` to express these
-    constraints more cleanly.
 -}
 module Hedgehog.Classes
   ( -- * Running
