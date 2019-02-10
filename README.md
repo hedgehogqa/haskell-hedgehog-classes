@@ -70,7 +70,9 @@ That is all there is to using `hedgehog-classes` in your test suite. For usage e
 ## Example error messages
 Below is an example of an error message one might get from a failed test from `hedgehog-classes`:
 
-TODO: PUT IMAGE HERE
+![alt text](imgs/badlist.png "Here we can see a definition of foldl' that does not accumulate strictly")
+
+![alt text](imgs/badsemigroup.png "Here we can see a semigroup instance which is not associative")
 
 ## Differences from similar libraries
 There are a number of libraries that have similar goals to `hedgehog-classes`, and I will discuss only those that wrap `hedgehog`, not `QuickCheck`.
