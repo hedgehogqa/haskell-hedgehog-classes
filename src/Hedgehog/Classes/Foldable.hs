@@ -26,6 +26,8 @@ import qualified Data.Foldable as Foldable
 -- [__ToList__]: @'Foldable.toList' ≡ 'Foldable.foldr' (:) []@
 -- [__Null__]: @'Foldable.null' ≡ 'Foldable.foldr' ('const' ('const' 'False')) 'True'@
 -- [__Length__]: @'Foldable.length' ≡ 'getSum' '.' 'Foldable.foldMap' ('const' ('Sum' 1))@
+--
+-- This additionally tests that the user's implementations of 'Foldable.foldr'' and 'Foldable.foldl'' are strict in their accumulators.
 foldableLaws ::
   ( Foldable f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
