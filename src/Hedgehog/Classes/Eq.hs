@@ -10,7 +10,6 @@ import Hedgehog.Classes.Common
 -- [__Reflexivity__]: @x '==' x@ ≡ @'True'@
 -- [__Symmetry__]: @x '==' y@ ≡ @y '==' x@
 -- [__Transitivity__]: @x '==' y '&&' y '==' z@ ≡ @x '==' z@
--- [__Substitutivity__]: @x '==' y@ ≡ @f x '==' f y@
 -- [__Negation__]: @x '/=' y@ ≡ @'not' (x '==' y)@
 eqLaws :: (Eq a, Show a) => Gen a -> Laws
 eqLaws gen = Laws "Eq"
