@@ -85,7 +85,7 @@ There are a number of libraries that have similar goals to `hedgehog-classes`, a
       - Currently the only thing `hedgehog-checkers` can do that this library cannot
         is test properties of higher-kinded typeclass laws where the construction of
         the type requires constraints on its type arguments (e.g. `Ord` for something
-        like `Data.Set.Set`
+        like `Data.Set.Set`)
       
   - [hedgehog-laws](https://github.com/qfpl/hedgehog-laws):
       - All of the things that apply to `hedgehog-checkers`, but even more incomplete.
