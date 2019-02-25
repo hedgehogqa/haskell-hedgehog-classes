@@ -1,3 +1,5 @@
+{-# language CPP #-}
+
 {-| This library provides sets of properties that should hold for common
     typeclasses.
 
@@ -27,12 +29,18 @@ module Hedgehog.Classes
   , exponentialSemigroupLaws
   , idempotentSemigroupLaws
   , rectangularBandSemigroupLaws
+#if HAVE_AESON 
+  , jsonLaws
+#endif
+  , genericLaws
+#if HAVE_SEMIRINGS
+  , semiringLaws
+  , ringLaws
+#endif 
   , showLaws
   , showReadLaws
   , storableLaws
-  , genericLaws
-  , jsonLaws
-
+    
     -- ** Unary type constructors
   , alternativeLaws
   , applicativeLaws
@@ -55,7 +63,7 @@ module Hedgehog.Classes
   , categoryLaws
   , commutativeCategoryLaws
 
-    -- * Defining your own laws
+    -- * Defining your own 'Laws'
   , Laws(..)
   , LawContext(..)
   , Context(..)
@@ -86,7 +94,9 @@ import Hedgehog.Classes.Functor (functorLaws)
 import Hedgehog.Classes.Generic (genericLaws)
 import Hedgehog.Classes.Integral (integralLaws)
 --import Hedgehog.Classes.Ix (ixLaws)
+#if HAVE_AESON
 import Hedgehog.Classes.Json (jsonLaws)
+#endif
 import Hedgehog.Classes.Monad (monadLaws)
 import Hedgehog.Classes.MonadIO (monadIOLaws)
 import Hedgehog.Classes.MonadPlus (monadPlusLaws)
@@ -94,6 +104,9 @@ import Hedgehog.Classes.MonadZip (monadZipLaws)
 import Hedgehog.Classes.Monoid (monoidLaws, commutativeMonoidLaws)
 import Hedgehog.Classes.Ord (ordLaws)
 import Hedgehog.Classes.Semigroup (semigroupLaws, commutativeSemigroupLaws, exponentialSemigroupLaws, idempotentSemigroupLaws, rectangularBandSemigroupLaws)
+#if HAVE_SEMIRINGS
+import Hedgehog.Classes.Semiring (semiringLaws, ringLaws)
+#endif
 import Hedgehog.Classes.Show (showLaws)
 import Hedgehog.Classes.ShowRead (showReadLaws)
 import Hedgehog.Classes.Storable (storableLaws)

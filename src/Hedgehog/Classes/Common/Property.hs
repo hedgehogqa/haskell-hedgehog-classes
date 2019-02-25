@@ -4,10 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-
-#if HAVE_QUANTIFIED_CONSTRAINTS
 {-# LANGUAGE QuantifiedConstraints #-}
-#endif
 
 -- | This module exports hedgehog comparison tests
 --   that don't contain CallStack information, since this would
@@ -31,10 +28,6 @@ import Hedgehog.Internal.Property (MonadTest, liftTest, mkTest, success, Failure
 import Text.Show.Pretty (ppShow)
 import qualified Data.Char as Char
 import qualified Data.List as List
-
-#if HAVE_QUANTIFIED_CONSTRAINTS == 0
-import qualified Data.Functor.Classes as C
-#endif
 
 bar :: String
 bar = "━━━"
@@ -156,12 +149,8 @@ hneqCtx1 ::
      , HasCallStack
      , Eq a
      , Show a
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
-#else
-     , C.Eq1 f, C.Show1 f
-#endif 
      ) => f a -> f a -> Context -> m ()
 hneqCtx1 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `neq1` y)
@@ -176,12 +165,8 @@ hneq1 ::
      , HasCallStack
      , Eq a
      , Show a
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
-#else
-     , C.Eq1 f, C.Show1 f
-#endif 
      ) => f a -> f a -> m ()
 hneq1 x y = hneqCtx1 x y NoContext
 
@@ -192,12 +177,8 @@ heqCtx1 ::
      , HasCallStack
      , Eq a
      , Show a
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
-#else
-     , C.Eq1 f, C.Show1 f
-#endif 
      ) => f a -> f a -> Context -> m ()
 heqCtx1 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `eq1` y)
@@ -212,12 +193,8 @@ heq1 ::
      , HasCallStack
      , Eq a
      , Show a
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x. Eq x => Eq (f x)
      , forall x. Show x => Show (f x)
-#else
-     , C.Eq1 f, C.Show1 f
-#endif 
      ) => f a -> f a -> m ()
 heq1 x y = heqCtx1 x y NoContext
 
@@ -232,12 +209,8 @@ heqCtx2 ::
      , Eq b
      , Show a
      , Show b
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
-#else
-     , C.Eq2 f, C.Show2 f
-#endif 
      ) => f a b -> f a b -> Context -> m ()
 heqCtx2 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `eq2` y)
@@ -254,12 +227,8 @@ heq2 ::
      , Eq b
      , Show a
      , Show b
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
-#else
-     , C.Eq2 f, C.Show2 f
-#endif 
      ) => f a b -> f a b -> m ()
 heq2 x y = heqCtx2 x y NoContext
 
@@ -274,12 +243,8 @@ hneqCtx2 ::
      , Eq b
      , Show a
      , Show b
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
-#else
-     , C.Eq2 f, C.Show2 f
-#endif 
      ) => f a b -> f a b -> Context -> m ()
 hneqCtx2 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `neq2` y)
@@ -296,12 +261,7 @@ hneq2 ::
      , Eq b
      , Show a
      , Show b
-#if HAVE_QUANTIFIED_CONSTRAINTS
      , forall x y. (Eq x, Eq y) => Eq (f x y)
      , forall x y. (Show x, Show y) => Show (f x y)
-#else
-     , C.Eq2 f, C.Show2 f
-#endif 
      ) => f a b -> f a b -> m ()
 hneq2 x y = hneqCtx2 x y NoContext
-
