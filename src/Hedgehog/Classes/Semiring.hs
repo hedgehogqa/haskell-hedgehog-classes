@@ -8,13 +8,14 @@ module Hedgehog.Classes.Semiring () where
 
 #else
 
-module Hedgehog.Classes.Semiring (semiringLaws, ringLaws) where
+module Hedgehog.Classes.Semiring (semiringLaws, ringLaws, starLaws) where
 
 import Hedgehog
 import Hedgehog.Classes.Common
 
 import Prelude hiding (Num(..))
 import Data.Semiring
+import Data.Star
 
 -- | Tests the following 'Semiring' laws:
 --
@@ -52,8 +53,19 @@ ringLaws gen = Laws "Ring"
   [ ("Additive Inverse", ringAdditiveInverse gen)
   ]
 
+-- | Tests the following 'Star' laws:
+--
+-- [__Asteration__]: @'star' x@ ≡ @'one' '+' x '*' 'star' x@
+-- [__APlus__]: @'aplus' x@ ≡ @x '*' 'star' x@
+starLaws :: (Star a, Eq a, Show a) => Gen a -> Laws
+starLaws gen = Laws "Star"
+  [ ("Asteration", starAsteration gen)
+  , ("APlus", starAplus gen)
+  ]
+
 type SemiringProp a = (Semiring a, Eq a, Show a) => Gen a -> Property
 type RingProp a = (Ring a, Eq a, Show a) => Gen a -> Property
+type StarProp a = (Star a, Eq a, Show a) => Gen a -> Property
 
 ringAdditiveInverse :: forall a. RingProp a
 ringAdditiveInverse gen = property $ do
@@ -296,4 +308,42 @@ semiringRightAnnihilation gen = property $ do
               ]
         }    
   heqCtx lhs rhs ctx
+
+starAsteration :: forall a. StarProp a
+starAsteration gen = property $ do
+  x <- forAll gen
+  let lhs = star x
+  let rhs = one + x * star x
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "Asteration", lawContextTcName = "Star"
+        , lawContextLawBody = "star x" `congruency` "one + x * star x"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp =
+            let showX = show x; showOne = show (one :: a);
+            in lawWhere
+              [ "star x" `congruency` "one + x * star x, where"
+              , "x = " ++ showX
+              , "one = " ++ showOne
+              ]
+        }
+  heqCtx lhs rhs ctx 
+
+starAplus :: forall a. StarProp a
+starAplus gen = property $ do
+  x <- forAll gen
+  let lhs = aplus x
+  let rhs = x * star x
+  let ctx = contextualise $ LawContext
+        { lawContextLawName = "APlus", lawContextTcName = "Star"
+        , lawContextLawBody = "aplus x" `congruency` "x * star x"
+        , lawContextReduced = reduced lhs rhs
+        , lawContextTcProp =
+            let showX = show x
+            in lawWhere
+              [ "aplus x" `congruency` "x * star x, where"
+              , "x = " ++ showX
+              ]
+        }
+  heqCtx lhs rhs ctx 
+ 
 #endif
