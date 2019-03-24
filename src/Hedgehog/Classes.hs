@@ -36,6 +36,7 @@ module Hedgehog.Classes
 #if HAVE_SEMIRINGS
   , semiringLaws
   , ringLaws
+  , starLaws
 #endif 
   , showLaws
   , showReadLaws
@@ -105,7 +106,7 @@ import Hedgehog.Classes.Monoid (monoidLaws, commutativeMonoidLaws)
 import Hedgehog.Classes.Ord (ordLaws)
 import Hedgehog.Classes.Semigroup (semigroupLaws, commutativeSemigroupLaws, exponentialSemigroupLaws, idempotentSemigroupLaws, rectangularBandSemigroupLaws)
 #if HAVE_SEMIRINGS
-import Hedgehog.Classes.Semiring (semiringLaws, ringLaws)
+import Hedgehog.Classes.Semiring (semiringLaws, ringLaws, starLaws)
 #endif
 import Hedgehog.Classes.Show (showLaws)
 import Hedgehog.Classes.ShowRead (showReadLaws)
