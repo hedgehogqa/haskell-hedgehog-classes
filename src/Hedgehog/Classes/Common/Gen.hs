@@ -2,6 +2,7 @@
 
 module Hedgehog.Classes.Common.Gen
   ( genSmallList
+  , genVerySmallList 
   , genSmallNonEmptyList
   , genShowReadPrecedence
   , genSmallString
@@ -36,6 +37,9 @@ genSmallNonEmptyList gen = Gen.list (Range.linear 1 7) gen
 
 genSmallList :: Gen a -> Gen [a]
 genSmallList gen = Gen.list (Range.linear 0 6) gen
+
+genVerySmallList :: Gen a -> Gen [a]
+genVerySmallList gen = Gen.list (Range.linear 0 2) gen
 
 genSmallString :: Gen String
 genSmallString = Gen.string (Range.linear 0 6) Gen.ascii

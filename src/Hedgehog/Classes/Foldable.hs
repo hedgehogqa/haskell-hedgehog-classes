@@ -51,7 +51,7 @@ foldableFold ::
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
   ) => (forall x. Gen x -> Gen (f x)) -> Property
 foldableFold fgen = property $ do
-  a <- forAll $ fgen genSmallSum
+  a <- forAll $ fgen $ genVerySmallList genSmallInteger
   let lhs = Foldable.fold a
   let rhs = Foldable.foldMap id a
   let ctx = contextualise $ LawContext
@@ -76,7 +76,7 @@ foldableFoldMap ::
 foldableFoldMap fgen = property $ do
   a <- forAll $ fgen genSmallInteger
   e <- forAll genQuadraticEquation
-  let f = Sum . runQuadraticEquation e
+  let f = (:[]) . runQuadraticEquation e
   let lhs = Foldable.foldMap f a
   let rhs = Foldable.foldr (mappend . f) mempty a
   let ctx = contextualise $ LawContext
@@ -85,7 +85,7 @@ foldableFoldMap fgen = property $ do
         , lawContextTcName = "Foldable"
         , lawContextTcProp =
             let showA = show a
-                showF = "Sum $ " ++ show e
+                showF = "(:[]) $ " ++ show e
             in lawWhere
               [ "foldMap f a" `congruency` "foldr (mappend . f) mempty  a, where"
               , "f = " ++ showF
