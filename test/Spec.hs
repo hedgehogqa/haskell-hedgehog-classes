@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Main (main) where
 
 import Hedgehog.Classes
