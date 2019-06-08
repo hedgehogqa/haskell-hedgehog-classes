@@ -13,7 +13,7 @@ import Data.Monoid (Endo(..), Sum(..), Product(..))
 
 -- | Tests the following 'Bifoldable' laws:
 --
--- [__Identity__]: @'bifold'@ ≡ @'bifoldMap' 'id' 'id'@ 
+-- [__Identity__]: @'bifold'@ ≡ @'bifoldMap' 'id' 'id'@
 -- [__FoldMap__]: @'bifoldMap' f g@ ≡ @'bifoldr' ('mappend' '.' f) ('mappend' '.' g) 'mempty'@
 -- [__Foldr__]: @'bifoldr' f g z t@ ≡ @'appEndo' ('bifoldMap' ('Endo' '.' f) ('Endo' '.' g) t) z@
 bifoldableLaws :: forall f.
@@ -60,28 +60,33 @@ bifoldableIdentity fgen = property $ do
                  [ "bimap id id x" `congruency` "x, where"
                  , "x = " ++ showX
                  ]
-        , lawContextReduced = reduced lhs rhs 
-        } 
+        , lawContextReduced = reduced lhs rhs
+        }
   heqCtx lhs rhs ctx
-        
+
 bifoldableFoldMap :: forall f. BifoldableProp f
 bifoldableFoldMap fgen = property $ do
   x <- forAll $ fgen genSmallInteger genSmallInteger
-  let f = Sum; g = Sum . (+1)
+  f' <- forAll genQuadraticEquation
+  g' <- forAll genQuadraticEquation
+  let f = Sum . runQuadraticEquation f'
+  let g = Sum . runQuadraticEquation g'
   let lhs = (bifoldMap f g x)
   let rhs = (bifoldr (mappend . f) (mappend . g) mempty x)
   let ctx = contextualise $ LawContext
         { lawContextLawName = "FoldMap", lawContextLawBody = "bifoldMap f g" `congruency` "bifoldr (mappend . f) (mappend . g) mempty"
         , lawContextTcName = "Bifoldable", lawContextTcProp =
              let showX = show x;
+                 showF = show f';
+                 showG = show g';
              in lawWhere
                  [ "bifoldMap f g x" `congruency` "bifoldr (mappend . f) (mappend . g) mempty x, where"
-                 , "f = \\x -> Sum x"
-                 , "g = \\x -> Sum (x + 1)"
+                 , "f = " ++ showF
+                 , "g = " ++ showG
                  , "x = " ++ showX
                  ]
-        , lawContextReduced = reduced lhs rhs 
-        } 
+        , lawContextReduced = reduced lhs rhs
+        }
   heqCtx lhs rhs ctx
 
 bifoldableFoldr :: forall f. BifoldableProp f
@@ -105,9 +110,9 @@ bifoldableFoldr fgen = property $ do
               , "t = " ++ showX
               , "z = " ++ showZ
               ]
-        , lawContextReduced = reduced lhs rhs 
+        , lawContextReduced = reduced lhs rhs
         }
-  heqCtx lhs rhs ctx 
+  heqCtx lhs rhs ctx
 
 type BifoldableFunctorProp f =
   ( Bifoldable f, Bifunctor f
@@ -131,9 +136,9 @@ bifoldableFunctorComposition fgen = property $ do
               , "g = \\x -> Product (x + 1)"
               , "x = " ++ showX
               ]
-        , lawContextReduced = reduced lhs rhs 
+        , lawContextReduced = reduced lhs rhs
         }
-  heqCtx lhs rhs ctx 
+  heqCtx lhs rhs ctx
 
 bifoldableFunctorFoldMap :: forall f. BifoldableFunctorProp f
 bifoldableFunctorFoldMap fgen = property $ do
@@ -155,7 +160,7 @@ bifoldableFunctorFoldMap fgen = property $ do
               , "i = " ++ showI
               , "x = " ++ showX
               ]
-        , lawContextReduced = reduced lhs rhs 
+        , lawContextReduced = reduced lhs rhs
         }
   heqCtx lhs rhs ctx
 
