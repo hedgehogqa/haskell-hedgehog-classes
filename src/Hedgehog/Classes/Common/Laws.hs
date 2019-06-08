@@ -90,10 +90,10 @@ contextualise LawContext{..} = Context $ unlines
 --
 -- >>> genOrdering :: Gen Ordering; genOrdering = frequency [(1,pure EQ),(1,pure LT),(1,pure GT)]
 -- >>> lawsCheck (monoidLaws genOrdering)
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
+-- Monoid: Left Identity    ✓ <interactive> passed 100 tests.
+-- Monoid: Right Identity    ✓ <interactive> passed 100 tests.
+-- Monoid: Associativity    ✓ <interactive> passed 100 tests.
+-- Monoid: Concatenation    ✓ <interactive> passed 100 tests.
 -- True
 lawsCheck ::
      Laws -- ^ The 'Laws' you would like to check.
@@ -104,13 +104,13 @@ lawsCheck = fmap getAll . lawsCheckInternal
 --   a single type.
 --
 -- >>> lawsCheckOne (word8 constantBounded) [jsonLaws, showReadLaws]
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
+-- ToJSON/FromJSON: Partial Isomorphism    ✓ <interactive> passed 100 tests.
+-- ToJSON/FromJSON: Encoding equals value    ✓ <interactive> passed 100 tests.
+-- Show/Read: Partial Isomorphism: show/read    ✓ <interactive> passed 100 tests.
+-- Show/Read: Partial Isomorphism: show/read with initial space    ✓ <interactive> passed 100 tests.
+-- Show/Read: Partial Isomorphism: showsPrec/readsPrec    ✓ <interactive> passed 100 tests.
+-- Show/Read: Partial Isomorphism: showList/readList    ✓ <interactive> passed 100 tests.
+-- Show/Read: Partial Isomorphism: showListWith shows/readListDefault    ✓ <interactive> passed 100 tests.
 -- True
 lawsCheckOne ::
      Gen a -- ^ The generator for your type.
@@ -139,11 +139,11 @@ lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 --
 -- -- Generate a small @Set Int@
 -- genSet :: Gen (Set Int)
--- genSet = Set.fromList <$> (Gen.list (Range.linear 2 10) (Gen.int Range.constantBounded))
+-- genSet = Set.fromList \<$\> (Gen.list (Range.linear 2 10) (Gen.int Range.constantBounded))
 --
 -- -- Generate a small @Map String Int@
 -- genMap :: Gen (Map String Int)
--- genMap = Map.fromList <$> (liftA2 List.zip genStrings genInts)
+-- genMap = Map.fromList \<$\> (liftA2 List.zip genStrings genInts)
 --   where
 --     rng = Range.linear 2 6
 --     genStrings = Gen.list rng (Gen.string rng Gen.lower)
@@ -170,26 +170,27 @@ lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 -- -- Set Int --
 -- -------------
 --
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
+-- Eq: Transitive   ✓ <interactive> passed 100 tests.
+-- Eq: Symmetric   ✓ <interactive> passed 100 tests.
+-- Eq: Reflexive   ✓ <interactive> passed 100 tests.
+-- Eq: Negation   ✓ <interactive> passed 100 tests.
+-- Monoid: Left Identity   ✓ <interactive> passed 100 tests.
+-- Monoid: Right Identity   ✓ <interactive> passed 100 tests.
+-- Monoid: Associativity   ✓ <interactive> passed 100 tests.
+-- Monoid: Concatenation   ✓ <interactive> passed 100 tests.
 --
 -- --------------------
 -- -- Map String Int --
 -- --------------------
 --
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---   ✓ <interactive> passed 100 tests.
---
+-- Eq: Transitive   ✓ <interactive> passed 100 tests.
+-- Eq: Symmetric   ✓ <interactive> passed 100 tests.
+-- Eq: Reflexive   ✓ <interactive> passed 100 tests.
+-- Eq: Negation   ✓ <interactive> passed 100 tests.
+-- Monoid: Left Identity   ✓ <interactive> passed 100 tests.
+-- Monoid: Right Identity   ✓ <interactive> passed 100 tests.
+-- Monoid: Associativity   ✓ <interactive> passed 100 tests.
+-- Monoid: Concatenation   ✓ <interactive> passed 100 tests.
 --
 -- All tests succeeded
 -- True
