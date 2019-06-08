@@ -13,7 +13,7 @@ import qualified Hedgehog.Range as Range
 testFoldable :: [(String, [Laws])]
 testFoldable =
   [ ("Set", listSet)
---  , ("BadList", listBadList) 
+--  , ("BadList", listBadList)
   ]
 
 listSet :: [Laws]
@@ -24,7 +24,6 @@ genSet gen = do
   x <- gen
   pure (Set.singleton x)
 
-{-
 listBadList :: [Laws]
 listBadList = [foldableLaws genBadList]
 
@@ -37,4 +36,3 @@ newtype BadList a = BadList [a]
 instance Foldable BadList where
   foldMap f (BadList x) = foldMap f x
   foldl' = List.foldl
--}

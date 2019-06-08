@@ -1,6 +1,7 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
 module Hedgehog.Classes.Common.Laws
   ( Laws(..)
@@ -22,7 +23,8 @@ module Hedgehog.Classes.Common.Laws
   ) where
 
 import Control.Monad.IO.Class (MonadIO(liftIO))
-import Data.Monoid (All(..), Ap(..))
+import Data.Char (isSpace, isDigit)
+import Data.Monoid (All(..), Any(..), Ap(..))
 import Hedgehog (Gen)
 import Hedgehog.Classes.Common.Property (Context(..))
 import Hedgehog.Internal.Property (Property(..))
@@ -33,6 +35,7 @@ import System.Exit (exitFailure)
 import qualified Hedgehog.Classes.Common.PP as PP
 import qualified Hedgehog.Internal.Region as Region
 import qualified Hedgehog.Internal.Seed as Seed
+import qualified System.IO.Silently as S
 
 congruent :: String
 congruent = " ≡ "
@@ -73,7 +76,7 @@ reduced lhs rhs = show lhs ++ congruent ++ show rhs
 
 -- | Turn a 'LawContext' into a 'Context'.
 contextualise :: LawContext -> Context
-contextualise LawContext{..} = Context $ unlines 
+contextualise LawContext{..} = Context $ unlines
   [ "When testing the " ++ lawContextLawName ++ " law(" ++ dagger ++"), for the " ++ lawContextTcName ++ " typeclass, the following test failed: "
   , newline ++ lawContextTcProp
   , newline ++ "The reduced test is: "
@@ -166,7 +169,7 @@ lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 -- -------------
 -- -- Set Int --
 -- -------------
--- 
+--
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
@@ -174,11 +177,11 @@ lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
--- 
+--
 -- --------------------
 -- -- Map String Int --
 -- --------------------
--- 
+--
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
@@ -186,8 +189,8 @@ lawsCheckOne g = fmap getAll . lawsCheckOneInternal g
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
 --   ✓ <interactive> passed 100 tests.
--- 
--- 
+--
+--
 -- All tests succeeded
 -- True
 -- @
@@ -200,7 +203,11 @@ lawsCheckInternal :: Laws -> IO All
 lawsCheckInternal (Laws className properties) =
   flip foldMapA properties $ \(name,p) -> do
     putStr (className ++ ": " ++ name ++ " ")
-    All <$> check p
+    (out,b) <- S.capture $ check p
+    if b
+      then putStr "   ✓ <interactive> passed 100 tests.\n"
+      else putStr $ (removeBadOutput out) <> "\n"
+    pure (All b)
 
 lawsCheckOneInternal :: Gen a -> [Gen a -> Laws] -> IO All
 lawsCheckOneInternal p ls = foldMap (lawsCheckInternal . ($ p)) ls
@@ -214,8 +221,12 @@ lawsCheckManyInternal xs = do
     putStrLn $ prettyHeader typeName
     r <- flip foldMapA laws $ \(Laws typeclassName properties) -> do
       flip foldMapA properties $ \(name,p) -> do
-        putStr (typeclassName ++ ": " ++ name ++ " ")
-        check p >>= \case { True -> pure Good; _ -> pure Bad }
+        putStr (typeclassName ++ ": " ++ name)
+        (out,b) <- S.capture $ check p
+        if b
+          then putStr "   ✓ <interactive> passed 100 tests.\n"
+          else putStr $ (removeBadOutput out) <> "\n"
+        pure (boolToStatus b)
     putStrLn ""
     pure r
   putStrLn ""
@@ -245,12 +256,15 @@ instance Semigroup Status where
 instance Monoid Status where
   mempty = Good
 
+boolToStatus :: Bool -> Status
+boolToStatus = \case { False -> Bad; True -> Good; }
+
 checkRegion :: MonadIO m
   => Region
   -> Property
   -> m (Report Result)
 checkRegion region prop = liftIO $ do
-  seed <- liftIO Seed.random 
+  seed <- liftIO Seed.random
   result <- checkReport (propertyConfig prop) 0 seed (propertyTest prop) $ \progress -> do
     ppprogress <- renderProgress Nothing Nothing progress
     case reportStatus progress of
@@ -261,8 +275,7 @@ checkRegion region prop = liftIO $ do
     Failed _ -> Region.openRegion region ppresult
     GaveUp -> Region.openRegion region ppresult
     OK -> Region.setRegion region ppresult
-
-  pure result 
+  pure result
 
 check :: MonadIO m
   => Property
@@ -270,3 +283,34 @@ check :: MonadIO m
 check prop = liftIO . Region.displayRegion $ \region ->
   (== OK) . reportStatus <$> checkRegion region prop
 
+-- HACK!
+-- BAD!
+-- ALERT!
+
+stripLeading :: String -> String
+stripLeading [] = []
+stripLeading s@(x:xs) = if isSpace x
+  then stripLeading xs
+  else s
+
+startsWithNumber :: String -> Bool
+startsWithNumber [] = False
+startsWithNumber (x:_) = isDigit x
+
+startsWithCorner :: String -> Bool
+startsWithCorner [] = False
+startsWithCorner (x:_) = x == '┏'
+
+containsSkinnyBar :: String -> Bool
+containsSkinnyBar = any (== '│')
+
+isBad :: String -> Bool
+isBad x = getAny $ foldMap (\f -> Any (f x))
+  [ startsWithNumber, startsWithCorner, containsSkinnyBar ]
+
+removeBadOutput :: String -> String
+removeBadOutput = unlines . go . lines where
+  go [] = []
+  go (x:xs) = if isBad (stripLeading x)
+    then go xs
+    else x : go xs

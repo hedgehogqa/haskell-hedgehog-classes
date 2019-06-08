@@ -14,7 +14,7 @@ module Hedgehog.Classes.Common.Property
   , heq, heq1, heq2
   , heqCtx, heqCtx1, heqCtx2
   , hneq, hneq1, hneq2
-  , hneqCtx, hneqCtx1, hneqCtx2 
+  , hneqCtx, hneqCtx1, hneqCtx2
   , bar
   , Context(..)
   ) where
@@ -24,7 +24,7 @@ import Data.Typeable (typeOf)
 import GHC.Stack
 import Hedgehog.Classes.Common.Compat
 import Hedgehog.Internal.Exception (tryEvaluate)
-import Hedgehog.Internal.Property (MonadTest, liftTest, mkTest, success, Failure(..), Log(..))
+import Hedgehog.Internal.Property (MonadTest, liftTest, mkTest, success, Failure(..))
 import Text.Show.Pretty (ppShow)
 import qualified Data.Char as Char
 import qualified Data.List as List
@@ -40,8 +40,8 @@ evalNoSrc x = either (withFrozenCallStack failExceptionNoSrc) pure (tryEvaluate 
 
 failWithNoSrc :: (MonadTest m, HasCallStack) => String -> m a
 failWithNoSrc msg = do
-  liftTest $ mkTest (Left $ Failure Nothing "" Nothing, [Footnote msg])
- 
+  liftTest $ mkTest (Left $ Failure Nothing msg Nothing, mempty)
+
 failExceptionNoSrc :: (MonadTest m, HasCallStack) => SomeException -> m a
 failExceptionNoSrc (SomeException x) = withFrozenCallStack $
   failWithNoSrc $ unlines
@@ -55,7 +55,7 @@ data Context = NoContext | Context String
 contextToString :: Context -> String
 contextToString = \case
   NoContext -> "No Context provided."
-  Context ctx -> bar ++ " Context " ++ bar ++ "\n" ++ ctx ++ bar5
+  Context ctx -> bar ++ " Context " ++ bar ++ "\n" ++ ctx ++ "\n" ++ bar5
 
 failContext::
   ( MonadTest m, HasCallStack
@@ -65,7 +65,7 @@ failContext _x _y ctx = withFrozenCallStack $
   failWithNoSrc $ contextToString ctx
 
 -- | Fails the test if the right argument is less than or equal to the left.
--- see https://github.com/hedgehogqa/haskell-hedgehog/pull/196 
+-- see https://github.com/hedgehogqa/haskell-hedgehog/pull/196
 hLessThan :: (MonadTest m, Ord a, Show a, HasCallStack) => a -> a -> m ()
 hLessThan x y = do
   ok <- withFrozenCallStack $ evalNoSrc (x < y)
