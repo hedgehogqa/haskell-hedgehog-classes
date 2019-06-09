@@ -25,7 +25,6 @@ renderResult :: MonadIO m
   -> m String
 renderResult x = renderDoc Nothing =<< ppResult x
 
-
 ppResult :: MonadIO m
   => Report Result
   -> m (Doc Markup)

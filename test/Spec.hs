@@ -7,6 +7,7 @@ import Spec.Applicative
 import Spec.Arrow
 import Spec.Bifoldable
 import Spec.Bifunctor
+import Spec.Binary
 import Spec.Bitraversable
 import Spec.Bits
 import Spec.Category
@@ -38,6 +39,7 @@ allNullaryLaws :: [(String, [Laws])]
 allNullaryLaws = testBits
   ++ testEnum
   ++ testBoundedEnum
+  ++ testBinary
   ++ testEq
   ++ testGeneric
   ++ testIntegral

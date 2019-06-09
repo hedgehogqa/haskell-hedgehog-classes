@@ -59,9 +59,8 @@ contextToString = \case
 
 failContext::
   ( MonadTest m, HasCallStack
-  , Show a, Show b
-  ) => a -> b -> Context -> m ()
-failContext _x _y ctx = withFrozenCallStack $
+  ) => Context -> m ()
+failContext ctx = withFrozenCallStack $
   failWithNoSrc $ contextToString ctx
 
 -- | Fails the test if the right argument is less than or equal to the left.
@@ -102,7 +101,7 @@ hneqCtx x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `neq` y)
   if ok
     then success
-    else withFrozenCallStack $ failContext x y ctx
+    else withFrozenCallStack $ failContext ctx
 
 -- | Passes the test if the given arguments are not equal. Otherwise fails
 --   with 'NoContext'.
@@ -128,7 +127,7 @@ heqCtx x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `eq` y)
   if ok
     then success
-    else withFrozenCallStack $ failContext x y ctx
+    else withFrozenCallStack $ failContext ctx
 
 -- | Passes the test if the given arguments are equal. Otherwise fails
 --   with 'NoContext'.
@@ -156,7 +155,7 @@ hneqCtx1 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `neq1` y)
   if ok
     then success
-    else withFrozenCallStack $ failContext x y ctx
+    else withFrozenCallStack $ failContext ctx
 
 -- | Passes the test if the given arguments are not equal. Otherwise fails
 --   with 'NoContext'.
@@ -184,7 +183,7 @@ heqCtx1 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `eq1` y)
   if ok
     then success
-    else withFrozenCallStack $ failContext x y ctx
+    else withFrozenCallStack $ failContext ctx
 
 -- | Passes the test if the given arguments are equal. Otherwise fails
 --   with 'NoContext'.
@@ -216,7 +215,7 @@ heqCtx2 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `eq2` y)
   if ok
     then success
-    else withFrozenCallStack $ failContext x y ctx
+    else withFrozenCallStack $ failContext ctx
 
 -- | Passes the test if the given arguments are equal. Otherwise fails
 --   with 'NoContext'.
@@ -250,7 +249,7 @@ hneqCtx2 x y ctx = do
   ok <- withFrozenCallStack $ evalNoSrc (x `neq2` y)
   if ok
     then success
-    else withFrozenCallStack $ failContext x y ctx
+    else withFrozenCallStack $ failContext ctx
 
 -- | Passes the test if the given arguments are not equal. Otherwise fails
 --   with 'NoContext'.

@@ -15,6 +15,7 @@ module Hedgehog.Classes
 
     -- * Properties
     -- ** Ground types
+  , binaryLaws
   , bitsLaws
   , eqLaws
   , integralLaws
@@ -29,7 +30,7 @@ module Hedgehog.Classes
   , exponentialSemigroupLaws
   , idempotentSemigroupLaws
   , rectangularBandSemigroupLaws
-#if HAVE_AESON 
+#if HAVE_AESON
   , jsonLaws
 #endif
   , genericLaws
@@ -37,15 +38,15 @@ module Hedgehog.Classes
   , semiringLaws
   , ringLaws
   , starLaws
-#endif 
+#endif
   , showLaws
   , showReadLaws
   , storableLaws
-    
+
     -- ** Unary type constructors
   , alternativeLaws
   , applicativeLaws
-  , contravariantLaws 
+  , contravariantLaws
   , foldableLaws
   , functorLaws
   , monadLaws
@@ -83,6 +84,7 @@ import Hedgehog.Classes.Applicative (applicativeLaws)
 import Hedgehog.Classes.Arrow (arrowLaws)
 import Hedgehog.Classes.Bifoldable (bifoldableLaws, bifoldableFunctorLaws)
 import Hedgehog.Classes.Bifunctor (bifunctorLaws)
+import Hedgehog.Classes.Binary (binaryLaws)
 import Hedgehog.Classes.Bitraversable (bitraversableLaws)
 import Hedgehog.Classes.Bits (bitsLaws)
 import Hedgehog.Classes.Category (categoryLaws, commutativeCategoryLaws)
@@ -112,4 +114,4 @@ import Hedgehog.Classes.Show (showLaws)
 import Hedgehog.Classes.ShowRead (showReadLaws)
 import Hedgehog.Classes.Storable (storableLaws)
 import Hedgehog.Classes.Traversable (traversableLaws)
- 
+
