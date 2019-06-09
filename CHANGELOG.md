@@ -3,6 +3,17 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2
+===
+
+* switch to hedgehog-1.0
+* add `binaryLaws`
+* relax cabal-version to 2.2
+* use randomly generated, not hard-coded functions, in bifoldable tests
+* significantly simplify pretty printing using `silently` package, and
+  bad hack.
+* make several haddock improvements.
+
 0.1.2
 =====
 
