@@ -3,6 +3,10 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.0.1
+=======
+* improve reliability of hedgehog output filtering.
+
 0.2
 ===
 
