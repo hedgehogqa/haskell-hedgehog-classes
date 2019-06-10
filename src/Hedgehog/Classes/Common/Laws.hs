@@ -23,8 +23,8 @@ module Hedgehog.Classes.Common.Laws
   ) where
 
 import Control.Monad.IO.Class (MonadIO(liftIO))
-import Data.Char (isSpace, isDigit)
-import Data.Monoid (All(..), Any(..), Ap(..))
+import Data.Char (isSpace)
+import Data.Monoid (All(..), Ap(..))
 import Hedgehog (Gen)
 import Hedgehog.Classes.Common.Property (Context(..))
 import Hedgehog.Internal.Property (Property(..))
@@ -289,25 +289,34 @@ check prop = liftIO . Region.displayRegion $ \region ->
 -- ALERT!
 
 stripLeading :: String -> String
-stripLeading [] = []
-stripLeading s@(x:xs) = if isSpace x
-  then stripLeading xs
-  else s
+stripLeading = \case
+  [] -> []
+  s@(x:xs) -> if isSpace x
+    then stripLeading xs
+    else s
 
-startsWithNumber :: String -> Bool
-startsWithNumber [] = False
-startsWithNumber (x:_) = isDigit x
+-- | Like 'Data.Functor.Contravariant.Predicate', but its
+--   Semigroup/Monoid instances are disjunctive instead of
+--   conjunctive.
+newtype DPredicate a = DPredicate { getDPredicate :: a -> Bool }
+instance Semigroup (DPredicate a) where
+  DPredicate p <> DPredicate q = DPredicate $ \a -> p a || q a
+instance Monoid (DPredicate a) where
+  mempty = DPredicate $ const False
 
-startsWithCorner :: String -> Bool
-startsWithCorner [] = False
-startsWithCorner (x:_) = x == '┏'
+startsWithCorner :: DPredicate String
+startsWithCorner = DPredicate $ \case
+  [] -> False
+  (x:_) -> x == '┏'
 
-containsSkinnyBar :: String -> Bool
-containsSkinnyBar = any (== '│')
+containsBar :: DPredicate String
+containsBar = DPredicate $ \s -> any (== '┃') s
 
 isBad :: String -> Bool
-isBad x = getAny $ foldMap (\f -> Any (f x))
-  [ startsWithNumber, startsWithCorner, containsSkinnyBar ]
+isBad = getDPredicate $ mconcat
+  [ startsWithCorner
+  , containsBar
+  ]
 
 removeBadOutput :: String -> String
 removeBadOutput = unlines . go . lines where
