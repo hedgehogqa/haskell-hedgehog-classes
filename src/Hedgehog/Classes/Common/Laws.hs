@@ -15,8 +15,10 @@ module Hedgehog.Classes.Common.Laws
   , reduced
   , lawWhere
   , congruency
+  , implies
 
   , congruent
+  , implication
   , newline
   , tab
   , tab2
@@ -40,8 +42,14 @@ import qualified System.IO.Silently as S
 congruent :: String
 congruent = " ≡ "
 
+implication :: String
+implication = " ==> "
+
 congruency :: String -> String -> String
 congruency x y = x ++ congruent ++ y
+
+implies :: String -> String -> String
+implies x y = x ++ implication ++ y
 
 newline, tab, tab2 :: String
 newline = "\n"

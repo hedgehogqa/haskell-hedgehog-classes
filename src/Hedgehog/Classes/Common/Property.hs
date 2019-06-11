@@ -10,11 +10,13 @@
 --   that don't contain CallStack information, since this would
 --   expose library internals in error messages.
 module Hedgehog.Classes.Common.Property
-  ( hLessThan, hGreaterThan
-  , heq, heq1, heq2
+  ( heq, heq1, heq2
   , heqCtx, heqCtx1, heqCtx2
   , hneq, hneq1, hneq2
   , hneqCtx, hneqCtx1, hneqCtx2
+  , himplCtx
+  , hLessThan, hGreaterThan
+  , hLessThanCtx, hGreaterThanCtx
   , bar
   , Context(..)
   ) where
@@ -24,7 +26,7 @@ import Data.Typeable (typeOf)
 import GHC.Stack
 import Hedgehog.Classes.Common.Compat
 import Hedgehog.Internal.Exception (tryEvaluate)
-import Hedgehog.Internal.Property (MonadTest, liftTest, mkTest, success, Failure(..))
+import Hedgehog.Internal.Property (MonadTest, liftTest, mkTest, success, discard, Failure(..), PropertyT)
 import Text.Show.Pretty (ppShow)
 import qualified Data.Char as Char
 import qualified Data.List as List
@@ -62,6 +64,34 @@ failContext::
   ) => Context -> m ()
 failContext ctx = withFrozenCallStack $
   failWithNoSrc $ contextToString ctx
+
+-- | Fails the test with the given context if the right argument is
+--   less than or equal to the left.
+hLessThanCtx ::
+  ( MonadTest m
+  , Ord a
+  , Show a
+  , HasCallStack
+  ) => a -> a -> Context -> m ()
+hLessThanCtx x y ctx = do
+  ok <- withFrozenCallStack $ evalNoSrc (x < y)
+  if ok
+    then success
+    else withFrozenCallStack $ failContext ctx
+
+-- | Fails the test with the given context if the right argument is
+--   greater than or equal to the left.
+hGreaterThanCtx ::
+  ( MonadTest m
+  , Ord a
+  , Show a
+  , HasCallStack
+  ) => a -> a -> Context -> m ()
+hGreaterThanCtx x y ctx = do
+  ok <- withFrozenCallStack $ evalNoSrc (x > y)
+  if ok
+    then success
+    else withFrozenCallStack $ failContext ctx
 
 -- | Fails the test if the right argument is less than or equal to the left.
 -- see https://github.com/hedgehogqa/haskell-hedgehog/pull/196
@@ -264,3 +294,14 @@ hneq2 ::
      , forall x y. (Show x, Show y) => Show (f x y)
      ) => f a b -> f a b -> m ()
 hneq2 x y = hneqCtx2 x y NoContext
+
+-- | Passes the test if the LHS implies the RHS. Otherwise fails with
+--   the given 'Context'.
+himplCtx ::
+    ( Monad m
+    , HasCallStack
+    ) => Bool -> Bool -> Context -> PropertyT m ()
+himplCtx False _ _ = discard
+himplCtx True b ctx = if b
+  then success
+  else withFrozenCallStack $ failContext ctx

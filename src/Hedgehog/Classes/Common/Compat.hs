@@ -2,7 +2,7 @@
 
 module Hedgehog.Classes.Common.Compat
   ( readMaybe
-  , eq 
+  , eq
   , eq1
   , eq2
 
