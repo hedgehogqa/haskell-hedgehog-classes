@@ -3,6 +3,12 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.1
+=====
+* fix problem where ordLaws failed for everything. there was
+  some messed up logic used to check that transitivity held.
+  Thanks @ocharles for reporting this.
+
 0.2.0.1
 =======
 * improve reliability of hedgehog output filtering.
