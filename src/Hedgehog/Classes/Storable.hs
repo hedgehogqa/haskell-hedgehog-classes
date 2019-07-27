@@ -103,7 +103,7 @@ storablePokeByte gen = property $ do
 storableSetGet :: forall a. (Eq a, Show a, Storable a) => Gen a -> Property
 storableSetGet gen = property $ do
   a <- forAll gen
-  len <- forAll $ Gen.int (Range.linear 0 20)
+  len <- forAll $ Gen.int (Range.linear 1 20)
   ix <- forAll $ Gen.int (Range.linear 0 (len - 1))
   unsafePerformIO $ do
     ptr <- genArray gen len
