@@ -1,3 +1,8 @@
+{-# language
+        DerivingStrategies
+      , GeneralizedNewtypeDeriving
+  #-}
+
 module Spec.Monad
   ( testMonad
   , testMonadIO
@@ -5,11 +10,9 @@ module Spec.Monad
   , testMonadZip
   ) where
 
-import Control.Applicative (Alternative(..))
-import Control.Monad (MonadPlus(..))
+import Control.Applicative (Alternative(..), liftA2)
 import Control.Monad.IO.Class (MonadIO(..))
 
-import Data.Functor.Compose (Compose(..))
 import Data.Functor.Identity (Identity(..))
 
 import Hedgehog
@@ -27,7 +30,7 @@ testMonad =
   [ ("[]", lawsList)
   , ("Either e", lawsEither)
   , ("Identity", lawsIdentity)
-  --, ("IO", lawsIO)
+  , ("IO", lawsIO)
   , ("Maybe", lawsMaybe)
   ]
 
@@ -50,7 +53,6 @@ testMonadIO =
 testMonadPlus :: [(String, [Laws])]
 testMonadPlus =
   [ ("[]", plusLawsList)
-  --, ("IO", plusLawsIO)
   , ("Maybe", plusLawsMaybe)
   ]
 
@@ -95,35 +97,22 @@ lawsMaybe = [monadLaws Gen.maybe]
 plusLawsMaybe = [monadPlusLaws Gen.maybe]
 zipLawsMaybe = [monadZipLaws Gen.maybe]
 
-lawsIO, ioLawsIO, plusLawsIO :: [Laws]
+lawsIO, ioLawsIO :: [Laws]
 lawsIO = [monadLaws io]
 ioLawsIO = [monadIOLaws io]
-plusLawsIO = [monadPlusLaws io]
 
 newtype TestIO a = TestIO (IO a)
+  deriving newtype (Functor, Applicative, Monad, Alternative)
+
 -- | Unsafe!
 instance Eq a => Eq (TestIO a) where
-  TestIO a == TestIO b = unsafePerformIO $ do
-    a' <- a
-    b' <- b
-    return $ a' == b'
+  TestIO a == TestIO b = unsafePerformIO $ liftA2 (==) a b
+  {-# noinline (==) #-}
 -- | Unsafe!
 instance Show a => Show (TestIO a) where
   showsPrec d (TestIO a) = unsafePerformIO $ fmap (showsPrec d) a
-instance Functor TestIO where
-  fmap f (TestIO a) = TestIO $ fmap f a
-instance Applicative TestIO where
-  pure = TestIO . pure
-  TestIO a <*> TestIO b = TestIO $ a <*> b
-instance Alternative TestIO where
-  empty = TestIO empty
-  TestIO a <|> TestIO b = TestIO $ a <|> b
--- | Unsafe!  And also doesn't seem to work...
-instance Monad TestIO where
-  TestIO a >>= f = f $ unsafePerformIO a
 instance MonadIO TestIO where
   liftIO = TestIO
-instance MonadPlus TestIO
 
 io :: MonadGen m => m a -> m (TestIO a)
-io = fmap return
+io = fmap pure
