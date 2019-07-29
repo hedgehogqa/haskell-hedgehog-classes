@@ -3,11 +3,18 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.2
+=====
+* fix problem in storable set-get that caused attempt to index into
+  0-element malloc'd array
+* Test suite now tests almost all laws sans arrow/category (thanks @ag-eitilt!)
+* Correct tcName of `MonadPlus`. Was `Monad`, now it's `MonadPlus`.
+
 0.2.1
 =====
 * fix problem where ordLaws failed for everything. there was
   some messed up logic used to check that transitivity held.
-  Thanks @ocharles for reporting this.
+  Thanks very much to @ocharles for reporting this.
 
 0.2.0.1
 =======
@@ -15,7 +22,6 @@ The changelog is available [on GitHub][2].
 
 0.2
 ===
-
 * switch to hedgehog-1.0
 * add `binaryLaws`
 * relax cabal-version to 2.2
