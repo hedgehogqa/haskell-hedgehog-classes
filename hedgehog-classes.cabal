@@ -153,46 +153,49 @@ library
 --    cpp-options: -DHAVE_VECTOR
 
 test-suite spec
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Spec.hs
-
-  other-modules:       Spec.Alternative
-                       Spec.Applicative
-                       Spec.Arrow
-                       Spec.Bifoldable
-                       Spec.Bifunctor
-                       Spec.Binary
-                       Spec.Bitraversable
-                       Spec.Bits
-                       Spec.Category
-                       Spec.Comonad
-                       Spec.Contravariant
-                       Spec.Enum
-                       Spec.Eq
-                       Spec.Foldable
-                       Spec.Functor
-                       Spec.Generic
-                       Spec.Integral
---                       Spec.Ix
-                       Spec.Json
-                       Spec.Monad
-                       Spec.Monoid
-                       Spec.Ord
-                       Spec.Semigroup
-                       Spec.Semiring
-                       Spec.Show
-                       Spec.Storable
-                       Spec.Traversable
-
-  build-depends:       base
-                     , aeson
-                     , binary
-                     , comonad
-                     , containers
-                     , hedgehog
-                     , hedgehog-classes
-
-  ghc-options:         -Wall
-
-  default-language:    Haskell2010
+  type:
+    exitcode-stdio-1.0
+  hs-source-dirs:
+    test
+  main-is:
+    Spec.hs
+  other-modules:
+    Spec.Alternative
+    Spec.Applicative
+    Spec.Arrow
+    Spec.Bifoldable
+    Spec.Bifunctor
+    Spec.Binary
+    Spec.Bitraversable
+    Spec.Bits
+    Spec.Category
+    Spec.Comonad
+    Spec.Contravariant
+    Spec.Enum
+    Spec.Eq
+    Spec.Foldable
+    Spec.Functor
+    Spec.Generic
+    Spec.Integral
+--    Spec.Ix
+    Spec.Json
+    Spec.Monad
+    Spec.Monoid
+    Spec.Ord
+    Spec.Semigroup
+    Spec.Semiring
+    Spec.Show
+    Spec.Storable
+    Spec.Traversable
+  build-depends:
+    , aeson
+    , base
+    , binary
+    , comonad
+    , containers
+    , hedgehog
+    , hedgehog-classes
+  ghc-options:
+    -Wall
+  default-language:
+    Haskell2010
