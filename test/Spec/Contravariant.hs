@@ -5,7 +5,7 @@ module Spec.Contravariant (testContravariant) where
 import Hedgehog
 import Hedgehog.Classes
 
-import Data.Functor.Contravariant
+--import Data.Functor.Contravariant -- lol
 import Data.Functor.Const (Const(..))
 import Data.Functor.Sum (Sum(..))
 import Data.Functor.Product (Product(..))
@@ -20,7 +20,7 @@ testContravariant =
   , ("Const", listConst)
   , ("Sum", listSum)
   , ("Product", listProduct)
---  , ("Bad Contravariant", listBadContravariant) 
+--  , ("Bad Contravariant", listBadContravariant)
   ]
 
 listProxy :: [Laws]
