@@ -20,7 +20,7 @@ monadPlusLaws ::
   ( MonadPlus f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
   ) => (forall x. Gen x -> Gen (f x)) -> Laws
-monadPlusLaws gen = Laws "Monad"
+monadPlusLaws gen = Laws "MonadPlus"
   [ ("Left Identity", monadPlusLeftIdentity gen)
   , ("Right Identity", monadPlusRightIdentity gen)
   , ("Associativity", monadPlusAssociativity gen)
@@ -50,7 +50,7 @@ monadPlusLeftIdentity fgen = property $ do
               , "mzero = " ++ showMZero
               ]
         }
-  heqCtx1 lhs rhs ctx  
+  heqCtx1 lhs rhs ctx
 
 monadPlusRightIdentity :: forall f. MonadPlusProp f
 monadPlusRightIdentity fgen = property $ do
@@ -68,8 +68,8 @@ monadPlusRightIdentity fgen = property $ do
               , "x = " ++ showX
               , "mzero = " ++ showMZero
               ]
-        } 
-  heqCtx1 lhs rhs ctx  
+        }
+  heqCtx1 lhs rhs ctx
 
 monadPlusAssociativity :: forall f. MonadPlusProp f
 monadPlusAssociativity fgen = property $ do
@@ -91,7 +91,7 @@ monadPlusAssociativity fgen = property $ do
               , "c = " ++ showC
               ]
         }
-  heqCtx1 lhs rhs ctx 
+  heqCtx1 lhs rhs ctx
 
 monadPlusLeftZero :: forall f. MonadPlusProp f
 monadPlusLeftZero _ = property $ do
@@ -128,7 +128,7 @@ monadPlusRightZero fgen = property $ do
               , "v = " ++ showV
               , "mzero = " ++ showMZero
               ]
-        } 
-  heqCtx1 lhs rhs ctx   
+        }
+  heqCtx1 lhs rhs ctx
 
 
