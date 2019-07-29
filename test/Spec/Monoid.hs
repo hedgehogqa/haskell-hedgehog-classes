@@ -18,29 +18,37 @@ testMonoid =
 
 testCommutativeMonoid :: [(String, [Laws])]
 testCommutativeMonoid =
-  [ ("Sum Integer", lawsSum)
-  , ("Product Integer", lawsProduct)
-  , ("Maybe Integer", lawsMaybe)
+  [ ("Sum Integer", commutativeLawsSum)
+  , ("Product Integer", commutativeLawsProduct)
+  , ("Maybe Integer", commutativeLawsMaybe)
   ]
-
-lawsSum, lawsProduct, lawsMaybe, lawsAp :: [Laws]
-
-lawsSum = [monoidLaws genSum]
-lawsProduct = [monoidLaws genProduct]
-lawsMaybe = [monoidLaws genMaybe]
-lawsAp = [monoidLaws genAp]
 
 genInteger :: Gen Integer
 genInteger = Gen.integral (Range.linear (-3) 20)
 
+lawsSum, commutativeLawsSum :: [Laws]
+lawsSum = [monoidLaws genSum]
+commutativeLawsSum = [commutativeMonoidLaws genSum]
+
 genSum :: Gen (Sum Integer)
 genSum = fmap coerce genInteger
+
+lawsProduct, commutativeLawsProduct :: [Laws]
+lawsProduct = [monoidLaws genProduct]
+commutativeLawsProduct = [commutativeMonoidLaws genProduct]
 
 genProduct :: Gen (Product Integer)
 genProduct = fmap coerce genInteger
 
+lawsMaybe, commutativeLawsMaybe :: [Laws]
+lawsMaybe = [monoidLaws genMaybe]
+commutativeLawsMaybe = [commutativeMonoidLaws genMaybe]
+
 genMaybe :: Gen (Maybe (Sum Integer))
 genMaybe = Gen.maybe genSum
+
+lawsAp :: [Laws]
+lawsAp = [monoidLaws genAp]
 
 genAp :: Gen (Ap Maybe (Sum Integer))
 genAp = fmap coerce genMaybe

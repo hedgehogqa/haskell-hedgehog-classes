@@ -21,14 +21,11 @@ import Spec.Integral
 --import Spec.Ix
 import Spec.Json
 import Spec.Monad
-import Spec.MonadIO
-import Spec.MonadPlus
-import Spec.MonadZip
 import Spec.Monoid
 import Spec.Ord
 import Spec.Semigroup
+import Spec.Semiring
 import Spec.Show
-import Spec.ShowRead
 import Spec.Storable
 import Spec.Traversable
 
@@ -53,6 +50,9 @@ allNullaryLaws = testBits
   ++ testExponentialSemigroup
   ++ testIdempotentSemigroup
   ++ testRectangularBandSemigroup
+  ++ testSemiring
+  ++ testRing
+  ++ testStar
   ++ testShow
   ++ testShowRead
   ++ testStorable

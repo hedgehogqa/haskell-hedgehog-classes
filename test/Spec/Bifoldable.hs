@@ -15,18 +15,20 @@ testBifoldable =
 
 testBifoldableFunctor :: [(String, [Laws])]
 testBifoldableFunctor =
-  [ ("Either", lawsEither)
-  , ("Const", lawsConst)
+  [ ("Either", functorLawsEither)
+  , ("Const", functorLawsConst)
   ]
 
-lawsEither :: [Laws]
-lawsEither = [bifoldableLaws either]
-
-lawsConst :: [Laws]
+lawsConst, functorLawsConst :: [Laws]
 lawsConst = [bifoldableLaws const]
+functorLawsConst = [bifoldableFunctorLaws const]
 
 const :: MonadGen m => m a -> m b -> m (Const a b)
 const genA _genB = fmap Const genA
+
+lawsEither, functorLawsEither :: [Laws]
+lawsEither = [bifoldableLaws either]
+functorLawsEither = [bifoldableFunctorLaws either]
 
 either :: MonadGen m => m e -> m a -> m (Either e a)
 either genE genA =

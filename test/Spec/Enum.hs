@@ -3,11 +3,17 @@ module Spec.Enum (testEnum, testBoundedEnum) where
 import Hedgehog
 import Hedgehog.Classes
 
+import Data.Int (Int64)
+import Data.Word (Word64)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
+import Numeric.Natural (Natural)
 
 testEnum :: [(String, [Laws])]
-testEnum = []
+testEnum =
+  [ ("Integer", listInteger)
+  , ("Natural", listNatural)
+  ]
 
 testBoundedEnum :: [(String, [Laws])]
 testBoundedEnum =
@@ -58,3 +64,12 @@ listWord8 = [boundedEnumLaws (ranged Gen.word8)]
 listWord16 = [boundedEnumLaws (ranged Gen.word16)]
 listWord32 = [boundedEnumLaws (ranged Gen.word32)]
 listWord64 = [boundedEnumLaws (ranged Gen.word64)]
+
+listInteger, listNatural :: [Laws]
+listInteger = [enumLaws (Gen.integral $ Range.constantFrom
+    (0 :: Integer)
+    (2 * fromIntegral (minBound :: Int64))
+    (2 * fromIntegral (maxBound :: Int64)))]
+listNatural = [enumLaws (Gen.integral $ Range.constant
+    (0 :: Natural)
+    (2 * fromIntegral (maxBound :: Word64)))]
