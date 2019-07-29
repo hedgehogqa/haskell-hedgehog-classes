@@ -58,6 +58,14 @@ flag aeson
 --   default: True
 --   manual: True
 
+flag comonad
+  description:
+    You can disable the use of the `comonad` package using `-f-comonad`.
+    .
+    This may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
 flag semirings
   description:
     You can disable the use of the `semirings` package using `-f-semirings`.
@@ -92,6 +100,7 @@ library
       Hedgehog.Classes.Common.Laws
       Hedgehog.Classes.Common.Property
       Hedgehog.Classes.Common.PP
+    Hedgehog.Classes.Comonad
     Hedgehog.Classes.Contravariant
     Hedgehog.Classes.Enum
     Hedgehog.Classes.Eq
@@ -136,6 +145,9 @@ library
   if flag(semirings)
     build-depends: semirings >= 0.2 && < 0.4
     cpp-options: -DHAVE_SEMIRINGS
+  if flag(comonad)
+    build-depends: comonad >= 5.0 && < 5.1
+    cpp-options: -DHAVE_COMONAD
 --  if flag(vector)
 --    build-depends: vector >= 0.12.0.0 && < 0.13.0.0
 --    cpp-options: -DHAVE_VECTOR
@@ -154,6 +166,7 @@ test-suite spec
                        Spec.Bitraversable
                        Spec.Bits
                        Spec.Category
+                       Spec.Comonad
                        Spec.Contravariant
                        Spec.Enum
                        Spec.Eq
@@ -175,6 +188,7 @@ test-suite spec
   build-depends:       base
                      , aeson
                      , binary
+                     , comonad
                      , containers
                      , hedgehog
                      , hedgehog-classes

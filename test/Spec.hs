@@ -11,6 +11,7 @@ import Spec.Binary
 import Spec.Bitraversable
 import Spec.Bits
 import Spec.Category
+import Spec.Comonad
 import Spec.Contravariant
 import Spec.Enum
 import Spec.Eq
@@ -60,6 +61,7 @@ allNullaryLaws = testBits
 allUnaryLaws :: [(String, [Laws])]
 allUnaryLaws = testAlternative
   ++ testApplicative
+  ++ testComonad
   ++ testContravariant
   ++ testFoldable
   ++ testFunctor

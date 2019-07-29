@@ -71,7 +71,7 @@ monadRightIdentity fgen = property $ do
               [ "m >>= return" `congruency` "m, where"
               , "m = " ++ showM
               ]
-        }  
+        }
   heqCtx1 lhs rhs ctx
 
 monadAssociativity :: forall f. MonadProp f
@@ -115,7 +115,7 @@ monadReturn _ = property $ do
               [ "return x" `congruency` "pure x, where"
               , "x = " ++ showX
               ]
-        }  
+        }
   heqCtx1 lhs rhs ctx
 
 monadAp :: forall f. MonadProp f
@@ -135,7 +135,7 @@ monadAp _ = property $ do
                 showF = show f'
             in lawWhere
               [ "ap f x" `congruency` "f <*> x, where"
-              , "f = " ++ showF 
+              , "f = " ++ showF
               , "x = " ++ showX
               ]
         }

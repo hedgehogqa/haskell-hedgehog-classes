@@ -1,6 +1,9 @@
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Hedgehog.Classes.Common.Equation
   ( LinearEquation(..), runLinearEquation, genLinearEquation
@@ -9,6 +12,9 @@ module Hedgehog.Classes.Common.Equation
   , QuadraticEquation(..), runQuadraticEquation, genQuadraticEquation
   , CubicEquation(..), runCubicEquation, genCubicEquation
 
+#ifdef HAVE_COMONAD
+  , LinearEquationW(..), runLinearEquationW, genLinearEquationW
+#endif
   ) where
 
 import Hedgehog
@@ -18,6 +24,10 @@ import qualified Hedgehog.Range as Range
 import qualified Data.List as List
 
 import Data.Monoid (Endo(..))
+
+#ifdef HAVE_COMONAD
+import Control.Comonad
+#endif
 
 data QuadraticEquation = QuadraticEquation
   { _quadraticEquationQuadratic :: Integer
@@ -61,6 +71,30 @@ runLinearEquation (LinearEquation a b) x = a * x + b
 
 genLinearEquation :: Gen LinearEquation
 genLinearEquation = LinearEquation <$> genSmallInteger <*> genSmallInteger
+#ifdef HAVE_COMONAD
+data LinearEquationW w = LinearEquationW (w LinearEquation) (w LinearEquation)
+
+deriving instance (forall x. Eq x => Eq (w x)) => Eq (LinearEquationW w)
+instance (forall x. Show x => Show (w x)) => Show (LinearEquationW w) where
+  show (LinearEquationW a b) = (\f -> f "")
+    $ showString "\\x -> if odd x then "
+    . showsPrec 0 a
+    . showString " else "
+    . showsPrec 0 b
+
+runLinearEquationW :: Comonad w
+  => LinearEquationW w -> w Integer -> Integer
+runLinearEquationW (LinearEquationW e1 e2) (extract -> i) = if odd i
+  then runLinearEquation (extract e1) i
+  else runLinearEquation (extract e2) i
+
+genLinearEquationW :: Comonad w
+  => (forall x. Gen x -> Gen (w x))
+  -> Gen (LinearEquationW w)
+genLinearEquationW fgen = LinearEquationW
+  <$> fgen genLinearEquation
+  <*> fgen genLinearEquation
+#endif
 
 data LinearEquationM m = LinearEquationM (m LinearEquation) (m LinearEquation)
 

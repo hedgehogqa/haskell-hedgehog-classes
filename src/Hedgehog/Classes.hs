@@ -46,6 +46,9 @@ module Hedgehog.Classes
     -- ** Unary type constructors
   , alternativeLaws
   , applicativeLaws
+#ifdef HAVE_COMONAD
+  , comonadLaws
+#endif
   , contravariantLaws
   , foldableLaws
   , functorLaws
@@ -89,6 +92,9 @@ import Hedgehog.Classes.Bitraversable (bitraversableLaws)
 import Hedgehog.Classes.Bits (bitsLaws)
 import Hedgehog.Classes.Category (categoryLaws, commutativeCategoryLaws)
 import Hedgehog.Classes.Common
+#ifdef HAVE_COMONAD
+import Hedgehog.Classes.Comonad (comonadLaws)
+#endif
 import Hedgehog.Classes.Contravariant (contravariantLaws)
 import Hedgehog.Classes.Enum (enumLaws, boundedEnumLaws)
 import Hedgehog.Classes.Eq (eqLaws)
