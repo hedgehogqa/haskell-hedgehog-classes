@@ -164,14 +164,11 @@ test-suite spec
 --                       Spec.Ix
                        Spec.Json
                        Spec.Monad
-                       Spec.MonadIO
-                       Spec.MonadPlus
-                       Spec.MonadZip
                        Spec.Monoid
                        Spec.Ord
                        Spec.Semigroup
+                       Spec.Semiring
                        Spec.Show
-                       Spec.ShowRead
                        Spec.Storable
                        Spec.Traversable
 

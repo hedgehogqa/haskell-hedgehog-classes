@@ -9,27 +9,54 @@ module Spec.Semigroup
 import Hedgehog.Classes
 
 import Data.Monoid (Sum(..))
+import Data.Semigroup (Last(..))
 import Hedgehog (Gen)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
 testSemigroup :: [(String, [Laws])]
-testSemigroup = [("Maybe", listMaybe)]
-
-listMaybe :: [Laws]
-listMaybe = map ($ genMaybe) [semigroupLaws, commutativeSemigroupLaws]
-
-genMaybe :: Gen (Maybe (Sum Int))
-genMaybe = Gen.maybe (fmap Sum $ Gen.int Range.constantBounded)
+testSemigroup =
+  [ ("Last", lawsLast)
+  , ("Maybe", lawsMaybe)
+  ]
 
 testCommutativeSemigroup :: [(String, [Laws])]
-testCommutativeSemigroup = []
+testCommutativeSemigroup =
+  [ ("Maybe", commutativeLawsMaybe)
+  ]
 
 testExponentialSemigroup :: [(String, [Laws])]
-testExponentialSemigroup = []
+testExponentialSemigroup =
+  [ ("Last", exponentialLawsLast)
+  , ("Maybe", exponentialLawsMaybe)
+  ]
 
 testIdempotentSemigroup :: [(String, [Laws])]
-testIdempotentSemigroup = []
+testIdempotentSemigroup =
+  [ ("Last", idempotentLawsLast)
+  ]
 
 testRectangularBandSemigroup :: [(String, [Laws])]
-testRectangularBandSemigroup = []
+testRectangularBandSemigroup =
+  [ ("Last", rectangularBandLawsLast)
+  ]
+
+genInteger :: Gen Integer
+genInteger = Gen.integral (Range.linear (-3) 20)
+
+lawsLast, exponentialLawsLast, idempotentLawsLast, rectangularBandLawsLast :: [Laws]
+lawsLast = [semigroupLaws genLast]
+exponentialLawsLast = [exponentialSemigroupLaws genLast]
+idempotentLawsLast = [idempotentSemigroupLaws genLast]
+rectangularBandLawsLast = [rectangularBandSemigroupLaws genLast]
+
+genLast :: Gen (Last Integer)
+genLast = Last <$> genInteger
+
+lawsMaybe, commutativeLawsMaybe, exponentialLawsMaybe :: [Laws]
+lawsMaybe = [semigroupLaws genMaybe]
+commutativeLawsMaybe = [commutativeSemigroupLaws genMaybe]
+exponentialLawsMaybe = [exponentialSemigroupLaws genMaybe]
+
+genMaybe :: Gen (Maybe (Sum Integer))
+genMaybe = Gen.maybe (Sum <$> genInteger)
