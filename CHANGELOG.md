@@ -3,6 +3,12 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.3
+=====
+* Semirings upper bound increased to 0.5. Lower bound not touched.
+  [0.2, 0.4) -> [0.2, 0.5)
+* Add `comonadLaws`.
+
 0.2.2
 =====
 * fix problem in storable set-get that caused attempt to index into
