@@ -24,6 +24,7 @@ import Spec.Json
 import Spec.Monad
 import Spec.Monoid
 import Spec.Ord
+import Spec.Prim
 import Spec.Semigroup
 import Spec.Semiring
 import Spec.Show
@@ -46,6 +47,7 @@ allNullaryLaws = testBits
   ++ testMonoid
   ++ testCommutativeMonoid
   ++ testOrd
+  ++ testPrim
   ++ testSemigroup
   ++ testCommutativeSemigroup
   ++ testExponentialSemigroup

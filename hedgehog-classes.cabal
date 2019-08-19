@@ -74,6 +74,14 @@ flag semirings
   default: True
   manual: True
 
+flag primitive
+  description:
+    You can disable the use of the `primitive` package using `-f-primitive`.
+    .
+    This may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
 library
   hs-source-dirs:
     src
@@ -117,6 +125,7 @@ library
     Hedgehog.Classes.MonadZip
     Hedgehog.Classes.Monoid
     Hedgehog.Classes.Ord
+    Hedgehog.Classes.Prim
     Hedgehog.Classes.Semigroup
     Hedgehog.Classes.Semiring
     Hedgehog.Classes.Show
@@ -151,6 +160,9 @@ library
 --  if flag(vector)
 --    build-depends: vector >= 0.12.0.0 && < 0.13.0.0
 --    cpp-options: -DHAVE_VECTOR
+  if flag(primitive)
+    build-depends: primitive >= 0.7 && < 0.8
+    cpp-options: -DHAVE_PRIMITIVE
 
 test-suite spec
   type:
@@ -182,6 +194,7 @@ test-suite spec
     Spec.Monad
     Spec.Monoid
     Spec.Ord
+    Spec.Prim
     Spec.Semigroup
     Spec.Semiring
     Spec.Show
