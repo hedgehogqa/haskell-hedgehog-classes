@@ -196,7 +196,7 @@ primSetSetAddr gen = property $ do
       arr1 <- ptrToPrimArray p1 len
       withBytes len $ \p2 -> do
         copyPrimArrayToPtr p2 arr1 0 len
-        -- writeOffPtr p2 ix el
+        writeOffPtr p2 ix el
         arr2 <- ptrToPrimArray p2 len
         pure (arr1, arr2)
   arr1 === arr2
