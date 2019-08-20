@@ -190,16 +190,18 @@ primSetSetAddr gen = property $ do
   len <- forAll genSmallArrayLen
   ix <- forAll $ Gen.int (Range.linear 0 (len - 1))
   el <- forAll gen
-  (arr1, arr2) <- liftIO $ do
+  (arr2, arr3) <- liftIO $ do
+    arr1 <- genPrimArray gen len
     withBytes len $ \p1 -> do
+      copyPrimArrayToPtr p1 arr1 0 len
       writeOffPtr p1 ix el
-      arr1 <- ptrToPrimArray p1 len
+      arr2 <- ptrToPrimArray p1 len
       withBytes len $ \p2 -> do
-        copyPrimArrayToPtr p2 arr1 0 len
+        copyPrimArrayToPtr p2 arr2 0 len
         writeOffPtr p2 ix el
-        arr2 <- ptrToPrimArray p2 len
-        pure (arr1, arr2)
-  arr1 === arr2
+        arr3 <- ptrToPrimArray p2 len
+        pure (arr2, arr3)
+  arr2 === arr3
 
 -- | Setting a range should match the default implementation
 primSetRangeAddr :: (Eq a, Show a, Prim a) => Gen a -> Property
