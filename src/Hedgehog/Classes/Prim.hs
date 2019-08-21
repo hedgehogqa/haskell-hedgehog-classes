@@ -9,7 +9,7 @@ module Hedgehog.Classes.Prim (primLaws) where
 
 import Control.Monad (when)
 import Foreign.Marshal.Alloc
-import GHC.Exts
+import GHC.Exts hiding (setByteArray#)
 
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Primitive
