@@ -86,7 +86,7 @@ There are a number of libraries that have similar goals to `hedgehog-classes`, a
         is test properties of higher-kinded typeclass laws where the construction of
         the type requires constraints on its type arguments (e.g. `Ord` for something
         like `Data.Set.Set`)
-      
+
   - [hedgehog-laws](https://github.com/qfpl/hedgehog-laws):
       - All of the things that apply to `hedgehog-checkers`, but even more incomplete.
 
@@ -124,6 +124,8 @@ There are a number of libraries that have similar goals to `hedgehog-classes`, a
   - `semirings`
        - Semiring
        - Ring
+  - `primitive`
+       - Prim
 
 Some typeclasses can have additional laws, which are not part of their sufficient definition. A common example is commutativity of a monoid. In such cases where this is sensible, `hedgehog-classes` provides functions such `commutativeMonoidLaws`, `commutativeSemigroupLaws`, etc. `hedgehog-classes` also tests that `foldl'`/`foldr'` actually accumulate strictly. There are other such cases that are documented on Hackage.
 

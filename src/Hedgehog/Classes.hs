@@ -34,6 +34,9 @@ module Hedgehog.Classes
   , jsonLaws
 #endif
   , genericLaws
+#if HAVE_PRIMITIVE
+  , primLaws
+#endif
 #if HAVE_SEMIRINGS
   , semiringLaws
   , ringLaws
@@ -112,6 +115,9 @@ import Hedgehog.Classes.MonadPlus (monadPlusLaws)
 import Hedgehog.Classes.MonadZip (monadZipLaws)
 import Hedgehog.Classes.Monoid (monoidLaws, commutativeMonoidLaws)
 import Hedgehog.Classes.Ord (ordLaws)
+#if HAVE_PRIMITIVE
+import Hedgehog.Classes.Prim (primLaws)
+#endif
 import Hedgehog.Classes.Semigroup (semigroupLaws, commutativeSemigroupLaws, exponentialSemigroupLaws, idempotentSemigroupLaws, rectangularBandSemigroupLaws)
 #if HAVE_SEMIRINGS
 import Hedgehog.Classes.Semiring (semiringLaws, ringLaws, starLaws)
