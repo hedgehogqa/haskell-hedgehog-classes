@@ -121,6 +121,8 @@ There are a number of libraries that have similar goals to `hedgehog-classes`, a
   - `aeson`
        - ToJSON
        - ToJSON/FromJSON
+  - `comonad`
+       - Comonad
   - `semirings`
        - Semiring
        - Ring
