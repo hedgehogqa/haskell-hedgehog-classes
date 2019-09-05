@@ -8,6 +8,7 @@ The changelog is available [on GitHub][2].
 * Semirings upper bound increased to 0.6. [0.2, 0.5) -> [0.2, 0.6)
 * Add `primLaws`.
 * Remove GHC 8.8.1 from cabal's tested-with field.
+* Add documentation to `comonadLaws`.
 
 0.2.3
 =====
