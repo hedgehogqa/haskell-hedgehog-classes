@@ -3,6 +3,12 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.4
+=====
+* Semirings upper bound increased to 0.6. [0.2, 0.5) -> [0.2, 0.6)
+* Add `primLaws`.
+* Remove GHC 8.8.1 from cabal's tested-with field.
+
 0.2.3
 =====
 * Semirings upper bound increased to 0.5. Lower bound not touched.

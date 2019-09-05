@@ -1,5 +1,5 @@
 module Hedgehog.Classes.Common
-  ( module Common 
+  ( module Common
   ) where
 
 import Hedgehog.Classes.Common.ApTrans  as Common
