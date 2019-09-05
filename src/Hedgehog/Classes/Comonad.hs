@@ -16,6 +16,21 @@ import Control.Comonad
 import Hedgehog
 import Hedgehog.Classes.Common
 
+-- | Tests the following 'Comonad' laws:
+--
+-- [__Extend/Extract Identity__]: @'extend' 'extract' ≡ 'id'@
+-- [__Extract/Extend__]: @'extract' '.' 'extend' f ≡ f@
+-- [__Extend/Extend__]: @'extend' f '.' 'extend' g ≡ 'extend' (f '.' 'extend' g)@
+-- [__Extract Right Identity__]: @f '=>=' 'extract' ≡ f@
+-- [__Extract Left Identity__]: @'extract' '=>=' f ≡ f@
+-- [__Cokleisli Associativity__]: @(f '=>=' g) '=>=' h ≡ f '=>=' (g '=>=' h)@
+-- [__Extract/Duplicate Identity__]: @'extract' '.' 'duplicate' ≡ 'id'@
+-- [__Fmap Extract/Duplicate Identity__]: @'fmap' 'extract' '.' 'duplicate' ≡ 'id'@
+-- [__Double Duplication__]: @'duplicate' '.' 'duplicate' ≡ 'fmap' 'duplicate' '.' 'duplicate'@
+-- [__Extend/Fmap . Duplicate Identity__]: @'extend' f ≡ 'fmap' f '.' 'duplicate'@
+-- [__Duplicate/Extend id Identity__]: @'duplicate' ≡ 'extend' 'id'@
+-- [__Fmap/Extend Extract__]: @'fmap' f ≡ 'extend' (f '.' 'extract')@
+-- [__Fmap/LiftW Isomorphism__]: @'fmap' ≡ 'liftW'@
 comonadLaws ::
   ( Comonad f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
