@@ -16,9 +16,9 @@ description:
   .
   This library is directly inspired by `quickcheck-classes`.
 homepage:
-  https://github.com/chessai/hedgehog-classes
+  https://github.com/hedgehogqa/haskell-hedgehog-classes
 bug-reports:
-  https://github.com/chessai/hedgehog-classes/issues
+  https://github.com/hedgehogqa/haskell-hedgehog-classes/issues
 license:
   BSD-3-Clause
 license-file:
@@ -42,7 +42,7 @@ source-repository head
   type:
     git
   location:
-    https://github.com/chessai/hedgehog-classes.git
+    https://github.com/hedgehogqa/haskell-hedgehog-classes.git
 
 flag aeson
   description:
