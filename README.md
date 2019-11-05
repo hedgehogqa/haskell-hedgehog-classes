@@ -72,23 +72,11 @@ Below is an example of an error message one might get from a failed test from `h
 
 ![alt text](imgs/badsemigroup.png "Here we can see a semigroup instance which is not associative")
 
-## Differences from similar libraries
-There are a number of libraries that have similar goals to `hedgehog-classes`, and I will discuss only those that wrap `hedgehog`, not `QuickCheck`.
+## Similar libraries
+There are a number of libraries that have similar goals to `hedgehog-classes`:
 
   - [hedgehog-checkers](https://github.com/bitemyapp/hedgehog-checkers):
-      - Incomplete
-      - Not actively developed
-      - Less typeclasses
-      - Hasn't been uploaded to hackage, even with a sufficient starting-point API
-      - API is slightly more complex
-      - Does not make an effort to provide custom error messages
-      - Currently the only thing `hedgehog-checkers` can do that this library cannot
-        is test properties of higher-kinded typeclass laws where the construction of
-        the type requires constraints on its type arguments (e.g. `Ord` for something
-        like `Data.Set.Set`)
-
   - [hedgehog-laws](https://github.com/qfpl/hedgehog-laws):
-      - All of the things that apply to `hedgehog-checkers`, but even more incomplete.
 
 ## Supported Typeclasses
 
