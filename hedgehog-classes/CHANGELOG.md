@@ -61,4 +61,4 @@ The changelog is available [on GitHub][2].
 * Initially created.
 
 [1]: https://pvp.haskell.org
-[2]: https://github.com/chessai/hedgehog-classes/releases
+[2]: https://github.com/hedgehogqa/haskell-hedgehog-classes/releases
