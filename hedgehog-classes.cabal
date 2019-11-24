@@ -84,6 +84,14 @@ flag primitive
   default: True
   manual: True
 
+flag profunctors
+  description:
+    You can disable the use of the `profunctors` package using `-f-profunctors`.
+    .
+    This may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
 library
   hs-source-dirs:
     src
@@ -128,6 +136,7 @@ library
     Hedgehog.Classes.Monoid
     Hedgehog.Classes.Ord
     Hedgehog.Classes.Prim
+    Hedgehog.Classes.Profunctor
     Hedgehog.Classes.Semigroup
     Hedgehog.Classes.Semiring
     Hedgehog.Classes.Show
@@ -153,6 +162,9 @@ library
 --  if flag(semigroupoids)
 --    build-depends: semigroupoids >= 0.5.3.0 && < 0.6.0.0
 --    cpp-options: -DHAVE_SEMIGROUPOIDS
+  if flag(profunctors)
+    build-depends: profunctors >= 5.2 && < 5.6
+    cpp-options: -DHAVE_PROFUNCTORS
   if flag(semirings)
     build-depends: semirings >= 0.2 && < 0.6
     cpp-options: -DHAVE_SEMIRINGS
@@ -197,6 +209,7 @@ test-suite spec
     Spec.Monoid
     Spec.Ord
     Spec.Prim
+    Spec.Profunctor
     Spec.Semigroup
     Spec.Semiring
     Spec.Show
@@ -205,11 +218,13 @@ test-suite spec
   build-depends:
     , aeson
     , base
+    , bifunctors
     , binary
     , comonad
     , containers
     , hedgehog
     , hedgehog-classes
+    , profunctors
   ghc-options:
     -Wall
   default-language:

@@ -25,6 +25,7 @@ import Spec.Monad
 import Spec.Monoid
 import Spec.Ord
 import Spec.Prim
+import Spec.Profunctor
 import Spec.Semigroup
 import Spec.Semiring
 import Spec.Show
@@ -81,6 +82,7 @@ allBinaryLaws = testArrow
   ++ testBitraversable
   ++ testCategory
   ++ testCommutativeCategory
+  ++ testProfunctor
 
 allLaws :: [(String, [Laws])]
 allLaws = allNullaryLaws ++ allUnaryLaws ++ allBinaryLaws
