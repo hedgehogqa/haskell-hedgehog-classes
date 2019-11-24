@@ -49,7 +49,7 @@ module Hedgehog.Classes
     -- ** Unary type constructors
   , alternativeLaws
   , applicativeLaws
-#ifdef HAVE_COMONAD
+#if HAVE_COMONAD
   , comonadLaws
 #endif
   , contravariantLaws
@@ -70,6 +70,9 @@ module Hedgehog.Classes
   , bitraversableLaws
   , categoryLaws
   , commutativeCategoryLaws
+#if HAVE_PROFUNCTORS
+  , profunctorLaws
+#endif
 
     -- * Defining your own 'Laws'
   , Laws(..)
@@ -114,6 +117,9 @@ import Hedgehog.Classes.MonadIO (monadIOLaws)
 import Hedgehog.Classes.MonadPlus (monadPlusLaws)
 import Hedgehog.Classes.MonadZip (monadZipLaws)
 import Hedgehog.Classes.Monoid (monoidLaws, commutativeMonoidLaws)
+#if HAVE_PROFUNCTORS
+import Hedgehog.Classes.Profunctor (profunctorLaws)
+#endif
 import Hedgehog.Classes.Ord (ordLaws)
 #if HAVE_PRIMITIVE
 import Hedgehog.Classes.Prim (primLaws)

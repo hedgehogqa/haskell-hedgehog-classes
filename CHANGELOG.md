@@ -3,6 +3,10 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+???
+===
+* Add `profunctorLaws`.
+
 0.2.4
 =====
 * Semirings upper bound increased to 0.6. [0.2, 0.5) -> [0.2, 0.6)
