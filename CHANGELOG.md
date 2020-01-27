@@ -3,6 +3,13 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.4.1
+=======
+* Fix error introduced by change of hedgehog's
+  internal API between hedgehog-1.0.1 and
+  hedgehog-1.0.2.
+* Re-add GHC 8.8.1 to cabal's tested-with field.
+
 0.2.4
 =====
 * Semirings upper bound increased to 0.6. [0.2, 0.5) -> [0.2, 0.6)
