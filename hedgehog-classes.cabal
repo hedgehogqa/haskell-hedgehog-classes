@@ -2,7 +2,7 @@ cabal-version: 2.2
 name:
   hedgehog-classes
 version:
-  0.2.4
+  0.2.4.1
 synopsis:
   Hedgehog will eat your typeclass bugs
 description:
