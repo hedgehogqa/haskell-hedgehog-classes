@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -29,6 +30,7 @@ import Data.Char (isSpace)
 import Data.Monoid (All(..), Ap(..))
 import Hedgehog (Gen)
 import Hedgehog.Classes.Common.Property (Context(..))
+import Hedgehog.Internal.Config (UseColor(..))
 import Hedgehog.Internal.Property (Property(..))
 import Hedgehog.Internal.Region (Region)
 import Hedgehog.Internal.Report (Report, Result(..), Progress(..), renderProgress, reportStatus)
@@ -275,7 +277,12 @@ checkRegion :: MonadIO m
 checkRegion region prop = liftIO $ do
   seed <- liftIO Seed.random
   result <- checkReport (propertyConfig prop) 0 seed (propertyTest prop) $ \progress -> do
-    ppprogress <- renderProgress Nothing Nothing progress
+#if MIN_VERSION_hedgehog(1,0,2)
+    let u = EnableColor
+#else
+    let u = Just EnableColor
+#endif
+    ppprogress <- renderProgress u Nothing progress
     case reportStatus progress of
       Running -> Region.setRegion region ppprogress
       Shrinking _ -> Region.openRegion region ppprogress

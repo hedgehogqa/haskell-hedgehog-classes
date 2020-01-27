@@ -19,11 +19,18 @@ import Control.Monad.IO.Class (MonadIO(..))
 import Hedgehog.Internal.Report hiding (ppResult, renderResult)
 import Text.PrettyPrint.Annotated.WL (Doc)
 import qualified Hedgehog.Internal.Report as R
+import Hedgehog.Internal.Config (UseColor(..))
 
 renderResult :: MonadIO m
   => Report Result
   -> m String
-renderResult x = renderDoc Nothing =<< ppResult x
+renderResult x = renderDoc u =<< ppResult x
+  where
+#if MIN_VERSION_hedgehog(1,0,2)
+    u = EnableColor
+#else
+    u = Just EnableColor
+#endif
 
 ppResult :: MonadIO m
   => Report Result
