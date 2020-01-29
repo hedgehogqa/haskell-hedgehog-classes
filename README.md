@@ -132,7 +132,7 @@ To use this library for testing, just add it to a test stanza of your cabal file
 To use this library to export your own `Laws` functions which you wish to distribute, add it to the library stanza of your cabal file.
 
   [hackage]: http://hackage.haskell.org/package/hedgehog-classes
-  [hackage-shield]: https://img.shields.io/badge/hackage-v0.1.1.0-blue.svg
+  [hackage-shield]: https://img.shields.io/badge/hackage-v0.2.4.1-blue.svg
 
 ## Improvements
 
