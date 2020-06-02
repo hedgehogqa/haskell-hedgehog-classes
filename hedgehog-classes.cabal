@@ -84,6 +84,14 @@ flag primitive
   default: True
   manual: True
 
+flag vector
+  description:
+    You can disable the use of the `vector` package using `-f-vector`.
+    .
+    This may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
 library
   hs-source-dirs:
     src
@@ -126,6 +134,7 @@ library
     Hedgehog.Classes.MonadPlus
     Hedgehog.Classes.MonadZip
     Hedgehog.Classes.Monoid
+    Hedgehog.Classes.MVector
     Hedgehog.Classes.Ord
     Hedgehog.Classes.Prim
     Hedgehog.Classes.Semigroup
@@ -159,9 +168,9 @@ library
   if flag(comonad)
     build-depends: comonad >= 5.0 && < 5.1
     cpp-options: -DHAVE_COMONAD
---  if flag(vector)
---    build-depends: vector >= 0.12.0.0 && < 0.13.0.0
---    cpp-options: -DHAVE_VECTOR
+  if flag(vector)
+    build-depends: vector >= 0.12.0.0 && < 0.13.0.0
+    cpp-options: -DHAVE_VECTOR
   if flag(primitive)
     build-depends: primitive >= 0.6.4 && < 0.8
     cpp-options: -DHAVE_PRIMITIVE
@@ -195,6 +204,7 @@ test-suite spec
     Spec.Json
     Spec.Monad
     Spec.Monoid
+    Spec.MVector
     Spec.Ord
     Spec.Prim
     Spec.Semigroup
@@ -214,3 +224,6 @@ test-suite spec
     -Wall
   default-language:
     Haskell2010
+  if flag(vector)
+    build-depends: vector
+    cpp-options: -DHAVE_VECTOR
