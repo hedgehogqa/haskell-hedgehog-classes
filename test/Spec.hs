@@ -23,6 +23,7 @@ import Spec.Integral
 import Spec.Json
 import Spec.Monad
 import Spec.Monoid
+import Spec.MVector
 import Spec.Ord
 import Spec.Prim
 import Spec.Semigroup
@@ -59,6 +60,7 @@ allNullaryLaws = testBits
   ++ testShow
   ++ testShowRead
   ++ testStorable
+  ++ testMUVector
 
 allUnaryLaws :: [(String, [Laws])]
 allUnaryLaws = testAlternative

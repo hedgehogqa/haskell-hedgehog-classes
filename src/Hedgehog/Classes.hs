@@ -45,7 +45,9 @@ module Hedgehog.Classes
   , showLaws
   , showReadLaws
   , storableLaws
-
+#if HAVE_VECTOR
+  , muvectorLaws
+#endif
     -- ** Unary type constructors
   , alternativeLaws
   , applicativeLaws
@@ -114,6 +116,9 @@ import Hedgehog.Classes.MonadIO (monadIOLaws)
 import Hedgehog.Classes.MonadPlus (monadPlusLaws)
 import Hedgehog.Classes.MonadZip (monadZipLaws)
 import Hedgehog.Classes.Monoid (monoidLaws, commutativeMonoidLaws)
+#if HAVE_VECTOR
+import Hedgehog.Classes.MVector (muvectorLaws)
+#endif
 import Hedgehog.Classes.Ord (ordLaws)
 #if HAVE_PRIMITIVE
 import Hedgehog.Classes.Prim (primLaws)
@@ -126,4 +131,3 @@ import Hedgehog.Classes.Show (showLaws)
 import Hedgehog.Classes.ShowRead (showReadLaws)
 import Hedgehog.Classes.Storable (storableLaws)
 import Hedgehog.Classes.Traversable (traversableLaws)
-
