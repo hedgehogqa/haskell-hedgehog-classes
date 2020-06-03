@@ -3,6 +3,11 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.5
+=====
+* Add MUVector laws
+* Update upper bounds on dependencies
+
 0.2.4.1
 =======
 * Fix error introduced by change of hedgehog's
