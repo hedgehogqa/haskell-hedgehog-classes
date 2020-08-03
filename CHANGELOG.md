@@ -3,6 +3,10 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.5.1
+=======
+* Bump upper bound on pretty-show from <1.10 to <1.11
+
 0.2.5
 =====
 * Add MUVector laws
