@@ -12,7 +12,7 @@ import qualified Hedgehog.Range as Range
 
 import Foreign.Marshal.Alloc
 import Foreign.Marshal.Array
-import GHC.Ptr (Ptr(..), plusPtr)
+import GHC.Ptr (Ptr(..), nullPtr, plusPtr, minusPtr, alignPtr)
 import Foreign.Storable (Storable(..))
 import System.IO.Unsafe (unsafePerformIO)
 
@@ -77,7 +77,8 @@ storablePeekByte :: forall a. (Eq a, Show a, Storable a) => Gen a -> Property
 storablePeekByte gen = property $ do
   as <- forAll $ genSmallNonEmptyList gen
   let len = List.length as
-  off <- forAll $ Gen.int (Range.linear 0 (len - 1))
+  ix <- forAll $ Gen.int (Range.linear 0 (len - 1))
+  let off = ix * (nullPtr `plusPtr` sizeOf (head as)) `alignPtr` alignment (head as) `minusPtr` nullPtr
   unsafePerformIO $ do
     addr <- genArray gen len
     x :: a <- peekByteOff addr off
