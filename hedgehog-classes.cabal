@@ -148,7 +148,7 @@ library
     Hedgehog.Classes.Storable
     Hedgehog.Classes.Traversable
   build-depends:
-    , base >= 4.12 && < 4.16
+    , base >= 4.12 && < 4.17
     , binary >= 0.8 && < 0.9
     , containers >= 0.5 && < 0.7
     , hedgehog >= 1 && < 1.1
@@ -167,7 +167,7 @@ library
 --    build-depends: semigroupoids >= 0.5.3.0 && < 0.6.0.0
 --    cpp-options: -DHAVE_SEMIGROUPOIDS
   if flag(semirings)
-    build-depends: semirings >= 0.2 && < 0.7
+    build-depends: semirings >= 0.2 && < 0.8
     cpp-options: -DHAVE_SEMIRINGS
   if flag(comonad)
     build-depends: comonad >= 5.0 && < 5.1
