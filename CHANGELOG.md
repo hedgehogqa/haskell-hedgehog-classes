@@ -3,6 +3,17 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+0.2.5.3
+=======
+* Correct bug in which `storablePeekByte` uses the wrong offset values
+* Update base upper bound. [4.12, 4.15) -> [4.12, 4.17)
+* Update semirings upper bound. [0.2, 0.7) -> [0.2, 0.8)
+* Update aeson upper bound. [0.9, 1.6) -> [0.9, 2.1)
+
+0.2.5.2
+=======
+* Update semirings upper bound. [0.2, 0.6) -> [0.2, 0.7)
+
 0.2.5.1
 =======
 * Bump upper bound on pretty-show from <1.10 to <1.11
