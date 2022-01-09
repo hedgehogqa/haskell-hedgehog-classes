@@ -3,6 +3,11 @@
 `hedgehog-classes` uses [PVP Versioning][1].
 The changelog is available [on GitHub][2].
 
+Unreleased
+=======
+* Make `Hedgehog.Classes.Aeson` module empty when the `aeson` flag is disabled.
+* Make `Hedgehog.Classes.Prim` module empty when the `primitive` flag is disabled.
+
 0.2.5.3
 =======
 * Correct bug in which `storablePeekByte` uses the wrong offset values
