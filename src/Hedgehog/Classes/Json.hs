@@ -1,4 +1,11 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+
+#ifndef HAVE_AESON
+
+module Hedgehog.Classes.Json () where
+
+#else
 
 module Hedgehog.Classes.Json (jsonLaws) where
 
@@ -35,7 +42,7 @@ jsonEncodingPartialIsomorphism gen = property $ do
               , "encode x = " ++ showEncoded
               ]
         , lawContextReduced = reduced lhs rhs
-        }  
+        }
   heqCtx lhs rhs ctx
 
 jsonEncodingEqualsValue :: forall a. (ToJSON a, Show a) => Gen a -> Property
@@ -58,7 +65,8 @@ jsonEncodingEqualsValue gen = property $ do
               , "encoded = " ++ showEncoded
               , "decoded = " ++ showDecoded
               ]
-        , lawContextReduced = reduced lhs rhs 
+        , lawContextReduced = reduced lhs rhs
         }
-  heqCtx lhs rhs ctx 
+  heqCtx lhs rhs ctx
 
+#endif

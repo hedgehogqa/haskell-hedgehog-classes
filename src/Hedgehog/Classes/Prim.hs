@@ -1,9 +1,16 @@
+{-# language CPP #-}
 {-# language LambdaCase #-}
 {-# language UnboxedTuples #-}
 {-# language TypeApplications #-}
 {-# language MagicHash #-}
 {-# language BangPatterns #-}
 {-# language ScopedTypeVariables #-}
+
+#ifndef HAVE_PRIMITIVE
+
+module Hedgehog.Classes.Prim () where
+
+#else
 
 module Hedgehog.Classes.Prim (primLaws) where
 
@@ -257,3 +264,4 @@ primListRoundtripAddr gen = property $ do
     ptrToList 0
   xs === xs'
 
+#endif
