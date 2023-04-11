@@ -10,7 +10,8 @@ module Spec.Monad
   , testMonadZip
   ) where
 
-import Control.Applicative (Alternative(..), liftA2)
+import qualified Control.Applicative as App (liftA2)
+import Control.Applicative (Alternative(..))
 import Control.Monad.IO.Class (MonadIO(..))
 
 import Data.Functor.Identity (Identity(..))
@@ -106,7 +107,7 @@ newtype TestIO a = TestIO (IO a)
 
 -- | Unsafe!
 instance Eq a => Eq (TestIO a) where
-  TestIO a == TestIO b = unsafePerformIO $ liftA2 (==) a b
+  TestIO a == TestIO b = unsafePerformIO $ App.liftA2 (==) a b
   {-# noinline (==) #-}
 -- | Unsafe!
 instance Show a => Show (TestIO a) where

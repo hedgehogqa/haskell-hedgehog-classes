@@ -4,7 +4,7 @@
 
 module Hedgehog.Classes.Applicative (applicativeLaws) where
 
-import Control.Applicative (Applicative(..))
+import qualified Control.Applicative as App (liftA2)
 
 import Hedgehog
 import Hedgehog.Classes.Common
@@ -15,8 +15,8 @@ import Hedgehog.Classes.Common
 -- [__Composition__]: @'pure' ('.') '<*>' u '<*>' v '<*>' w@ ≡ @u '<*>' (v '<*>' w)@
 -- [__Homomorphism__]: @'pure' f '<*>' 'pure'@ x ≡ @'pure' (f x)@
 -- [__Interchange__]: @u '<*>' 'pure' y@ ≡ @'pure' ('$' y) '<*>' u@
--- [__LiftA2 1__]: @'liftA2' 'id' f x@ ≡ @f '<*>' x@
--- [__LiftA2 2__]: @'liftA2' f x y@ ≡ @f '<$>' x '<*>' y@
+-- [__LiftA2 1__]: @'App.liftA2' 'id' f x@ ≡ @f '<*>' x@
+-- [__LiftA2 2__]: @'App.liftA2' f x y@ ≡ @f '<$>' x '<*>' y@
 applicativeLaws ::
   ( Applicative f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
@@ -27,7 +27,7 @@ applicativeLaws gen = Laws "Applicative"
   , ("Homomorphism", applicativeHomomorphism gen)
   , ("Interchange", applicativeInterchange gen)
   , ("LiftA2 Part 1", applicativeLiftA2_1 gen)
-  , ("LiftA2 Part 2", applicativeLiftA2_2 gen) 
+  , ("LiftA2 Part 2", applicativeLiftA2_2 gen)
   ]
 
 type ApplicativeProp f =
@@ -122,7 +122,7 @@ applicativeLiftA2_1 fgen = property $ do
   f' <- forAll $ fgen genQuadraticEquation
   x <- forAll $ fgen genSmallInteger
   let f = fmap runQuadraticEquation f'
-  let lhs = liftA2 id f x
+  let lhs = App.liftA2 id f x
   let rhs = f <*> x
   let ctx = contextualise $ LawContext
         { lawContextLawName = "LiftA2 1", lawContextLawBody = "liftA2 id f x" `congruency` "f <*> x"
@@ -143,7 +143,7 @@ applicativeLiftA2_2 fgen = property $ do
   y <- forAll $ fgen genSmallInteger
   f' <- forAll $ genLinearEquationTwo
   let f = runLinearEquationTwo f'
-  let lhs = liftA2 f x y
+  let lhs = App.liftA2 f x y
   let rhs = f <$> x <*> y
   let ctx = contextualise $ LawContext
         { lawContextLawName = "LiftA2 2", lawContextLawBody = "liftA2 f x y == f <$> x <*> y"
