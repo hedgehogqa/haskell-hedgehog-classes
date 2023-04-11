@@ -10,7 +10,7 @@ module Spec.Comonad
   ) where
 
 import Data.List.NonEmpty
-import Control.Applicative (liftA2)
+import qualified Control.Applicative as App (liftA2)
 import Control.Comonad
 import Control.Comonad.Store hiding (store)
 import Data.Functor.Identity (Identity(..))
@@ -43,7 +43,7 @@ identity :: MonadGen m => m a -> m (Identity a)
 identity = fmap Identity
 
 nonempty :: MonadGen m => m a -> m (NonEmpty a)
-nonempty gen = liftA2 (:|) gen (list gen)
+nonempty gen = App.liftA2 (:|) gen (list gen)
 
 tup :: MonadGen m => m a -> m (Integer, a)
 tup gen = (,)
