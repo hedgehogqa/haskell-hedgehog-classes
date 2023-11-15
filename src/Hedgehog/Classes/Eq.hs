@@ -13,9 +13,9 @@ import Hedgehog.Classes.Common
 -- [__Negation__]: @x '/=' y@ ≡ @'not' (x '==' y)@
 eqLaws :: (Eq a, Show a) => Gen a -> Laws
 eqLaws gen = Laws "Eq"
-  [ ("Transitive", eqTransitive gen)
-  , ("Symmetric", eqSymmetric gen)  
-  , ("Reflexive", eqReflexive gen) 
+  [ ("Transitivity", eqTransitive gen)
+  , ("Symmetry", eqSymmetric gen)  
+  , ("Reflexivity", eqReflexive gen) 
   , ("Negation", eqNegation gen) 
   ]
 
