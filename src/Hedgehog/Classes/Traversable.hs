@@ -26,7 +26,7 @@ traversableLaws ::
   ( Traversable f
   , forall x. Eq x => Eq (f x), forall x. Show x => Show (f x)
   ) => (forall x. Gen x -> Gen (f x)) -> Laws
-traversableLaws gen = Laws "Foldable"
+traversableLaws gen = Laws "Traversable"
   [ ("Naturality", traversableNaturality gen)
   , ("Identity", traversableIdentity gen)
   , ("Composition", traversableComposition gen)
