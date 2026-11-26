@@ -8,6 +8,7 @@ Unreleased
 * Make `Hedgehog.Classes.Aeson` module empty when the `aeson` flag is disabled.
 * Make `Hedgehog.Classes.Prim` module empty when the `primitive` flag is disabled.
 * Support GHC 9.12 and hedgehog 1.6 and 1.7
+* `binaryLaws` fails when decoding leaves input unread, and reports a failed decode as a law failure rather than an exception.
 
 0.2.5.3
 =======
